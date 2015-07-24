@@ -345,13 +345,13 @@ public class AlbumTest extends TestCase {
         Gson gson = new Gson();
         Album album = gson.fromJson(DATA_EXAMPLE, Album.class);
         assertNotNull(album);
-        assertEquals(album.getId(), 302127);
+            assertEquals(album.getId(), Long.valueOf(302127));
         assertEquals(album.getTitle(), "Discovery");
         assertEquals(album.getDuration(), 3663);
         assertEquals(album.getTracksCount(), 14);
         assertNotNull(album.getContributors());
         assertEquals(album.getContributors().size(), 1);
-        assertEquals(album.getContributors().get(0).getId(), 27);
+            assertEquals(album.getContributors().get(0).getId(), Long.valueOf(27));
         assertEquals(album.getTracklist(), "https://api.deezer.com/album/302127/tracks");
         assertEquals(album.getGenreID(), 113);
         assertEquals(album.getType(), "album");

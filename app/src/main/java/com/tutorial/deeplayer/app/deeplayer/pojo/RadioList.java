@@ -15,4 +15,13 @@ public class RadioList extends BaseTypedItem {
     public void setData(List<Radio> data) {
         this.data = data;
     }
+
+    public List<Radio> getUserData() {
+        if (data != null) {
+            for (Radio radio : data) {
+                radio.setFavourite(true);
+            }
+        }
+        return data;
+    }
 }

@@ -1,7 +1,6 @@
 package com.tutorial.deeplayer.app.deeplayer.pojo;
 
 import com.google.gson.Gson;
-import com.tutorial.deeplayer.app.deeplayer.pojo.Track;
 
 import junit.framework.TestCase;
 
@@ -321,10 +320,10 @@ public class TrackTest extends TestCase {
         Gson gson = new Gson();
         Track track = gson.fromJson(DATA_EXAMPLE, Track.class);
         assertNotNull(track);
-        assertEquals(track.getId(), 3135556);
+            assertEquals(track.getId(), Long.valueOf(3135556));
         assertEquals(track.getTitle(), "Harder Better Faster Stronger");
         assertNotNull(track.getAlbum());
-        assertEquals(track.getAlbum().getId(), 302127);
+            assertEquals(track.getAlbum().getId(), Long.valueOf(302127));
         assertEquals(track.getAlbum().getTitle(), "Discovery");
         assertNotNull(track.getContributors());
         assertEquals(track.getContributors().size(), 1);

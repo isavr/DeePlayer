@@ -21,5 +21,8 @@ public interface RadioAPI {
     Observable<RadioList> getRadiosByTop();
 
     @GET("/radio/{id}/tracks")
-    Observable<TrackList> getRadioTracks(@Path("id") int radioId);
+    Observable<TrackList> getRadioTracks(@Path("id") long radioId);
+
+    @GET("/user/me/radios")
+    Observable<RadioList> getUserRadios();
 }

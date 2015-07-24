@@ -1,21 +1,24 @@
 package com.tutorial.deeplayer.app.deeplayer.pojo;
 
+import com.google.gson.annotations.SerializedName;
 import com.tutorial.deeplayer.app.deeplayer.errors.DeezerError;
 
 /**
  * Created by ilya.savritsky on 17.07.2015.
  */
 public class BaseTypedItem {
-    private DeezerError error;
-    protected int id;
+    //@Ignore
+    //private DeezerError error;
+    @SerializedName("id")
+    protected Long _id;
     protected String type;
 
-    public int getId() {
-        return id;
+    public Long getId() {
+        return _id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setId(Long id) {
+        this._id = id;
     }
 
     public String getType() {
@@ -27,10 +30,10 @@ public class BaseTypedItem {
     }
 
     public DeezerError getError() {
-        return error;
+        return null;
     }
 
     public void setError(DeezerError error) {
-        this.error = error;
+        //this.error = error;
     }
 }

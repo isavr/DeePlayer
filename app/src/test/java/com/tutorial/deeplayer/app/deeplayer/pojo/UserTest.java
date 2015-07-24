@@ -1,7 +1,6 @@
 package com.tutorial.deeplayer.app.deeplayer.pojo;
 
 import com.google.gson.Gson;
-import com.tutorial.deeplayer.app.deeplayer.pojo.User;
 
 import junit.framework.TestCase;
 
@@ -39,7 +38,7 @@ public class UserTest extends TestCase {
         Gson gson = new Gson();
         User user = gson.fromJson(DATA_EXAMPLE, User.class);
         assertNotNull(user);
-        assertEquals(user.getId(), 701236078);
+        assertEquals(user.getId(), Long.valueOf(701236078));
         assertEquals(user.getName(), "Test user");
         assertEquals(user.getTracklist(), "https://api.deezer.com/user/700316071/flow");
         assertEquals(user.getBirthday(), "1991-01-01");

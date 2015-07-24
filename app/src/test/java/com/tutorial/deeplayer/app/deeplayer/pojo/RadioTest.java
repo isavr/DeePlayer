@@ -1,7 +1,6 @@
 package com.tutorial.deeplayer.app.deeplayer.pojo;
 
 import com.google.gson.Gson;
-import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 
 import junit.framework.TestCase;
 
@@ -29,7 +28,7 @@ public class RadioTest extends TestCase {
         Gson gson = new Gson();
         Radio artist = gson.fromJson(DATA_EXAMPLE, Radio.class);
         assertNotNull(artist);
-        assertEquals(artist.getId(), 37675);
+        assertEquals(artist.getId(), Long.valueOf(37675));
         assertEquals(artist.getTitle(), "Coffee lounge");
         assertEquals(artist.getTracklist(), "https://api.deezer.com/radio/37675/tracks");
         assertEquals(artist.getType(), "radio");

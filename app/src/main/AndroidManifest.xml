@@ -27,6 +27,22 @@
             android:name=".activities.MainActivity"
             android:label="@string/title_activity_main">
         </activity>
+
+        <provider
+            android:name=".data.DataProvider"
+            android:authorities="com.tutorial.deeplayer.app"
+            android:enabled="true"
+            android:exported="false">
+        </provider>
+
+        <activity
+            android:name=".activities.MixActivity"
+            android:label="@string/title_activity_mix"
+            android:parentActivityName=".activities.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tutorial.deeplayer.app.deeplayer.activities.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

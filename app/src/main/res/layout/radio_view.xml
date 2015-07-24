@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.tutorial.deeplayer.app.deeplayer.views.RadioView xmlns:android="http://schemas.android.com/apk/res/android"
+                                                      android:layout_width="wrap_content"
+                                                      android:layout_height="wrap_content"
+                                                      android:layout_marginEnd="@dimen/abc_list_item_padding_horizontal_material"
+                                                      android:layout_marginLeft="@dimen/abc_list_item_padding_horizontal_material"
+                                                      android:layout_marginRight="@dimen/abc_list_item_padding_horizontal_material"
+                                                      android:layout_marginStart="@dimen/abc_list_item_padding_horizontal_material"
+                                                      android:layout_marginTop="@dimen/abc_list_item_padding_horizontal_material"
+                                                      android:descendantFocusability="blocksDescendants"
+    >
+
+    <ImageButton
+        android:clickable="false"
+        android:id="@+id/icon_view"
+        android:layout_width="@dimen/radio_item_width"
+        android:layout_height="@dimen/radio_item_height"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"/>
+
+    <TextView
+        android:clickable="false"
+        android:id="@+id/title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:maxWidth="@dimen/radio_item_width"
+        android:text="Classic Rock"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:textColor="@android:color/white"/>
+
+    <CheckBox
+        android:id="@+id/favourite_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/abc_button_inset_horizontal_material"
+        android:layout_marginStart="@dimen/abc_button_inset_horizontal_material"
+        android:layout_marginTop="@dimen/abc_button_inset_horizontal_material"/>
+</com.tutorial.deeplayer.app.deeplayer.views.RadioView>

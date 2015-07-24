@@ -3,6 +3,8 @@ package com.tutorial.deeplayer.app.deeplayer.rest.service;
 import android.util.Log;
 
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
+import com.tutorial.deeplayer.app.deeplayer.pojo.RadioList;
+import com.tutorial.deeplayer.app.deeplayer.pojo.TrackList;
 import com.tutorial.deeplayer.app.deeplayer.pojo.User;
 import com.tutorial.deeplayer.app.deeplayer.rest.interfaces.RadioAPI;
 import com.tutorial.deeplayer.app.deeplayer.rest.interfaces.UserAPI;
@@ -64,8 +66,35 @@ public class RestService {
         });
     }
 
-    public Observable fetchRadioInfo() {
+    public Observable<RadioList> fetchRadioInfo() {
         return radioAPI.getRadios().flatMap(radioList -> {
+            if (radioList.getError() != null) {
+                return Observable.error(radioList.getError());
+            }
+            return Observable.just(radioList);
+        });
+    }
+
+    public Observable<RadioList> fetchUserRadioInfo() {
+        return radioAPI.getUserRadios().flatMap(radioList -> {
+            if (radioList.getError() != null) {
+                return Observable.error(radioList.getError());
+            }
+            return Observable.just(radioList);
+        });
+    }
+
+    public Observable<RadioList> fetchRadioTopInfo() {
+        return radioAPI.getRadiosByTop().flatMap(radioList -> {
+            if (radioList.getError() != null) {
+                return Observable.error(radioList.getError());
+            }
+            return Observable.just(radioList);
+        });
+    }
+
+    public Observable<TrackList> fetchRadioTracks(long radioId) {
+        return radioAPI.getRadioTracks(radioId).flatMap(radioList -> {
             if (radioList.getError() != null) {
                 return Observable.error(radioList.getError());
             }

@@ -1,7 +1,6 @@
 package com.tutorial.deeplayer.app.deeplayer.pojo;
 
 import com.google.gson.Gson;
-import com.tutorial.deeplayer.app.deeplayer.pojo.Genre;
 
 import junit.framework.TestCase;
 
@@ -28,7 +27,7 @@ public class GenreTest extends TestCase {
         Gson gson = new Gson();
         Genre genre = gson.fromJson(DATA_EXAMPLE, Genre.class);
         assertNotNull(genre);
-        assertEquals(genre.getId(), 0);
+        assertEquals(genre.getId(), Long.valueOf(0));
         assertEquals(genre.getName(), "All");
         assertEquals(genre.getType(), "genre");
     }

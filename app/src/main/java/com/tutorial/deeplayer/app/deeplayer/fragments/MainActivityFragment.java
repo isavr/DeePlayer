@@ -1,25 +1,30 @@
 package com.tutorial.deeplayer.app.deeplayer.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
+import com.tutorial.deeplayer.app.deeplayer.activities.MixActivity;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
-import com.tutorial.deeplayer.app.deeplayer.pojo.RadioList;
 import com.tutorial.deeplayer.app.deeplayer.pojo.User;
 import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService;
+import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnItemClick;
+import nl.nl2312.rxcupboard.RxDatabase;
 import rx.Observable;
 import rx.Observer;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.android.widget.OnItemClickEvent;
-import rx.android.widget.WidgetObservable;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
@@ -29,90 +34,140 @@ import rx.subscriptions.CompositeSubscription;
 public class MainActivityFragment extends BaseFragment {
     private static final String TAG = MainActivityFragment.class.getSimpleName();
 
-    private ListView listView;
+    @Bind(R.id.listView)
+    ListView listView;
     private CompositeSubscription compositeSubscription;
-
-    public MainActivityFragment() {
-    }
+    private RxDatabase rxCupboard = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        compositeSubscription = new CompositeSubscription();
+
         View root = inflater.inflate(R.layout.fragment_main, container, false);
-        listView = (ListView) root.findViewById(R.id.listView);
+        ButterKnife.bind(this, root);
+        //final SQLiteDatabase db = CupboardDbHelper.getConnection(getActivity());
+        //rxCupboard = RxCupboard.withDefault(db);
+
+
         String[] items = getResources().getStringArray(R.array.main_categories_list);
         ArrayAdapter<String> listAdapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, items);
         listView.setAdapter(listAdapter);
-        Observable observable = WidgetObservable.itemClicks(listView);
+
+
+        // check radio
+
+        return root;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        compositeSubscription = new CompositeSubscription();
+
+    }
+
+    @OnItemClick(R.id.listView)
+    public void listViewItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+        switch (position) {
+            case 4: {
+                Intent intent = new Intent(getActivity(), MixActivity.class);
+                startActivity(intent);
+                break;
+            }
+            case 5: {
+                // Check User info
+                //compositeSubscription.add(subscribeForUserUpdates());
+                compositeSubscription.add(subscribeForRadioUpdates());
+                break;
+            }
+            default: {
+
+            }
+        }
+    }
+
+
+    private Subscription subscribeForUserUpdates() {
         Observer userDataObserver = new Observer<User>() {
             @Override
             public void onCompleted() {
                 Log.d(TAG, "onCompleted");
+                DialogFactory.closeAlertDialog(getChildFragmentManager());
             }
 
             @Override
             public void onError(Throwable e) {
                 Log.d(TAG, "onError");
+                DialogFactory.showSimpleErrorMessage(getActivity(), getChildFragmentManager(), e.getMessage());
                 e.printStackTrace();
             }
 
             @Override
             public void onNext(User user) {
                 Log.d(TAG, "onNext");
-                //
+                //rxCupboard.put(user);
             }
         };
+        Observable<User> userObservable = new RestService().fetchUserInfoService().subscribeOn(Schedulers.io());
 
-        compositeSubscription.add(Observable.just(userDataObserver).subscribe());
-        // Check User info
-        Observable<User> userObservable = new RestService().fetchUserInfoService().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-        compositeSubscription.add(userObservable.subscribe(userDataObserver));
-        /*compositeSubscription.add(
-                observable.
-                        map(itemClickEvent -> ((OnItemClickEvent) itemClickEvent).position()).
-                        flatMap((Func1<Integer, Observable>) position -> {
-                            Log.d(TAG, "-> " + position);
-                            switch (position) {
-                                case 5: {
-                                    // test element
-                                    RestService service = new RestService();
-                                    return service.fetchUserInfoService().subscribeOn(Schedulers.io());
-                                }
-                                default: {
-                                    return null;
-                                }
-                            }
-                        }).observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(userDataObserver)
-        );*/
-        Observer<RadioList> radioObserver = new Observer<RadioList>() {
+        return userObservable.subscribe(userDataObserver);
+    }
+
+//   private Observable createObservable() {
+//        Observable<User> userObservable = new RestService().fetchUserInfoService().subscribeOn(Schedulers.io());
+//        Observable<Radio> radioObservable = new RestService().fetchRadioInfo().subscribeOn(Schedulers.io())
+//                .flatMap(item -> Observable.from(item.getData()));
+//        return Observable.zip(userObservable, radioObservable, (item1, item2) -> {return item1 + item2});
+//    }
+
+    private Subscription subscribeForRadioUpdates() {
+        DialogFactory.showProgressDialog(getActivity(), getChildFragmentManager());
+        Observer<Radio> radioObserver = new Observer<Radio>() {
             @Override
             public void onCompleted() {
                 Log.d(TAG, "onCompleted Radio");
+                DialogFactory.closeAlertDialog(getChildFragmentManager());
             }
 
             @Override
             public void onError(Throwable e) {
+                DialogFactory.showSimpleErrorMessage(getActivity(), getChildFragmentManager(), e.getMessage());
                 e.printStackTrace();
             }
 
             @Override
-            public void onNext(RadioList radioData) {
+            public void onNext(Radio radioData) {
                 Log.d(TAG, "onNext Radio");
-                Log.d(TAG, "radio count -> " + radioData.getData().size());
+                //rxCupboard.put(radioData);
             }
         };
-        Observable radioObservable = new RestService().fetchRadioInfo().subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-        compositeSubscription.add(radioObservable.subscribe(radioObserver));
-        return root;
+        //rxCupboard.delete(Radio.class);
+        RestService service = new RestService();
+        Observable<Radio> radioObservable = service.fetchRadioInfo().subscribeOn(Schedulers.io())
+                .flatMap(item -> Observable.from(item.getData())).observeOn(AndroidSchedulers.mainThread());
+//        Observable<Radio> userRadios = service.fetchUserRadioInfo().subscribeOn(Schedulers.io())
+//                .flatMap(item -> Observable.from(item.getData())).observeOn(AndroidSchedulers.mainThread());
+//
+//        return Observable.zip(radioObservable, userRadios, (radio, radio2) -> {
+//            radio.setFavourite(false);
+//            if (radio.getId() == radio2.getId()) {
+//                radio.setFavourite(true);
+//            }
+//            return radio;
+//        }).subscribe(radioObserver);
+        return radioObservable.subscribe(radioObserver);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        compositeSubscription.clear();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        compositeSubscription.unsubscribe();
+        ButterKnife.unbind(this);
     }
+
 }

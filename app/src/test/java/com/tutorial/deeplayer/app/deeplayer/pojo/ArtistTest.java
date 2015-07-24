@@ -6,8 +6,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
-
 /**
  * Created by ilya.savritsky on 17.07.2015.
  */
@@ -33,7 +31,7 @@ public class ArtistTest extends TestCase {
         Gson gson = new Gson();
         Artist artist = gson.fromJson(DATA_EXAMPLE, Artist.class);
         assertNotNull(artist);
-        assertEquals(artist.getId(), 27);
+        assertEquals(artist.getId(), Long.valueOf(27));
         assertEquals(artist.getName(), "Daft Punk");
         assertEquals(artist.getTracklist(), "https://api.deezer.com/artist/27/top?limit=50");
     }

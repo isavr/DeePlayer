@@ -8,6 +8,8 @@ public class Radio extends BaseItemWithPicture {
     private String description;
     private String share;
     private String tracklist;
+    private boolean favourite;
+    private long time_add;
 
     public String getTitle() {
         return title;
@@ -39,5 +41,21 @@ public class Radio extends BaseItemWithPicture {
 
     public void setTracklist(String tracklist) {
         this.tracklist = tracklist;
+    }
+
+    public boolean isFavourite() {
+        return favourite;
+    }
+
+    public void setFavourite(boolean favourite) {
+        this.favourite = favourite;
+    }
+
+    public long getTime_add() {
+        return time_add;
+    }
+
+    public void setTime_add(long time_add) {
+        this.time_add = time_add;
     }
 }
