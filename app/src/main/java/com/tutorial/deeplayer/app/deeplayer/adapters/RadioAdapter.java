@@ -1,13 +1,14 @@
 package com.tutorial.deeplayer.app.deeplayer.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
-import com.tutorial.deeplayer.app.deeplayer.views.RadioView;
+import com.tutorial.deeplayer.app.deeplayer.views.RadioItemView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,19 +20,17 @@ public class RadioAdapter extends BaseAdapter {
 
     private LayoutInflater layoutInflator;
     private List<Radio> items;
+    private RadioItemView.OnRadioItemFavouriteStatusInteractionListener listener;
 
-    public RadioAdapter(Context context) {
+    public RadioAdapter(Context context, RadioItemView.OnRadioItemFavouriteStatusInteractionListener listener) {
         this.layoutInflator = LayoutInflater.from(context);
         this.items = new ArrayList<>();
+        this.listener = listener;
     }
 
     public void add(Radio item) {
         this.items.add(item);
         notifyDataSetChanged();
-    }
-
-    public void update(Radio item) {
-        int ind = this.items.indexOf(item);
     }
 
     public void add(List<Radio> items) {
@@ -53,6 +52,20 @@ public class RadioAdapter extends BaseAdapter {
         //items.clear();
         layoutInflator = null;
         items = null;
+        listener = null;
+    }
+
+    public void updateItem(@NonNull Radio radio) {
+        int index = 0;
+        for (int i = 0; i < items.size(); ++i) {
+            Radio currRadio = items.get(i);
+            if (radio.getId().equals(currRadio.getId())) {
+                index = i;
+                break;
+            }
+        }
+        items.set(index, radio);
+        notifyDataSetChanged();
     }
 
     @Override
@@ -72,13 +85,18 @@ public class RadioAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null || !(convertView instanceof RadioView)) {
-            convertView = RadioView.inflate(layoutInflator, parent);
+        if (convertView == null || !(convertView instanceof RadioItemView)) {
+            convertView = RadioItemView.inflate(layoutInflator, parent);
         }
         Radio radio = getItem(position);
-        if (convertView instanceof RadioView) {
-            ((RadioView) convertView).bindToData(radio);
+        if (convertView instanceof RadioItemView) {
+            RadioItemView radioView = (RadioItemView) convertView;
+
+            radioView.setListener(listener);
+            radioView.bindToData(radio);
+            return radioView;
         }
+
         return convertView;
     }
 }

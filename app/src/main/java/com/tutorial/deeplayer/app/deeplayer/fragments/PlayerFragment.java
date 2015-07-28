@@ -15,6 +15,7 @@ import com.deezer.sdk.player.event.*;
 import com.deezer.sdk.player.exception.NotAllowedToPlayThatSongException;
 import com.deezer.sdk.player.exception.StreamLimitationException;
 import com.tutorial.deeplayer.app.deeplayer.R;
+import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -86,6 +87,7 @@ public class PlayerFragment extends BaseFragment {
         doDestroyPlayer();
         ButterKnife.unbind(this);
         super.onDestroy();
+        DeePlayerApp.get().getRefWatcher().watch(this, "Player Fragment");
     }
 
     /**
@@ -221,6 +223,7 @@ public class PlayerFragment extends BaseFragment {
 
             case STOPPED:
                 mSeekBar.setEnabled(false);
+                container.setVisibility(View.GONE);
                 showPlayerProgress(0);
                 showBufferProgress(0);
                 mButtonPlayerPause.setImageResource(R.drawable.ic_action_play);
@@ -316,6 +319,7 @@ public class PlayerFragment extends BaseFragment {
                 }
             } else if (v == mButtonPlayerStop) {
                 mPlayer.stop();
+                container.setVisibility(View.GONE);
                 //setPlayerVisible(false);
             } else if (v == mButtonPlayerSkipForward) {
                 onSkipToNextTrack();
@@ -380,13 +384,8 @@ public class PlayerFragment extends BaseFragment {
     /**
      * Handler for messages sent by the player and buffer
      */
-    private class PlayerHandler
-            implements
-            OnPlayerProgressListener,
-            OnBufferProgressListener,
-            OnPlayerStateChangeListener,
-            OnPlayerErrorListener,
-            OnBufferStateChangeListener,
+    private class PlayerHandler implements OnPlayerProgressListener, OnBufferProgressListener,
+            OnPlayerStateChangeListener, OnPlayerErrorListener, OnBufferStateChangeListener,
             OnBufferErrorListener {
 
         @Override

@@ -1,32 +1,41 @@
 package com.tutorial.deeplayer.app.deeplayer.views;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.Patterns;
-import android.view.LayoutInflater;
-import android.view.ViewGroup;
-import android.widget.*;
+import android.util.Log;
+import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.FrameLayout;
 
-import com.squareup.picasso.Picasso;
-import com.tutorial.deeplayer.app.deeplayer.R;
+import com.tutorial.deeplayer.app.deeplayer.adapters.RadioAdapter;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
+import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
+import com.tutorial.deeplayer.app.deeplayer.viewmodels.RadioViewModel;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
+import butterknife.OnItemClick;
+import rx.Observer;
 
 /**
- * Created by ilya.savritsky on 22.07.2015.
+ * Created by ilya.savritsky on 27.07.2015.
  */
-public class RadioView extends RelativeLayout {
-    @Bind(R.id.icon_view)
-    ImageView iconView;
-    @Bind(R.id.title_text)
-    TextView titleView;
-    @Bind(R.id.favourite_check)
-    CheckBox checkFavouriteView;
+public class RadioView extends FrameLayout implements RadioItemView.OnRadioItemFavouriteStatusInteractionListener {
+    public static final String TAG = LoginView.class.getSimpleName();
 
-    private Radio value;
+    @Bind(android.R.id.list)
+    AbsListView mListView;
+
+    private RadioAdapter radioAdapter;
+
+    private final RxBinderUtil rxBinderUtil = new RxBinderUtil(this);
+    private RadioViewModel radioViewModel;
+    private OnRadioItemInteractionListener listener;
 
     public RadioView(Context context) {
         super(context, null);
@@ -38,55 +47,111 @@ public class RadioView extends RelativeLayout {
 
     public RadioView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        setupChildren();
     }
 
-    public static RadioView inflate(LayoutInflater inflater, ViewGroup parent) {
-        RadioView radioView = (RadioView) inflater.inflate(R.layout.radio_view, parent, false);
-        radioView.setupChildren();
-        return radioView;
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        setupChildren();
     }
 
 
     private void setupChildren() {
         ButterKnife.bind(this);
+        radioAdapter = new RadioAdapter(getContext(), this);
+        mListView.setAdapter(radioAdapter);
+//        deezerConnect = new DeezerConnect(DeePlayerApp.get(),
+//                DeePlayerApp.get().getString(R.string.app_id));
+//        SessionStore sessionStore = new SessionStore();
+//        sessionStore.restore(deezerConnect, DeePlayerApp.get());
     }
 
-    public void bindToData(Radio radio) {
-        setTitle(radio.getTitle());
-        setIcon(radio.getPictureMedium());
-        setFavourite(radio.isFavourite());
-        this.value = radio;
-    }
+    public void setViewModel(@Nullable RadioViewModel viewModel) {
+        rxBinderUtil.clear();
+        //radioAdapter.clear();
+        //radioAdapter.remove();
+        if (viewModel != null) {
 
-    public void setTitle(String title) {
-        titleView.setText(title);
-    }
-
-    public void setIcon(String url) {
-        if (Patterns.WEB_URL.matcher(url).matches()) {
-            Picasso.with(getContext()).load(url).into(iconView);
+            radioViewModel = viewModel;
+            rxBinderUtil.bindProperty(viewModel.getSubject(), this::updateRadioList);
         }
     }
 
-    public void setFavourite(boolean isFavourite) {
-        checkFavouriteView.setChecked(isFavourite);
+    public void addRadioToFavourite(@NonNull final Radio radio) {
+        if (radioViewModel != null) {
+            rxBinderUtil.bindProperty(radioViewModel.addRadioToFavourite(radio), getFavouriteStatusChangeObserver(radio, true));
+        }
     }
 
-    @OnCheckedChanged(R.id.favourite_check)
-    public void itemStatusChanged(CompoundButton button, boolean value) {
-        if (this.value == null || this.value.isFavourite() != value) {
-            // perform change event
-            if (value) {
+    public void removeRadioFromFavourite(@NonNull final Radio radio) {
+        if (radioViewModel != null) {
+            rxBinderUtil.bindProperty(radioViewModel.removeRadioFromFavourite(radio), getFavouriteStatusChangeObserver(radio, false));
+            //rxBinderUtil.bindProperty(radioViewModel.removeRadioFromFavourite(radio), this::radioFavouriteStatusChanged);
+        }
+    }
 
-            } else {
-
+    private Observer<Boolean> getFavouriteStatusChangeObserver(@NonNull final Radio radio, final boolean toFavourite) {
+        return new Observer<Boolean>() {
+            @Override
+            public void onCompleted() {
             }
+
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+                radioFavouriteStatusChanged(radio, toFavourite, false);
+            }
+
+            @Override
+            public void onNext(Boolean aBoolean) {
+                radioFavouriteStatusChanged(radio, toFavourite, aBoolean);
+            }
+        };
+    }
+
+    private void radioFavouriteStatusChanged(@NonNull final Radio radio, final boolean toFavourite,
+                                             final boolean isSuccess) {
+        if (isSuccess) {
+            radio.setFavourite(toFavourite);
+            radioAdapter.updateItem(radio);
+            Log.d(TAG, "ALL IS OK");
+        } else {
+            radioAdapter.updateItem(radio);
         }
     }
 
+    public void setListener(@Nullable OnRadioItemInteractionListener listener) {
+        this.listener = listener;
+    }
 
-    public ImageView getIcon() {
-        return iconView;
+    private void updateRadioList(List<Radio> radios) {
+        Log.d(TAG, "update Radio -> " + radios.size());
+        radioAdapter.add(radios);
+    }
+
+    @OnItemClick(android.R.id.list)
+    public void listViewItemClicked(AdapterView<?> adapterView, View view, int position, long l) {
+        Radio radio = radioAdapter.getItem(position);
+        if (listener != null) {
+            listener.onRadioItemInteraction(radio);
+        }
+    }
+
+    @Override
+    public void onRadioItemFavouriteStatusChanged(@NonNull Radio radio, boolean isFavourite) {
+        if (isFavourite) {
+            addRadioToFavourite(radio);
+        } else {
+            removeRadioFromFavourite(radio);
+        }
+
+    }
+
+    public void clean() {
+        radioAdapter.remove();
+    }
+
+    public interface OnRadioItemInteractionListener {
+        void onRadioItemInteraction(@NonNull Radio radio);
     }
 }

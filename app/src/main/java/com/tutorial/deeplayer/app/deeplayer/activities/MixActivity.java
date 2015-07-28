@@ -1,6 +1,7 @@
 package com.tutorial.deeplayer.app.deeplayer.activities;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -21,11 +22,12 @@ import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.fragments.PlayerFragment;
 import com.tutorial.deeplayer.app.deeplayer.fragments.RadioFragment;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
+import com.tutorial.deeplayer.app.deeplayer.views.RadioView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MixActivity extends AppCompatActivity implements RadioFragment.OnFragmentInteractionListener, RadioPlayerListener {
+public class MixActivity extends AppCompatActivity implements RadioView.OnRadioItemInteractionListener, RadioPlayerListener {
     public static final String TAG = MixActivity.class.getSimpleName();
 
     @Bind(R.id.fragment_container)
@@ -93,30 +95,6 @@ public class MixActivity extends AppCompatActivity implements RadioFragment.OnFr
     }
 
     @Override
-    public void onFragmentInteraction(Radio radio) {
-        playerContainer.setVisibility(View.VISIBLE);
-        try {
-            Log.d(TAG, "play radio " + radio.getTitle());
-
-            if (mRadioPlayer != null) {
-                mRadioPlayer.stop();
-            }
-
-            mRadioPlayer = new RadioPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker());
-            mRadioPlayer.addPlayerListener(this);
-            mRadioPlayer.playRadio(RadioPlayer.RadioType.RADIO, radio.getId());
-            playerFragment.setAttachedPlayer(mRadioPlayer);
-
-        } catch (OAuthException e) {
-            e.printStackTrace();
-        } catch (DeezerError deezerError) {
-            deezerError.printStackTrace();
-        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
-            tooManyPlayersExceptions.printStackTrace();
-        }
-    }
-
-    @Override
     protected void onStop() {
         super.onStop();
     }
@@ -150,4 +128,70 @@ public class MixActivity extends AppCompatActivity implements RadioFragment.OnFr
     public void onRequestException(Exception e, Object o) {
 
     }
+
+    @Override
+    public void onRadioItemInteraction(@NonNull Radio radio) {
+        playerContainer.setVisibility(View.VISIBLE);
+        try {
+            Log.d(TAG, "play radio " + radio.getTitle());
+
+            if (mRadioPlayer != null) {
+                mRadioPlayer.stop();
+            }
+
+            mRadioPlayer = new RadioPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker());
+            mRadioPlayer.addPlayerListener(this);
+            mRadioPlayer.playRadio(RadioPlayer.RadioType.RADIO, radio.getId());
+            playerFragment.setAttachedPlayer(mRadioPlayer);
+
+        } catch (OAuthException e) {
+            e.printStackTrace();
+        } catch (DeezerError deezerError) {
+            deezerError.printStackTrace();
+        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
+            tooManyPlayersExceptions.printStackTrace();
+        }
+    }
+
+//    // TODO: move from here to model
+//    @Override
+//    public void onRadioItemFavouriteStatusChanged(@NonNull Radio radio, boolean isFavourite) {
+//        if (isFavourite) {
+//            // add to favourites
+//            new RestService().fetchResultRadioAddToFavourite(radio.getId()).subscribe(new Observer<Boolean>() {
+//                @Override
+//                public void onCompleted() {
+//                    Log.d(TAG, "completed !!!");
+//                }
+//
+//                @Override
+//                public void onError(Throwable e) {
+//                    e.printStackTrace();
+//                }
+//
+//                @Override
+//                public void onNext(Boolean aBoolean) {
+//                    Log.d(TAG, "onNext !!!" + aBoolean);
+//                }
+//            });
+//        } else {
+//            // remove from favourites
+//            new RestService().fetchResultRadioRemoveFromFavourite(radio.getId()).subscribe(new Observer<Boolean>() {
+//                @Override
+//                public void onCompleted() {
+//                    Log.d(TAG, "completed !!!");
+//                }
+//
+//                @Override
+//                public void onError(Throwable e) {
+//                    e.printStackTrace();
+//                }
+//
+//                @Override
+//                public void onNext(Boolean aBoolean) {
+//                    Log.d(TAG, "onNext !!!" + aBoolean);
+//                }
+//            });
+//        }
+//    }
 }

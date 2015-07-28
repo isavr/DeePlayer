@@ -102,4 +102,12 @@ public class RestService {
         });
     }
 
+    public Observable<Boolean> fetchResultRadioAddToFavourite(long radioId) {
+        return radioAPI.addRadioToFavourite(radioId);
+    }
+
+    public Observable<Boolean> fetchResultRadioRemoveFromFavourite(long radioId) {
+        return radioAPI.removeRadioFromFavourite(radioId);
+    }
+
 }

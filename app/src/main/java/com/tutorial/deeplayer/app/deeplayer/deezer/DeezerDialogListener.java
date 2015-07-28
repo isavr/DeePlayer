@@ -1,10 +1,10 @@
 package com.tutorial.deeplayer.app.deeplayer.deezer;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import com.deezer.sdk.network.connect.event.DialogListener;
 
+import rx.Observable;
 import rx.Observer;
 
 /**
@@ -13,20 +13,20 @@ import rx.Observer;
 public class DeezerDialogListener implements DialogListener {
     public static final String TAG = DeezerDialogListener.class.getSimpleName();
 
-    private Observer observer;
+    private Observer<Bundle> observer;
 
     public DeezerDialogListener(Observer observer) {
         this.observer = observer;
     }
 
-    public Observer getObserver() {
-        return observer;
+    public Observable getObservable() {
+        return Observable.just(observer);
     }
-
 
     @Override
     public void onComplete(Bundle values) {
         observer.onNext(values);
+        observer.onCompleted();
     }
 
     @Override

@@ -3,12 +3,14 @@ package com.tutorial.deeplayer.app.deeplayer.pojo;
 import com.google.gson.annotations.SerializedName;
 import com.tutorial.deeplayer.app.deeplayer.errors.DeezerError;
 
+import nl.qbusict.cupboard.annotation.Ignore;
+
 /**
  * Created by ilya.savritsky on 17.07.2015.
  */
 public class BaseTypedItem {
-    //@Ignore
-    //private DeezerError error;
+    @Ignore
+    private DeezerError error;
     @SerializedName("id")
     protected Long _id;
     protected String type;
@@ -34,6 +36,6 @@ public class BaseTypedItem {
     }
 
     public void setError(DeezerError error) {
-        //this.error = error;
+        this.error = error;
     }
 }
