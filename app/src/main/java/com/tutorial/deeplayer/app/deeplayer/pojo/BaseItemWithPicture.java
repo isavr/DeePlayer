@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Created by ilya.savritsky on 17.07.2015.
  */
-public class BaseItemWithPicture extends BaseTypedItem {
+public class BaseItemWithPicture extends FavouriteItem {
     protected String picture;
     @SerializedName("picture_small")
     protected String pictureSmall;

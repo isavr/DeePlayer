@@ -3,9 +3,7 @@ package com.tutorial.deeplayer.app.deeplayer.rest.service;
 import android.util.Log;
 
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.pojo.RadioList;
-import com.tutorial.deeplayer.app.deeplayer.pojo.TrackList;
-import com.tutorial.deeplayer.app.deeplayer.pojo.User;
+import com.tutorial.deeplayer.app.deeplayer.pojo.*;
 import com.tutorial.deeplayer.app.deeplayer.rest.interfaces.RadioAPI;
 import com.tutorial.deeplayer.app.deeplayer.rest.interfaces.UserAPI;
 
@@ -25,13 +23,10 @@ public class RestService {
 
     public RestService() {
         RequestInterceptor requestInterceptor = request -> {
-
             request.addQueryParam("output", "json");
             if (token != null && !"".equals(token)) {
                 request.addQueryParam("access_token", token);
             }
-
-            //request.addQueryParam("response_type", "token");
         };
 
         RestAdapter restAdapter = new RestAdapter.Builder()
@@ -76,7 +71,7 @@ public class RestService {
     }
 
     public Observable<RadioList> fetchUserRadioInfo() {
-        return radioAPI.getUserRadios().flatMap(radioList -> {
+        return userAPI.getUserRadios().flatMap(radioList -> {
             if (radioList.getError() != null) {
                 return Observable.error(radioList.getError());
             }
@@ -103,11 +98,37 @@ public class RestService {
     }
 
     public Observable<Boolean> fetchResultRadioAddToFavourite(long radioId) {
-        return radioAPI.addRadioToFavourite(radioId);
+        return userAPI.addRadioToFavourite(radioId);
     }
 
     public Observable<Boolean> fetchResultRadioRemoveFromFavourite(long radioId) {
-        return radioAPI.removeRadioFromFavourite(radioId);
+        return userAPI.removeRadioFromFavourite(radioId);
+    }
+
+    public Observable<DataList<Album>> fetchAlbumsRecommendedForUser() {
+        return userAPI.getAlbumsRecommendedForUser().flatMap(albumDataList -> {
+            if (albumDataList.getError() != null) {
+                return Observable.error(albumDataList.getError());
+            }
+            return Observable.just(albumDataList);
+        });
+    }
+
+    public Observable<DataList<Album>> fetchUserAlbums() {
+        return userAPI.getUserAlbums().flatMap(albumDataList -> {
+            if (albumDataList.getError() != null) {
+                return Observable.error(albumDataList.getError());
+            }
+            return Observable.just(albumDataList);
+        });
+    }
+
+    public Observable<Boolean> fetchResultAlbumAddToFavourite(long albumId) {
+        return userAPI.addAlbumToFavourite(albumId);
+    }
+
+    public Observable<Boolean> fetchResultAlbumRemoveFromFavourite(long albumId) {
+        return userAPI.removeAlbumFromFavourite(albumId);
     }
 
 }

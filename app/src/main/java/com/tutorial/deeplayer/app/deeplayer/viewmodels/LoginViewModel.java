@@ -16,12 +16,12 @@ import rx.subscriptions.CompositeSubscription;
 public class LoginViewModel extends AbstractViewModel {
     private static final String TAG = LoginViewModel.class.getSimpleName();
 
-    private BehaviorSubject<Bundle> subject = BehaviorSubject.create();
+    private final BehaviorSubject<Bundle> subject = BehaviorSubject.create();
 
     // TODO: add data layer properties
 
     // TODO: listener setup refactoring
-    private DeezerDialogListener listener;
+    private final DeezerDialogListener listener;
 
     public LoginViewModel() {
         // Data layers setup

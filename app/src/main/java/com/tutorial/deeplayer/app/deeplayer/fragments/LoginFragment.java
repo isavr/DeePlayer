@@ -69,6 +69,6 @@ public class LoginFragment extends Fragment {
         loginViewModel.dispose();
         loginViewModel = null;
         //instrumentation.getLeakTracing().traceLeakage(this);
-        DeePlayerApp.get().getRefWatcher().watch(this, "Login Fragment");
+        DeePlayerApp.getRefWatcher().watch(this, "Login Fragment");
     }
 }

@@ -2,14 +2,13 @@ package com.tutorial.deeplayer.app.deeplayer.pojo;
 
 import com.google.gson.Gson;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * Created by ilya.savritsky on 20.07.2015.
  */
-public class AlbumTest extends TestCase {
+public class AlbumTest {
     private static final String DATA_EXAMPLE = "{\n" +
             "  \"id\": \"302127\",\n" +
             "  \"title\": \"Discovery\",\n" +
@@ -344,19 +343,19 @@ public class AlbumTest extends TestCase {
     public void testAlbumParsing() {
         Gson gson = new Gson();
         Album album = gson.fromJson(DATA_EXAMPLE, Album.class);
-        assertNotNull(album);
-            assertEquals(album.getId(), Long.valueOf(302127));
-        assertEquals(album.getTitle(), "Discovery");
-        assertEquals(album.getDuration(), 3663);
-        assertEquals(album.getTracksCount(), 14);
-        assertNotNull(album.getContributors());
-        assertEquals(album.getContributors().size(), 1);
-            assertEquals(album.getContributors().get(0).getId(), Long.valueOf(27));
-        assertEquals(album.getTracklist(), "https://api.deezer.com/album/302127/tracks");
-        assertEquals(album.getGenreID(), 113);
-        assertEquals(album.getType(), "album");
-        assertNotNull(album.getTracks());
-        assertEquals(album.getTracks().getData().size(), 14);
+            Assert.assertNotNull(album);
+            Assert.assertEquals(album.getId(), Long.valueOf(302127));
+            Assert.assertEquals(album.getTitle(), "Discovery");
+            Assert.assertEquals(album.getDuration(), 3663);
+            Assert.assertEquals(album.getTracksCount(), 14);
+            Assert.assertNotNull(album.getContributors());
+            Assert.assertEquals(album.getContributors().size(), 1);
+            Assert.assertEquals(album.getContributors().get(0).getId(), Long.valueOf(27));
+            Assert.assertEquals(album.getTracklist(), "https://api.deezer.com/album/302127/tracks");
+            Assert.assertEquals(album.getGenreID(), 113);
+            Assert.assertEquals(album.getType(), "album");
+            Assert.assertNotNull(album.getTracks());
+            Assert.assertEquals(album.getTracks().getData().size(), 14);
 
     }
 }

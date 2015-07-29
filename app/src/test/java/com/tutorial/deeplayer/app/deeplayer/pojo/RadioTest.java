@@ -2,8 +2,7 @@ package com.tutorial.deeplayer.app.deeplayer.pojo;
 
 import com.google.gson.Gson;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -11,7 +10,7 @@ import org.junit.Test;
  */
 //@RunWith(RobolectricGradleTestRunner.class)
 //@Config(constants = BuildConfig.class, emulateSdk = 21)
-public class RadioTest extends TestCase {
+public class RadioTest {
     private static final String DATA_EXAMPLE = "{\n" +
             "      \"id\": \"37675\",\n" +
             "      \"title\": \"Coffee lounge\",\n" +
@@ -27,10 +26,10 @@ public class RadioTest extends TestCase {
     public void testRadioParsing() {
         Gson gson = new Gson();
         Radio artist = gson.fromJson(DATA_EXAMPLE, Radio.class);
-        assertNotNull(artist);
-        assertEquals(artist.getId(), Long.valueOf(37675));
-        assertEquals(artist.getTitle(), "Coffee lounge");
-        assertEquals(artist.getTracklist(), "https://api.deezer.com/radio/37675/tracks");
-        assertEquals(artist.getType(), "radio");
+        Assert.assertNotNull(artist);
+        Assert.assertEquals(artist.getId(), Long.valueOf(37675));
+        Assert.assertEquals(artist.getTitle(), "Coffee lounge");
+        Assert.assertEquals(artist.getTracklist(), "https://api.deezer.com/radio/37675/tracks");
+        Assert.assertEquals(artist.getType(), "radio");
     }
 }

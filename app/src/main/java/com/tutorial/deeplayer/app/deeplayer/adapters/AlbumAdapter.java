@@ -7,33 +7,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
-import com.tutorial.deeplayer.app.deeplayer.views.RadioItemView;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
+import com.tutorial.deeplayer.app.deeplayer.views.AlbumItemView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by ilya.savritsky on 22.07.2015.
+ * Created by ilya.savritsky on 29.07.2015.
  */
-public class RadioAdapter extends BaseAdapter {
+public class AlbumAdapter extends BaseAdapter {
 
     private LayoutInflater layoutInflator;
-    private List<Radio> items;
-    private RadioItemView.OnRadioItemFavouriteStatusInteractionListener listener;
+    private List<Album> items;
+    private AlbumItemView.OnAlbumItemFavouriteStatusInteractionListener listener;
 
-    public RadioAdapter(Context context, RadioItemView.OnRadioItemFavouriteStatusInteractionListener listener) {
+    public AlbumAdapter(Context context, AlbumItemView.OnAlbumItemFavouriteStatusInteractionListener listener) {
         this.layoutInflator = LayoutInflater.from(context);
         this.items = new ArrayList<>();
         this.listener = listener;
     }
 
-    public void add(Radio item) {
+    public void add(Album item) {
         this.items.add(item);
         notifyDataSetChanged();
     }
 
-    public void add(List<Radio> items) {
+    public void add(List<Album> items) {
         this.items.addAll(items);
         notifyDataSetChanged();
     }
@@ -43,7 +43,7 @@ public class RadioAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void removeItem(Radio item) {
+    public void removeItem(Album item) {
         items.remove(item);
         notifyDataSetChanged();
     }
@@ -55,11 +55,11 @@ public class RadioAdapter extends BaseAdapter {
         listener = null;
     }
 
-    public void updateItem(@NonNull Radio radio) {
+    public void updateItem(@NonNull Album radio) {
         int index = 0;
         for (int i = 0; i < items.size(); ++i) {
-            Radio currRadio = items.get(i);
-            if (radio.getId().equals(currRadio.getId())) {
+            Album currAlbum = items.get(i);
+            if (radio.getId().equals(currAlbum.getId())) {
                 index = i;
                 break;
             }
@@ -74,7 +74,7 @@ public class RadioAdapter extends BaseAdapter {
     }
 
     @Override
-    public Radio getItem(int position) {
+    public Album getItem(int position) {
         return items.get(position);
     }
 
@@ -85,15 +85,15 @@ public class RadioAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null || !(convertView instanceof RadioItemView)) {
-            convertView = RadioItemView.inflate(layoutInflator, parent);
+        if (convertView == null || !(convertView instanceof AlbumItemView)) {
+            convertView = AlbumItemView.inflate(layoutInflator, parent);
         }
-        Radio radio = getItem(position);
+        Album album = getItem(position);
         if (convertView != null) {
-            RadioItemView radioView = (RadioItemView) convertView;
+            AlbumItemView radioView = (AlbumItemView) convertView;
 
             radioView.setListener(listener);
-            radioView.bindToData(radio);
+            radioView.bindToData(album);
             return radioView;
         }
 

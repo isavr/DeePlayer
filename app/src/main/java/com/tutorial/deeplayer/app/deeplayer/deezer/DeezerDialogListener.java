@@ -13,9 +13,9 @@ import rx.Observer;
 public class DeezerDialogListener implements DialogListener {
     public static final String TAG = DeezerDialogListener.class.getSimpleName();
 
-    private Observer<Bundle> observer;
+    private final Observer<Bundle> observer;
 
-    public DeezerDialogListener(Observer observer) {
+    public DeezerDialogListener(Observer<Bundle> observer) {
         this.observer = observer;
     }
 

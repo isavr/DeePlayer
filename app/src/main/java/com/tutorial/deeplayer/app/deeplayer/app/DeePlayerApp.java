@@ -23,7 +23,7 @@ public class DeePlayerApp extends Application {
     }
 
     public static RefWatcher getRefWatcher() {
-        return DeePlayerApp.get()._refWatcher;
+        return _refWatcher;
     }
 
     @Override

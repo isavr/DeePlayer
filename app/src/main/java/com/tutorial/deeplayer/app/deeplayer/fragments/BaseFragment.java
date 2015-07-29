@@ -53,7 +53,7 @@ public class BaseFragment extends Fragment {
     public void onDestroy() {
         lifecycleSubject.onNext(LifecycleEvent.DESTROY);
         super.onDestroy();
-        DeePlayerApp.get().getRefWatcher().watch(this);
-        DeePlayerApp.get().getRefWatcher().watch(lifecycleSubject);
+        DeePlayerApp.getRefWatcher().watch(this);
+        DeePlayerApp.getRefWatcher().watch(lifecycleSubject);
     }
 }

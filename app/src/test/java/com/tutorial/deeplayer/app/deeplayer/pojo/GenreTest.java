@@ -2,8 +2,7 @@ package com.tutorial.deeplayer.app.deeplayer.pojo;
 
 import com.google.gson.Gson;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -11,7 +10,7 @@ import org.junit.Test;
  */
 //@RunWith(RobolectricGradleTestRunner.class)
 //@Config(constants = BuildConfig.class, emulateSdk = 21)
-public class GenreTest extends TestCase {
+public class GenreTest {
     private static final String DATA_EXAMPLE = "{\n" +
             "      \"id\": \"0\",\n" +
             "      \"name\": \"All\",\n" +
@@ -26,9 +25,9 @@ public class GenreTest extends TestCase {
     public void testGenreParsing() {
         Gson gson = new Gson();
         Genre genre = gson.fromJson(DATA_EXAMPLE, Genre.class);
-        assertNotNull(genre);
-        assertEquals(genre.getId(), Long.valueOf(0));
-        assertEquals(genre.getName(), "All");
-        assertEquals(genre.getType(), "genre");
+        Assert.assertNotNull(genre);
+        Assert.assertEquals(genre.getId(), Long.valueOf(0));
+        Assert.assertEquals(genre.getName(), "All");
+        Assert.assertEquals(genre.getType(), "genre");
     }
 }

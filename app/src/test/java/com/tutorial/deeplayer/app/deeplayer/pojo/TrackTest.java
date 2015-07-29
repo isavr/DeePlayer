@@ -2,8 +2,7 @@ package com.tutorial.deeplayer.app.deeplayer.pojo;
 
 import com.google.gson.Gson;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -12,7 +11,7 @@ import org.junit.Test;
 
 //@RunWith(RobolectricGradleTestRunner.class)
 //@Config(constants = BuildConfig.class, emulateSdk = 21)
-public class TrackTest extends TestCase {
+public class TrackTest {
     private static final String DATA_EXAMPLE = "{\n" +
             "  \"id\": \"3135556\",\n" +
             "  \"readable\": true,\n" +
@@ -319,14 +318,14 @@ public class TrackTest extends TestCase {
     public void testTrackParsing() {
         Gson gson = new Gson();
         Track track = gson.fromJson(DATA_EXAMPLE, Track.class);
-        assertNotNull(track);
-            assertEquals(track.getId(), Long.valueOf(3135556));
-        assertEquals(track.getTitle(), "Harder Better Faster Stronger");
-        assertNotNull(track.getAlbum());
-            assertEquals(track.getAlbum().getId(), Long.valueOf(302127));
-        assertEquals(track.getAlbum().getTitle(), "Discovery");
-        assertNotNull(track.getContributors());
-        assertEquals(track.getContributors().size(), 1);
-        assertEquals(track.getType(), "track");
+        Assert.assertNotNull(track);
+        Assert.assertEquals(track.getId(), Long.valueOf(3135556));
+        Assert.assertEquals(track.getTitle(), "Harder Better Faster Stronger");
+        Assert.assertNotNull(track.getAlbum());
+        Assert.assertEquals(track.getAlbum().getId(), Long.valueOf(302127));
+        Assert.assertEquals(track.getAlbum().getTitle(), "Discovery");
+        Assert.assertNotNull(track.getContributors());
+        Assert.assertEquals(track.getContributors().size(), 1);
+        Assert.assertEquals(track.getType(), "track");
     }
 }

@@ -2,6 +2,7 @@ package com.tutorial.deeplayer.app.deeplayer.activities;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.View;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.fragments.LoginFragment;
@@ -16,6 +17,10 @@ public class LoginActivity extends FragmentActivity {
 
     public LoginActivity() {
         //DeePlayerApp.get().getGraph().inject(this);
+    }
+
+    public void onLoginCLick(View v) {
+
     }
 
     @Override

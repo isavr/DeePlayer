@@ -9,6 +9,11 @@ import dagger.Provides;
 @Module
 public class ViewModelModule {
     @Provides
+    public MainViewModel provideMainViewModel() {
+        return new MainViewModel();
+    }
+
+    @Provides
     public LoginViewModel provideLoginViewModel() {
         return new LoginViewModel();
     }
@@ -16,5 +21,11 @@ public class ViewModelModule {
     @Provides
     public RadioViewModel provideRadioViewModel() {
         return new RadioViewModel();
+    }
+
+
+    @Provides
+    public RecommendedAlbumsViewModel provideRecommendedAlbumViewModel() {
+        return new RecommendedAlbumsViewModel();
     }
 }

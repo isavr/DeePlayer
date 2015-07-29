@@ -2,8 +2,7 @@ package com.tutorial.deeplayer.app.deeplayer.pojo;
 
 import com.google.gson.Gson;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -12,7 +11,7 @@ import org.junit.Test;
 
 //@RunWith(RobolectricGradleTestRunner.class)
 //@Config(constants = BuildConfig.class, emulateSdk = 21)
-public class UserTest extends TestCase {
+public class UserTest {
     private static final String DATA_EXAMPLE = "{\n" +
             "  \"id\": \"701236078\",\n" +
             "  \"name\": \"Test user\",\n" +
@@ -37,11 +36,11 @@ public class UserTest extends TestCase {
     public void testUserParsing() {
         Gson gson = new Gson();
         User user = gson.fromJson(DATA_EXAMPLE, User.class);
-        assertNotNull(user);
-        assertEquals(user.getId(), Long.valueOf(701236078));
-        assertEquals(user.getName(), "Test user");
-        assertEquals(user.getTracklist(), "https://api.deezer.com/user/700316071/flow");
-        assertEquals(user.getBirthday(), "1991-01-01");
-        assertEquals(user.getType(), "user");
+        Assert.assertNotNull(user);
+        Assert.assertEquals(user.getId(), Long.valueOf(701236078));
+        Assert.assertEquals(user.getName(), "Test user");
+        Assert.assertEquals(user.getTracklist(), "https://api.deezer.com/user/700316071/flow");
+        Assert.assertEquals(user.getBirthday(), "1991-01-01");
+        Assert.assertEquals(user.getType(), "user");
     }
 }

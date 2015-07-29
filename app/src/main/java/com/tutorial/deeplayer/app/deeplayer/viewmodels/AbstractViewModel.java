@@ -23,7 +23,7 @@ abstract public class AbstractViewModel {
         Log.v(TAG, "dispose");
 
         if (compositeSubscription != null) {
-            Log.e(TAG, "Disposing without calling unsubscribeFromDataStore first");
+            Log.e(TAG, "Disposing without calling unsubscribe FromDataStore first");
 
             // Unsubscribe in case we are still for some reason subscribed
             unsubscribeFromDataStore();

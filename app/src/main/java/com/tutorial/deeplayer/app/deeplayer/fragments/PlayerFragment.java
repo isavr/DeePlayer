@@ -87,7 +87,7 @@ public class PlayerFragment extends BaseFragment {
         doDestroyPlayer();
         ButterKnife.unbind(this);
         super.onDestroy();
-        DeePlayerApp.get().getRefWatcher().watch(this, "Player Fragment");
+        DeePlayerApp.getRefWatcher().watch(this, "Player Fragment");
     }
 
     /**
@@ -223,7 +223,7 @@ public class PlayerFragment extends BaseFragment {
 
             case STOPPED:
                 mSeekBar.setEnabled(false);
-                container.setVisibility(View.GONE);
+                //container.setVisibility(View.GONE);
                 showPlayerProgress(0);
                 showBufferProgress(0);
                 mButtonPlayerPause.setImageResource(R.drawable.ic_action_play);
@@ -259,8 +259,12 @@ public class PlayerFragment extends BaseFragment {
      */
     public void showTrackDuration(final long trackLength) {
         String text = formatTime(trackLength);
-        mTextLength.setText(text);
-        mSeekBar.setMax((int) trackLength / 1000);
+        if (mTextLength != null) {
+            mTextLength.setText(text);
+        }
+        if (mSeekBar != null) {
+            mSeekBar.setMax((int) trackLength / 1000);
+        }
     }
 
 
@@ -319,7 +323,7 @@ public class PlayerFragment extends BaseFragment {
                 }
             } else if (v == mButtonPlayerStop) {
                 mPlayer.stop();
-                container.setVisibility(View.GONE);
+                //container.setVisibility(View.GONE);
                 //setPlayerVisible(false);
             } else if (v == mButtonPlayerSkipForward) {
                 onSkipToNextTrack();
@@ -390,76 +394,44 @@ public class PlayerFragment extends BaseFragment {
 
         @Override
         public void onBufferError(final Exception ex, final double percent) {
-            getActivity().runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    handleError(ex);
-                }
-            });
+            getActivity().runOnUiThread(() -> handleError(ex));
         }
 
         @Override
         public void onBufferStateChange(final BufferState state, final double percent) {
-            getActivity().runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    showBufferProgress((int) Math.round(percent));
-                }
-            });
+            getActivity().runOnUiThread(() -> showBufferProgress((int) Math.round(percent)));
         }
 
         @Override
         public void onPlayerError(final Exception ex, final long timePosition) {
-            getActivity().runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    handleError(ex);
-                    if (ex instanceof NotAllowedToPlayThatSongException) {
-                        mPlayer.skipToNextTrack();
-                    } else if (ex instanceof StreamLimitationException) {
-                        // Do nothing ,
-                    } else {
-                        //finish();
-                    }
+            getActivity().runOnUiThread(() -> {
+                handleError(ex);
+                if (ex instanceof NotAllowedToPlayThatSongException) {
+                    mPlayer.skipToNextTrack();
+                } else if (ex instanceof StreamLimitationException) {
+                    // Do nothing ,
+                } else {
+                    //finish();
                 }
             });
         }
 
         @Override
         public void onPlayerStateChange(final PlayerState state, final long timePosition) {
-            getActivity().runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    showPlayerState(state);
-                    showPlayerProgress(timePosition);
-                }
+            getActivity().runOnUiThread(() -> {
+                showPlayerState(state);
+                showPlayerProgress(timePosition);
             });
         }
 
         @Override
         public void onBufferProgress(final double percent) {
-            getActivity().runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    showBufferProgress((int) Math.round(percent));
-                }
-            });
+            getActivity().runOnUiThread(() -> showBufferProgress((int) Math.round(percent)));
         }
 
         @Override
         public void onPlayerProgress(final long timePosition) {
-            getActivity().runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    showPlayerProgress(timePosition);
-                }
-            });
+            getActivity().runOnUiThread(() -> showPlayerProgress(timePosition));
         }
     }
 

@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by ilya.savritsky on 17.07.2015.
  */
-public class Album extends BaseTypedItem {
+public class Album extends FavouriteItem {
     private String title;
     private String upc;
     private String link;

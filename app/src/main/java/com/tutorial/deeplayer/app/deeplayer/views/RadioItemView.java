@@ -68,7 +68,7 @@ public class RadioItemView extends RelativeLayout {
 
     public void setIcon(String url) {
         if (Patterns.WEB_URL.matcher(url).matches()) {
-            Picasso.with(getContext()).load(url).into(iconView);
+            Picasso.with(getContext()).load(url).fit().centerInside().into(iconView);
         }
     }
 
@@ -90,16 +90,6 @@ public class RadioItemView extends RelativeLayout {
         }
     }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-    }
-
     public void setListener(OnRadioItemFavouriteStatusInteractionListener listener) {
         this.listener = listener;
     }
@@ -107,6 +97,4 @@ public class RadioItemView extends RelativeLayout {
     public interface OnRadioItemFavouriteStatusInteractionListener {
         void onRadioItemFavouriteStatusChanged(@NonNull Radio radio, boolean isFavourite);
     }
-
-
 }

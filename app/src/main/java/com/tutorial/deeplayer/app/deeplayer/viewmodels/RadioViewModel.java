@@ -3,6 +3,7 @@ package com.tutorial.deeplayer.app.deeplayer.viewmodels;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.tutorial.deeplayer.app.deeplayer.pojo.BaseTypedItem;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService;
 
@@ -21,7 +22,7 @@ import rx.subscriptions.CompositeSubscription;
  */
 public class RadioViewModel extends AbstractViewModel {
     private static final String TAG = RadioViewModel.class.getSimpleName();
-    private BehaviorSubject<List<Radio>> subject = BehaviorSubject.create();
+    private final BehaviorSubject<List<Radio>> subject = BehaviorSubject.create();
 
     @Override
     void subscribeToDataStoreInternal(@NonNull CompositeSubscription compositeSubscription) {
@@ -40,28 +41,23 @@ public class RadioViewModel extends AbstractViewModel {
 
             @Override
             public void onError(Throwable e) {
-                //DialogFactory.showSimpleErrorMessage(getActivity(), getChildFragmentManager(), e.getMessage());
                 e.printStackTrace();
                 subject.onError(e);
             }
 
             @Override
             public void onNext(List<Radio> radios) {
-                //Log.d(TAG, "onNext Radio");
-                //subject.onNext(radio);
                 subject.onNext(radios);
                 //rxCupboard.put(radio);
             }
         };
-        //mAdapter.clear();
         RestService service = new RestService();
         Observable<Radio> radioObservable = service.fetchRadioInfo().subscribeOn(Schedulers.io())
                 .flatMap(item -> Observable.from(item.getData()));
         Observable<Radio> userFavourites = service.fetchUserRadioInfo().subscribeOn(Schedulers.io())
                 .flatMap(item -> Observable.from(item.getUserData()));
-        return Observable.concat(userFavourites, radioObservable).distinct(radio -> radio.getId())
+        return Observable.concat(userFavourites, radioObservable).distinct(BaseTypedItem::getId)
                 .toSortedList((radio, radio2) -> {
-
                     if (radio.getTitle() != null && radio2.getTitle() != null) {
                         String title1 = radio.getTitle().trim();
                         String title2 = radio2.getTitle().trim();
@@ -83,7 +79,7 @@ public class RadioViewModel extends AbstractViewModel {
         return changeRadioFavouriteStatus(radio, false);
     }
 
-    public Observable<Boolean> changeRadioFavouriteStatus(Radio radio, boolean isChecked) {
+    private Observable<Boolean> changeRadioFavouriteStatus(Radio radio, boolean isChecked) {
         if (isChecked) {
             return new RestService().fetchResultRadioAddToFavourite(radio.getId());
         } else {

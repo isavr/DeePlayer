@@ -3,7 +3,8 @@ package com.tutorial.deeplayer.app.deeplayer.rest.interfaces;
 import com.tutorial.deeplayer.app.deeplayer.pojo.RadioList;
 import com.tutorial.deeplayer.app.deeplayer.pojo.TrackList;
 
-import retrofit.http.*;
+import retrofit.http.GET;
+import retrofit.http.Path;
 import rx.Observable;
 
 /**
@@ -22,13 +23,4 @@ public interface RadioAPI {
     @GET("/radio/{id}/tracks")
     Observable<TrackList> getRadioTracks(@Path("id") long radioId);
 
-    @GET("/user/me/radios")
-    Observable<RadioList> getUserRadios();
-
-    @POST("/user/me/radios")
-    @FormUrlEncoded
-    Observable<Boolean> addRadioToFavourite(@Field("radio_id") long radioId);
-
-    @DELETE("/user/me/radios")
-    Observable<Boolean> removeRadioFromFavourite(@Query("radio_id") long radioId);
 }

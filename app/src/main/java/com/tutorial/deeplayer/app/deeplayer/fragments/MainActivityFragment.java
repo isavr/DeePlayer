@@ -10,6 +10,8 @@ import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.MainViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.MainActivityView;
 
+import javax.inject.Inject;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -18,7 +20,7 @@ public class MainActivityFragment extends BaseFragment {
 
 
     private MainActivityView mainActivityView;
-    //@Inject
+    @Inject
     MainViewModel viewModel;
 //    @Inject
 //    Instrumentation instrumentation;
@@ -33,7 +35,7 @@ public class MainActivityFragment extends BaseFragment {
         super.onCreate(savedInstanceState);
 
         DeePlayerApp.get().getGraph().inject(this);
-        viewModel = new MainViewModel();
+        //viewModel = new MainViewModel();
     }
 
     @Override
@@ -68,7 +70,7 @@ public class MainActivityFragment extends BaseFragment {
         viewModel.dispose();
         viewModel = null;
         //instrumentation.getLeakTracing().traceLeakage(this);
-        DeePlayerApp.get().getRefWatcher().watch(this, "Main Fragment");
+        DeePlayerApp.getRefWatcher().watch(this, "Main Fragment");
     }
 
 //    @Override

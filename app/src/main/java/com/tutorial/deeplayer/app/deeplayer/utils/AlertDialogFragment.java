@@ -108,20 +108,10 @@ public class AlertDialogFragment extends DialogFragment {
             dialog = null;
         }
         if (negativeButtonClickListener == null) {
-            negativeButtonClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            };
+            negativeButtonClickListener = (dialog1, which) -> dialog1.dismiss();
         }
         if (positiveButtonClickListener == null) {
-            positiveButtonClickListener = new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            };
+            positiveButtonClickListener = (dialog1, which) -> dialog1.dismiss();
         }
         builder = new AlertDialog.Builder(mContextWeak.get(), android.R.style.Theme_DeviceDefault_Light_Dialog);
         builder.setTitle(title).setMessage(message)

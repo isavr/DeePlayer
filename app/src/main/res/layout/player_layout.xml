@@ -63,14 +63,15 @@
 
 </GridLayout> -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:com.deezer.sdk.tools="http://schemas.android.com/com.deezer.sdk.tools"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:background="@android:color/darker_gray"
-              android:orientation="vertical"
-              android:id="@+id/container"
-              com.deezer.sdk.tools:ignore="ContentDescription">
+<LinearLayout
+    android:id="@+id/container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:com.deezer.sdk.tools="http://schemas.android.com/com.deezer.sdk.tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/darker_gray"
+    android:orientation="vertical"
+    com.deezer.sdk.tools:ignore="ContentDescription">
 
     <View
         android:layout_width="fill_parent"
@@ -95,6 +96,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
+            android:contentDescription="Skip backward button"
             android:src="@drawable/ic_action_previous"/>
 
         <ImageButton
@@ -102,6 +104,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
+            android:contentDescription="Seek backward button"
             android:src="@drawable/ic_action_rewind"/>
 
         <ImageButton
@@ -109,6 +112,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
+            android:contentDescription="Stop button"
             android:src="@drawable/ic_action_stop"/>
 
         <ImageButton
@@ -116,6 +120,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
+            android:contentDescription="Play/pause button"
             android:src="@drawable/ic_action_play"/>
 
         <ImageButton
@@ -123,6 +128,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
+            android:contentDescription="Seek forward button"
             android:src="@drawable/ic_action_fast_forward"/>
 
         <ImageButton
@@ -130,6 +136,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
+            android:contentDescription="Skip forward button"
             android:src="@drawable/ic_action_next"/>
 
         <View
@@ -142,6 +149,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@android:color/transparent"
+            android:contentDescription="Repeat mode button"
             android:src="@drawable/ic_action_repeat"/>
 
         <View

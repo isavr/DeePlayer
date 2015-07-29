@@ -2,14 +2,13 @@ package com.tutorial.deeplayer.app.deeplayer.pojo;
 
 import com.google.gson.Gson;
 
-import junit.framework.TestCase;
-
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * Created by ilya.savritsky on 17.07.2015.
  */
-public class ArtistTest extends TestCase {
+public class ArtistTest {
     private static final String DATA_EXAMPLE = "{\n" +
             "  \"id\": \"27\",\n" +
             "  \"name\": \"Daft Punk\",\n" +
@@ -30,9 +29,9 @@ public class ArtistTest extends TestCase {
     public void testArtistParsing() {
         Gson gson = new Gson();
         Artist artist = gson.fromJson(DATA_EXAMPLE, Artist.class);
-        assertNotNull(artist);
-        assertEquals(artist.getId(), Long.valueOf(27));
-        assertEquals(artist.getName(), "Daft Punk");
-        assertEquals(artist.getTracklist(), "https://api.deezer.com/artist/27/top?limit=50");
+        Assert.assertNotNull(artist);
+        Assert.assertEquals(artist.getId(), Long.valueOf(27));
+        Assert.assertEquals(artist.getName(), "Daft Punk");
+        Assert.assertEquals(artist.getTracklist(), "https://api.deezer.com/artist/27/top?limit=50");
     }
 }

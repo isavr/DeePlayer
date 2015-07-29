@@ -32,7 +32,7 @@ public class BaseTypedItem {
     }
 
     public DeezerError getError() {
-        return null;
+        return error;
     }
 
     public void setError(DeezerError error) {

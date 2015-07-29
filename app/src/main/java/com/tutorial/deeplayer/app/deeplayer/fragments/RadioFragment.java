@@ -23,7 +23,7 @@ public class RadioFragment extends Fragment {
 //    @Inject
 //    Instrumentation instrumentation;
 
-    RadioView.OnRadioItemInteractionListener listener;
+    private RadioView.OnRadioItemInteractionListener listener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,7 +64,7 @@ public class RadioFragment extends Fragment {
         radioViewModel.dispose();
         radioViewModel = null;
         //instrumentation.getLeakTracing().traceLeakage(this);
-        DeePlayerApp.get().getRefWatcher().watch(this, "Radio Fragment");
+        DeePlayerApp.getRefWatcher().watch(this, "Radio Fragment");
     }
 
     @Override
@@ -74,7 +74,7 @@ public class RadioFragment extends Fragment {
             listener = (RadioView.OnRadioItemInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement OnRadioItemInteractionListener");
         }
     }
 

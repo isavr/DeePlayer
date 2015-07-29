@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by ilya.savritsky on 17.07.2015.
  */
-public class Track extends BaseTypedItem {
+public class Track extends FavouriteItem {
     private boolean readable;
     private String title;
     @SerializedName("title_short")

@@ -26,7 +26,7 @@ import rx.Observer;
  * Created by ilya.savritsky on 27.07.2015.
  */
 public class RadioView extends FrameLayout implements RadioItemView.OnRadioItemFavouriteStatusInteractionListener {
-    public static final String TAG = LoginView.class.getSimpleName();
+    public static final String TAG = RadioView.class.getSimpleName();
 
     @Bind(android.R.id.list)
     AbsListView mListView;
@@ -60,18 +60,11 @@ public class RadioView extends FrameLayout implements RadioItemView.OnRadioItemF
         ButterKnife.bind(this);
         radioAdapter = new RadioAdapter(getContext(), this);
         mListView.setAdapter(radioAdapter);
-//        deezerConnect = new DeezerConnect(DeePlayerApp.get(),
-//                DeePlayerApp.get().getString(R.string.app_id));
-//        SessionStore sessionStore = new SessionStore();
-//        sessionStore.restore(deezerConnect, DeePlayerApp.get());
     }
 
     public void setViewModel(@Nullable RadioViewModel viewModel) {
         rxBinderUtil.clear();
-        //radioAdapter.clear();
-        //radioAdapter.remove();
         if (viewModel != null) {
-
             radioViewModel = viewModel;
             rxBinderUtil.bindProperty(viewModel.getSubject(), this::updateRadioList);
         }
@@ -86,7 +79,6 @@ public class RadioView extends FrameLayout implements RadioItemView.OnRadioItemF
     public void removeRadioFromFavourite(@NonNull final Radio radio) {
         if (radioViewModel != null) {
             rxBinderUtil.bindProperty(radioViewModel.removeRadioFromFavourite(radio), getFavouriteStatusChangeObserver(radio, false));
-            //rxBinderUtil.bindProperty(radioViewModel.removeRadioFromFavourite(radio), this::radioFavouriteStatusChanged);
         }
     }
 
