@@ -17,7 +17,7 @@ public interface UserAPI {
 
 
     @GET("/user/me/radios")
-    Observable<RadioList> getUserRadios();
+    Observable<DataList<Radio>> getUserRadios();
 
     @POST("/user/me/radios")
     @FormUrlEncoded

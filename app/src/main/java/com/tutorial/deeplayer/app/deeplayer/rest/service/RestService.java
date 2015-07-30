@@ -61,7 +61,7 @@ public class RestService {
         });
     }
 
-    public Observable<RadioList> fetchRadioInfo() {
+    public Observable<DataList<Radio>> fetchRadioInfo() {
         return radioAPI.getRadios().flatMap(radioList -> {
             if (radioList.getError() != null) {
                 return Observable.error(radioList.getError());
@@ -70,7 +70,7 @@ public class RestService {
         });
     }
 
-    public Observable<RadioList> fetchUserRadioInfo() {
+    public Observable<DataList<Radio>> fetchUserRadioInfo() {
         return userAPI.getUserRadios().flatMap(radioList -> {
             if (radioList.getError() != null) {
                 return Observable.error(radioList.getError());
@@ -79,7 +79,7 @@ public class RestService {
         });
     }
 
-    public Observable<RadioList> fetchRadioTopInfo() {
+    public Observable<DataList<Radio>> fetchRadioTopInfo() {
         return radioAPI.getRadiosByTop().flatMap(radioList -> {
             if (radioList.getError() != null) {
                 return Observable.error(radioList.getError());
@@ -88,7 +88,7 @@ public class RestService {
         });
     }
 
-    public Observable<TrackList> fetchRadioTracks(long radioId) {
+    public Observable<DataList<Track>> fetchRadioTracks(long radioId) {
         return radioAPI.getRadioTracks(radioId).flatMap(radioList -> {
             if (radioList.getError() != null) {
                 return Observable.error(radioList.getError());

@@ -21,7 +21,7 @@ public class Album extends FavouriteItem {
     private String coverBig;
     @SerializedName("genre_id")
     private int genreID;
-    private GenresList genres;
+    private DataList<Genre> genres;
     private String label;
     @SerializedName("nb_tracks")
     private
@@ -42,7 +42,7 @@ public class Album extends FavouriteItem {
     private boolean hasExplicitLyrics;
     private Artist artist;
     private String tracklist;
-    private AlbumTrackList tracks;
+    private DataList<Track> tracks;
 
     public String getTitle() {
         return title;
@@ -116,11 +116,11 @@ public class Album extends FavouriteItem {
         this.genreID = genreID;
     }
 
-    public GenresList getGenres() {
+    public DataList<Genre> getGenres() {
         return genres;
     }
 
-    public void setGenres(GenresList genres) {
+    public void setGenres(DataList<Genre> genres) {
         this.genres = genres;
     }
 
@@ -220,11 +220,11 @@ public class Album extends FavouriteItem {
         this.tracklist = tracklist;
     }
 
-    public AlbumTrackList getTracks() {
+    public DataList<Track> getTracks() {
         return tracks;
     }
 
-    public void setTracks(AlbumTrackList tracks) {
+    public void setTracks(DataList<Track> tracks) {
         this.tracks = tracks;
     }
 }
