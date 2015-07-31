@@ -1,5 +1,6 @@
 package com.tutorial.deeplayer.app.deeplayer.activities;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +23,7 @@ import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.fragments.PlayerFragment;
 import com.tutorial.deeplayer.app.deeplayer.fragments.RadioFragment;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
+import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.views.RadioView;
 
 import butterknife.Bind;
@@ -35,6 +37,7 @@ public class MixActivity extends AppCompatActivity implements RadioView.OnRadioI
 
     @Bind(R.id.player)
     View playerContainer;
+
     private PlayerFragment playerFragment;
 
     private RadioPlayer mRadioPlayer;
@@ -62,6 +65,7 @@ public class MixActivity extends AppCompatActivity implements RadioView.OnRadioI
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, radioFragment)
                 .commit();
     }
+
 
     private void addPlayerFragment() {
         playerFragment = (PlayerFragment) getSupportFragmentManager().findFragmentByTag(PlayerFragment.TAG);
@@ -92,6 +96,16 @@ public class MixActivity extends AppCompatActivity implements RadioView.OnRadioI
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStopProgress() {
+        DialogFactory.closeAlertDialog(getSupportFragmentManager());
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 
     @Override

@@ -1,7 +1,9 @@
 package com.tutorial.deeplayer.app.deeplayer.activities;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -13,16 +15,19 @@ import com.deezer.sdk.network.connect.DeezerConnect;
 import com.deezer.sdk.network.connect.SessionStore;
 import com.deezer.sdk.network.request.event.DeezerError;
 import com.deezer.sdk.network.request.event.OAuthException;
+import com.deezer.sdk.player.AbstractPlayerWrapper;
 import com.deezer.sdk.player.AlbumPlayer;
+import com.deezer.sdk.player.ArtistRadioPlayer;
 import com.deezer.sdk.player.event.RadioPlayerListener;
 import com.deezer.sdk.player.exception.TooManyPlayersExceptions;
 import com.deezer.sdk.player.networkcheck.WifiOnlyNetworkStateChecker;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.fragments.AlbumFragment;
-import com.tutorial.deeplayer.app.deeplayer.fragments.PlayerFragment;
+import com.tutorial.deeplayer.app.deeplayer.fragments.*;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
-import com.tutorial.deeplayer.app.deeplayer.views.RecommendedAlbumsView;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
+import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
+import com.tutorial.deeplayer.app.deeplayer.views.*;
 
 import java.lang.ref.WeakReference;
 
@@ -33,6 +38,8 @@ import butterknife.ButterKnife;
  * Created by ilya.savritsky on 28.07.2015.
  */
 public class RecommendationsActivity extends AppCompatActivity implements RecommendedAlbumsView.OnAlbumItemInteractionListener,
+        RecommendedArtistsView.OnArtistItemInteractionListener,
+        RecommendationsControlsView.OnTypeSelectedListener,
         RadioPlayerListener {
     public static final String TAG = RecommendationsActivity.class.getSimpleName();
 
@@ -41,9 +48,13 @@ public class RecommendationsActivity extends AppCompatActivity implements Recomm
 
     @Bind(R.id.player)
     View playerContainer;
+
+//    @Bind(R.id.controls)
+//    View recommendationsControlsContainer;
+
     private PlayerFragment playerFragment;
 
-    private WeakReference<AlbumPlayer> weakPlayer;
+    private WeakReference<AbstractPlayerWrapper> weakPlayer;
 
     private AlbumPlayer mAlbumPlayer;
     private DeezerConnect deezerConnect;
@@ -51,9 +62,9 @@ public class RecommendationsActivity extends AppCompatActivity implements Recomm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mix);
+        setContentView(R.layout.activity_recommendations);
         ButterKnife.bind(this);
-        addFragment();
+        addControlsFragment();
         addPlayerFragment();
         playerContainer.setVisibility(View.GONE);
 
@@ -62,12 +73,52 @@ public class RecommendationsActivity extends AppCompatActivity implements Recomm
         sessionStore.restore(deezerConnect, getApplicationContext());
     }
 
-    private void addFragment() {
+    private void addFragment(RecommendationsTypes type) {
+        Fragment fragment = getFragmentForType(type);
+        if (fragment != null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
+                    .commit();
+        }
+    }
+
+    private Fragment getFragmentForType(RecommendationsTypes type) {
+        switch (type) {
+            case Artists: {
+                return getArtistFragment();
+            }
+            case Albums: {
+                return getAlbumFragment();
+            }
+            default: {
+                return null;
+            }
+        }
+    }
+
+    private ArtistFragment getArtistFragment() {
+        ArtistFragment artistFragment = (ArtistFragment) getSupportFragmentManager().findFragmentByTag(ArtistFragment.TAG);
+        if (artistFragment == null) {
+            artistFragment = new ArtistFragment();
+        }
+        return artistFragment;
+    }
+
+    private AlbumFragment getAlbumFragment() {
         AlbumFragment albumFragment = (AlbumFragment) getSupportFragmentManager().findFragmentByTag(AlbumFragment.TAG);
         if (albumFragment == null) {
             albumFragment = new AlbumFragment();
         }
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, albumFragment)
+        return albumFragment;
+    }
+
+
+    private void addControlsFragment() {
+        RecommendationsControlsFragment controlsFragment = (RecommendationsControlsFragment)
+                getSupportFragmentManager().findFragmentByTag(RecommendationsControlsFragment.TAG);
+        if (controlsFragment == null) {
+            controlsFragment = new RecommendationsControlsFragment();
+        }
+        getSupportFragmentManager().beginTransaction().replace(R.id.controls, controlsFragment)
                 .commit();
     }
 
@@ -129,6 +180,11 @@ public class RecommendationsActivity extends AppCompatActivity implements Recomm
     }
 
     @Override
+    public void onError(Throwable err) {
+        DialogFactory.showSimpleErrorMessage(this, getSupportFragmentManager(), err.getMessage());
+    }
+
+    @Override
     public void onAlbumItemInteraction(@NonNull Album album) {
         try {
             Log.d(TAG, "play album " + album.getTitle());
@@ -137,11 +193,11 @@ public class RecommendationsActivity extends AppCompatActivity implements Recomm
                 weakPlayer.get().stop();
             }
             playerContainer.setVisibility(View.VISIBLE);
-            if (weakPlayer == null || weakPlayer.get() == null) {
+            if (weakPlayer == null || weakPlayer.get() == null || !(weakPlayer.get() instanceof AlbumPlayer)) {
                 weakPlayer = new WeakReference<>(new AlbumPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker()));
                 weakPlayer.get().addPlayerListener(this);
             }
-            weakPlayer.get().playAlbum(album.getId());
+            ((AlbumPlayer) weakPlayer.get()).playAlbum(album.getId());
             playerFragment.setAttachedPlayer(weakPlayer.get());
 
         } catch (OAuthException e) {
@@ -150,6 +206,60 @@ public class RecommendationsActivity extends AppCompatActivity implements Recomm
             deezerError.printStackTrace();
         } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
             tooManyPlayersExceptions.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onArtistItemInteraction(@NonNull Artist artist) {
+        try {
+            Log.d(TAG, "play artist " + artist.getName());
+
+            if (weakPlayer != null && weakPlayer.get() != null) {
+                weakPlayer.get().stop();
+            }
+            playerContainer.setVisibility(View.VISIBLE);
+
+            if (weakPlayer == null || weakPlayer.get() == null || !(weakPlayer.get() instanceof ArtistRadioPlayer)) {
+                weakPlayer = new WeakReference<>(new ArtistRadioPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker()));
+                weakPlayer.get().addPlayerListener(this);
+            }
+            ((ArtistRadioPlayer) weakPlayer.get()).playArtistRadio(artist.getId());
+            playerFragment.setAttachedPlayer(weakPlayer.get());
+
+        } catch (OAuthException e) {
+            e.printStackTrace();
+        } catch (DeezerError deezerError) {
+            deezerError.printStackTrace();
+        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
+            tooManyPlayersExceptions.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onStopProgress() {
+        DialogFactory.closeAlertDialog(getSupportFragmentManager());
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public void onTypeSelected(RecommendationsTypes type) {
+        Log.d(TAG, "Handle type selection");
+        switch (type) {
+            case Artists: {
+                // Node: Do the same
+            }
+            case Albums: {
+                container.setVisibility(View.VISIBLE);
+                addFragment(type);
+                break;
+            }
+            default: {
+                container.setVisibility(View.GONE);
+            }
         }
     }
 }

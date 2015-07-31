@@ -66,8 +66,12 @@ public class RadioView extends FrameLayout implements RadioItemView.OnRadioItemF
         rxBinderUtil.clear();
         if (viewModel != null) {
             radioViewModel = viewModel;
-            rxBinderUtil.bindProperty(viewModel.getSubject(), this::updateRadioList);
+            rxBinderUtil.bindProperty(viewModel.getSubject(), this::updateRadioList, this::onError);
         }
+    }
+
+    private void onError(Throwable throwable) {
+        Log.d(TAG, "Handle Error");
     }
 
     public void addRadioToFavourite(@NonNull final Radio radio) {
@@ -118,6 +122,9 @@ public class RadioView extends FrameLayout implements RadioItemView.OnRadioItemF
 
     private void updateRadioList(List<Radio> radios) {
         Log.d(TAG, "update Radio -> " + radios.size());
+        if (listener != null) {
+            listener.onStopProgress();
+        }
         radioAdapter.add(radios);
     }
 
@@ -145,5 +152,7 @@ public class RadioView extends FrameLayout implements RadioItemView.OnRadioItemF
 
     public interface OnRadioItemInteractionListener {
         void onRadioItemInteraction(@NonNull Radio radio);
+
+        void onStopProgress();
     }
 }

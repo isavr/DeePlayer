@@ -9,20 +9,17 @@ import android.view.ViewGroup;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
-import com.tutorial.deeplayer.app.deeplayer.viewmodels.RadioViewModel;
-import com.tutorial.deeplayer.app.deeplayer.views.RadioView;
+import com.tutorial.deeplayer.app.deeplayer.views.RecommendationsControlsView;
 
-import javax.inject.Inject;
+/**
+ * Created by ilya.savritsky on 30.07.2015.
+ */
+public class RecommendationsControlsFragment extends Fragment {
+    public static final String TAG = RecommendationsControlsFragment.class.getSimpleName();
 
-public class RadioFragment extends Fragment {
-    public static final String TAG = RadioFragment.class.getSimpleName();
+    private RecommendationsControlsView recommendationsControlsView;
 
-    private RadioView radioView;
-    @Inject
-    RadioViewModel radioViewModel;
-
-    private RadioView.OnRadioItemInteractionListener listener;
+    private RecommendationsControlsView.OnTypeSelectedListener listener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,49 +29,41 @@ public class RadioFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_item, container, false);
+        return inflater.inflate(R.layout.fragment_recommendations_controls, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        radioView = (RadioView) view.findViewById(R.id.radio_view);
-        DialogFactory.showProgressDialog(this.getActivity(),
-                getActivity().getSupportFragmentManager());
-        radioViewModel.subscribeToDataStore();
+        recommendationsControlsView = (RecommendationsControlsView) view.findViewById(R.id.controls);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        radioView.setViewModel(radioViewModel);
-        radioView.setListener(listener);
+        recommendationsControlsView.setListener(listener);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        radioView.setViewModel(null);
-        radioView.setListener(null);
+        recommendationsControlsView.setListener(null);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        radioViewModel.unsubscribeFromDataStore();
-        radioViewModel.dispose();
-        radioViewModel = null;
-        DeePlayerApp.getRefWatcher().watch(this, "Radio Fragment");
+        DeePlayerApp.getRefWatcher().watch(this, "Recommended Albums Fragment");
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            listener = (RadioView.OnRadioItemInteractionListener) activity;
+            listener = (RecommendationsControlsView.OnTypeSelectedListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnRadioItemInteractionListener");
+                    + " must implement OnTypeSelectedListener");
         }
     }
 
@@ -82,7 +71,5 @@ public class RadioFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         listener = null;
-        radioView.clean();
-        radioView.setListener(null);
     }
 }

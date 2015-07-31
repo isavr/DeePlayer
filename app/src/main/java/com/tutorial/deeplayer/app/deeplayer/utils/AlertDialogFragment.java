@@ -10,6 +10,8 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
 
+import com.tutorial.deeplayer.app.deeplayer.R;
+
 import java.lang.ref.WeakReference;
 
 /**
@@ -113,7 +115,7 @@ public class AlertDialogFragment extends DialogFragment {
         if (positiveButtonClickListener == null) {
             positiveButtonClickListener = (dialog1, which) -> dialog1.dismiss();
         }
-        builder = new AlertDialog.Builder(mContextWeak.get(), android.R.style.Theme_DeviceDefault_Light_Dialog);
+        builder = new AlertDialog.Builder(mContextWeak.get(), R.style.Theme_AppCompat_Light_Dialog_Alert);
         builder.setTitle(title).setMessage(message)
                 .setNegativeButton(negativeButtonText, negativeButtonClickListener)
                 .setPositiveButton(positiveButtonText, positiveButtonClickListener);
@@ -124,7 +126,7 @@ public class AlertDialogFragment extends DialogFragment {
             dismiss();
             dialog = null;
         }
-        dialog = new ProgressDialog(mContextWeak.get(), android.R.style.Theme_DeviceDefault_Light_Dialog);
+        dialog = new ProgressDialog(mContextWeak.get(), R.style.Theme_AppCompat_Light_Dialog_Alert);
         dialog.setCancelMessage(null);
         dialog.setTitle(null);
         dialog.setDismissMessage(null);

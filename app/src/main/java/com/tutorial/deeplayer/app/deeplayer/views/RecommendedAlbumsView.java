@@ -67,7 +67,7 @@ public class RecommendedAlbumsView extends FrameLayout implements AlbumItemView.
         rxBinderUtil.clear();
         if (viewModel != null) {
             albumsViewModel = viewModel;
-            rxBinderUtil.bindProperty(viewModel.getSubject(), this::updateAlbumList);
+            rxBinderUtil.bindProperty(viewModel.getSubject(), this::updateAlbumList, this::onError);
         }
     }
 
@@ -82,6 +82,16 @@ public class RecommendedAlbumsView extends FrameLayout implements AlbumItemView.
     private void updateAlbumList(List<Album> albums) {
         Log.d(TAG, "update Albums -> " + albums.size());
         adapter.add(albums);
+        if (listener != null) {
+            listener.onStopProgress();
+        }
+    }
+
+    private void onError(Throwable throwable) {
+        Log.d(TAG, "Handle Error");
+        if (listener != null) {
+            listener.onError(throwable);
+        }
     }
 
     public void setListener(@Nullable OnAlbumItemInteractionListener listener) {
@@ -120,17 +130,17 @@ public class RecommendedAlbumsView extends FrameLayout implements AlbumItemView.
             @Override
             public void onError(Throwable e) {
                 e.printStackTrace();
-                radioFavouriteStatusChanged(album, toFavourite, false);
+                albumFavouriteStatusChanged(album, toFavourite, false);
             }
 
             @Override
             public void onNext(Boolean aBoolean) {
-                radioFavouriteStatusChanged(album, toFavourite, aBoolean);
+                albumFavouriteStatusChanged(album, toFavourite, aBoolean);
             }
         };
     }
 
-    private void radioFavouriteStatusChanged(@NonNull final Album album, final boolean toFavourite,
+    private void albumFavouriteStatusChanged(@NonNull final Album album, final boolean toFavourite,
                                              final boolean isSuccess) {
         if (isSuccess) {
             album.setFavourite(toFavourite);
@@ -148,5 +158,9 @@ public class RecommendedAlbumsView extends FrameLayout implements AlbumItemView.
 
     public interface OnAlbumItemInteractionListener {
         void onAlbumItemInteraction(@NonNull Album album);
+
+        void onStopProgress();
+
+        void onError(Throwable err);
     }
 }

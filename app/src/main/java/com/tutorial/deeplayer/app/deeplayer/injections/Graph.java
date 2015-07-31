@@ -36,6 +36,10 @@ public interface Graph {
 
     void inject(AlbumFragment albumFragment);
 
+    void inject(RecommendationsControlsFragment recommendationsControlsFragment);
+
+    void inject(ArtistFragment artistFragment);
+
     void inject(RestService restService);
 
     void inject(DeePlayerApp deePlayerApp);

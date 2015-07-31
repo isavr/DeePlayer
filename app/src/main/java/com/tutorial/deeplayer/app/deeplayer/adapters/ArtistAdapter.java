@@ -7,33 +7,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
-import com.tutorial.deeplayer.app.deeplayer.views.AlbumItemView;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
+import com.tutorial.deeplayer.app.deeplayer.views.ArtistItemView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by ilya.savritsky on 29.07.2015.
+ * Created by ilya.savritsky on 31.07.2015.
  */
-public class AlbumAdapter extends BaseAdapter {
+public class ArtistAdapter extends BaseAdapter {
 
     private LayoutInflater layoutInflator;
-    private List<Album> items;
-    private AlbumItemView.OnAlbumItemFavouriteStatusInteractionListener listener;
+    private List<Artist> items;
+    private ArtistItemView.OnArtistItemFavouriteStatusInteractionListener listener;
 
-    public AlbumAdapter(Context context, AlbumItemView.OnAlbumItemFavouriteStatusInteractionListener listener) {
+    public ArtistAdapter(Context context, ArtistItemView.OnArtistItemFavouriteStatusInteractionListener listener) {
         this.layoutInflator = LayoutInflater.from(context);
         this.items = new ArrayList<>();
         this.listener = listener;
     }
 
-    public void add(Album item) {
+    public void add(Artist item) {
         this.items.add(item);
         notifyDataSetChanged();
     }
 
-    public void add(List<Album> items) {
+    public void add(List<Artist> items) {
         this.items.addAll(items);
         notifyDataSetChanged();
     }
@@ -43,7 +43,7 @@ public class AlbumAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void removeItem(Album item) {
+    public void removeItem(Artist item) {
         items.remove(item);
         notifyDataSetChanged();
     }
@@ -55,16 +55,16 @@ public class AlbumAdapter extends BaseAdapter {
         listener = null;
     }
 
-    public void updateItem(@NonNull Album radio) {
+    public void updateItem(@NonNull Artist artist) {
         int index = 0;
         for (int i = 0; i < items.size(); ++i) {
-            Album currAlbum = items.get(i);
-            if (radio.getId().equals(currAlbum.getId())) {
+            Artist currAtist = items.get(i);
+            if (artist.getId().equals(currAtist.getId())) {
                 index = i;
                 break;
             }
         }
-        items.set(index, radio);
+        items.set(index, artist);
         notifyDataSetChanged();
     }
 
@@ -74,7 +74,7 @@ public class AlbumAdapter extends BaseAdapter {
     }
 
     @Override
-    public Album getItem(int position) {
+    public Artist getItem(int position) {
         return items.get(position);
     }
 
@@ -85,16 +85,16 @@ public class AlbumAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null || !(convertView instanceof AlbumItemView)) {
-            convertView = AlbumItemView.inflate(layoutInflator, parent);
+        if (convertView == null || !(convertView instanceof ArtistItemView)) {
+            convertView = ArtistItemView.inflate(layoutInflator, parent);
         }
-        Album album = getItem(position);
+        Artist album = getItem(position);
         if (convertView != null) {
-            AlbumItemView albumItemView = (AlbumItemView) convertView;
+            ArtistItemView radioView = (ArtistItemView) convertView;
 
-            albumItemView.setListener(listener);
-            albumItemView.bindToData(album);
-            return albumItemView;
+            radioView.setListener(listener);
+            radioView.bindToData(album);
+            return radioView;
         }
 
         return convertView;

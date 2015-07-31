@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="recommendations_types">
+        <item>Artists</item>
+        <item>Albums</item>
+        <item>Playlists</item>
+        <item>Tracks</item>
+    </string-array>
+</resources>

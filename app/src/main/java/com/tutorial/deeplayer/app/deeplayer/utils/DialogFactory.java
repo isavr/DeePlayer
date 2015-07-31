@@ -68,6 +68,7 @@ public class DialogFactory {
         }
         errorDialog.clear();
         errorDialog.setContext(context);
+        errorDialog.setTitle("Error");
         errorDialog.setMessage(message);
         errorDialog.create();
         errorDialog.show(manager, AlertDialogFragment.TAG);

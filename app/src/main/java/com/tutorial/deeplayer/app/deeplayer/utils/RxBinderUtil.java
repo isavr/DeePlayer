@@ -30,9 +30,10 @@ public class RxBinderUtil {
     }
 
     public <U> void bindProperty(@NonNull final Observable<U> observable,
-                                 @NonNull final Action1<U> setter) {
+                                 @NonNull final Action1<U> setter,
+                                 @NonNull final Action1<Throwable> onErrorAction) {
         compositeSubscription.add(
-                subscribeSetter(observable, setter, tag));
+                subscribeSetter(observable, setter, onErrorAction, tag));
     }
 
     public <U> void bindProperty(@NonNull final Observable<U> observable,
@@ -43,12 +44,13 @@ public class RxBinderUtil {
 
     static private <U> Subscription subscribeSetter(@NonNull final Observable<U> observable,
                                                     @NonNull final Action1<U> setter,
+                                                    @NonNull final Action1<Throwable> onErrorAction,
                                                     @NonNull final String tag) {
         Preconditions.checkNotNull(observable, "Observable cannot be null.");
 
         return observable
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new SetterSubscriber<>(setter, tag));
+                .subscribe(new SetterSubscriber<>(setter, onErrorAction, tag));
     }
 
     static private class SetterSubscriber<U> extends Subscriber<U> {
@@ -58,13 +60,17 @@ public class RxBinderUtil {
         final private Action1<U> setter;
 
         @NonNull
+        final private Action1<Throwable> onErrorAction;
+
+        @NonNull
         final private String tag;
 
-        public SetterSubscriber(@NonNull final Action1<U> setter, @NonNull final String tag) {
+        public SetterSubscriber(@NonNull final Action1<U> setter, @NonNull final Action1<Throwable> onErrorAction, @NonNull final String tag) {
             Preconditions.checkNotNull(setter, "Setter cannot be null.");
             Preconditions.checkNotNull(tag, "Tag cannot be null.");
 
             this.setter = setter;
+            this.onErrorAction = onErrorAction;
             this.tag = tag;
         }
 
@@ -76,6 +82,7 @@ public class RxBinderUtil {
         @Override
         public void onError(Throwable e) {
             Log.e(TAG, tag + "." + "onError", e);
+            onErrorAction.call(e);
         }
 
         @Override

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
@@ -75,10 +76,15 @@ public class LoginView extends LinearLayout {
 
             loginViewModel = viewModel;
             //rxBinderUtil.bindProperty(viewModel.getRepository(), this::loginSuccessfull);
-            rxBinderUtil.bindProperty(viewModel.getSubject(), this::loginSuccessfull);
-            rxBinderUtil.bindProperty(ViewObservable.clicks(loginButton, false), this::attemptLogin);
+            rxBinderUtil.bindProperty(viewModel.getSubject(), this::loginSuccessfull, this::onError);
+            rxBinderUtil.bindProperty(ViewObservable.clicks(loginButton, false), this::attemptLogin, this::onError);
         }
     }
+
+    private void onError(Throwable throwable) {
+        Log.d(TAG, "Handle Error");
+    }
+
 
     private void loginSuccessfull(Bundle bundle) {
         SessionStore store = new SessionStore();

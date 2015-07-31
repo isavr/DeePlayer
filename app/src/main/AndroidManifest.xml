@@ -40,7 +40,8 @@
             android:name=".activities.MixActivity"
             android:label="@string/title_activity_mix"
             android:parentActivityName=".activities.MainActivity"
-            android:windowSoftInputMode="stateAlwaysHidden">
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutorial.deeplayer.app.deeplayer.activities.MainActivity"/>
@@ -49,7 +50,8 @@
             android:name=".activities.RecommendationsActivity"
             android:label="@string/title_activity_recommendations"
             android:parentActivityName=".activities.MainActivity"
-            android:windowSoftInputMode="stateAlwaysHidden">
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:configChanges="orientation|keyboardHidden|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.tutorial.deeplayer.app.deeplayer.activities.MainActivity"/>

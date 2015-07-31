@@ -23,6 +23,10 @@ public class ViewModelModule {
         return new RadioViewModel();
     }
 
+    @Provides
+    public RecommendedArtistViewModel provideRecommendedArtistViewModel() {
+        return new RecommendedArtistViewModel();
+    }
 
     @Provides
     public RecommendedAlbumsViewModel provideRecommendedAlbumViewModel() {

@@ -131,4 +131,30 @@ public class RestService {
         return userAPI.removeAlbumFromFavourite(albumId);
     }
 
+    public Observable<DataList<Artist>> fetchArtistsRecommendedForUser() {
+        return userAPI.getArtistsRecommendedForUser().flatMap(artistDataList -> {
+            if (artistDataList.getError() != null) {
+                return Observable.error(artistDataList.getError());
+            }
+            return Observable.just(artistDataList);
+        });
+    }
+
+    public Observable<DataList<Artist>> fetchUserArtists() {
+        return userAPI.getUserArtists().flatMap(artistDataList -> {
+            if (artistDataList.getError() != null) {
+                return Observable.error(artistDataList.getError());
+            }
+            return Observable.just(artistDataList);
+        });
+    }
+
+    public Observable<Boolean> fetchResultArtistAddToFavourite(long artistId) {
+        return userAPI.addArtistToFavourite(artistId);
+    }
+
+    public Observable<Boolean> fetchResultArtistRemoveFromFavourite(long artistId) {
+        return userAPI.removeArtistFromFavourite(artistId);
+    }
+
 }

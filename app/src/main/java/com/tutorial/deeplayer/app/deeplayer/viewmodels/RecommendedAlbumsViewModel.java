@@ -21,7 +21,7 @@ import rx.subscriptions.CompositeSubscription;
  * Created by ilya.savritsky on 28.07.2015.
  */
 public class RecommendedAlbumsViewModel extends AbstractViewModel {
-    private static final String TAG = RadioViewModel.class.getSimpleName();
+    private static final String TAG = RecommendedAlbumsViewModel.class.getSimpleName();
     private final BehaviorSubject<List<Album>> subject = BehaviorSubject.create();
 
     @Override

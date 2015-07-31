@@ -38,4 +38,18 @@ public interface UserAPI {
 
     @DELETE("/user/me/albums")
     Observable<Boolean> removeAlbumFromFavourite(@Query("album_id") long albumId);
+
+    @GET("/user/me/artists")
+    Observable<DataList<Artist>> getUserArtists();
+
+    @GET("/user/me/recommendations/artists")
+    Observable<DataList<Artist>> getArtistsRecommendedForUser();
+
+
+    @POST("/user/me/artists")
+    @FormUrlEncoded
+    Observable<Boolean> addArtistToFavourite(@Field("artist_id") long artistId);
+
+    @DELETE("/user/me/artists")
+    Observable<Boolean> removeArtistFromFavourite(@Query("artist_id") long artistId);
 }
