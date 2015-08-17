@@ -4,7 +4,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,9 +14,7 @@ import com.deezer.sdk.network.connect.DeezerConnect;
 import com.deezer.sdk.network.connect.SessionStore;
 import com.deezer.sdk.network.request.event.DeezerError;
 import com.deezer.sdk.network.request.event.OAuthException;
-import com.deezer.sdk.player.AbstractPlayerWrapper;
-import com.deezer.sdk.player.AlbumPlayer;
-import com.deezer.sdk.player.ArtistRadioPlayer;
+import com.deezer.sdk.player.*;
 import com.deezer.sdk.player.event.RadioPlayerListener;
 import com.deezer.sdk.player.exception.TooManyPlayersExceptions;
 import com.deezer.sdk.player.networkcheck.WifiOnlyNetworkStateChecker;
@@ -37,9 +34,10 @@ import butterknife.ButterKnife;
 /**
  * Created by ilya.savritsky on 28.07.2015.
  */
-public class RecommendationsActivity extends AppCompatActivity implements RecommendedAlbumsView.OnAlbumItemInteractionListener,
+public class RecommendationsActivity extends BaseActivity implements RecommendedAlbumsView.OnAlbumItemInteractionListener,
         RecommendedArtistsView.OnArtistItemInteractionListener,
         RecommendationsControlsView.OnTypeSelectedListener,
+        RecommendedTracksView.OnTrackItemInteractionListener,
         RadioPlayerListener {
     public static final String TAG = RecommendationsActivity.class.getSimpleName();
 
@@ -89,10 +87,22 @@ public class RecommendationsActivity extends AppCompatActivity implements Recomm
             case Albums: {
                 return getAlbumFragment();
             }
+            case Tracks: {
+                return getTracksFragment();
+            }
             default: {
                 return null;
             }
         }
+    }
+
+    private RecommendedTracksFragment getTracksFragment() {
+        RecommendedTracksFragment recommendedTracksFragment = (RecommendedTracksFragment) getSupportFragmentManager().
+                findFragmentByTag(RecommendedTracksFragment.TAG);
+        if (recommendedTracksFragment == null) {
+            recommendedTracksFragment = new RecommendedTracksFragment();
+        }
+        return recommendedTracksFragment;
     }
 
     private ArtistFragment getArtistFragment() {
@@ -110,7 +120,6 @@ public class RecommendationsActivity extends AppCompatActivity implements Recomm
         }
         return albumFragment;
     }
-
 
     private void addControlsFragment() {
         RecommendationsControlsFragment controlsFragment = (RecommendationsControlsFragment)
@@ -236,6 +245,32 @@ public class RecommendationsActivity extends AppCompatActivity implements Recomm
     }
 
     @Override
+    public void onTrackItemInteraction(@NonNull com.tutorial.deeplayer.app.deeplayer.pojo.Track track) {
+        try {
+            Log.d(TAG, "play track " + track.getTitle());
+
+            if (weakPlayer != null && weakPlayer.get() != null) {
+                weakPlayer.get().stop();
+            }
+            playerContainer.setVisibility(View.VISIBLE);
+
+            if (weakPlayer == null || weakPlayer.get() == null || !(weakPlayer.get() instanceof TrackPlayer)) {
+                weakPlayer = new WeakReference<>(new TrackPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker()));
+                weakPlayer.get().addPlayerListener(this);
+            }
+            ((TrackPlayer) weakPlayer.get()).playTrack(track.getId());
+            playerFragment.setAttachedPlayer(weakPlayer.get());
+
+        } catch (OAuthException e) {
+            e.printStackTrace();
+        } catch (DeezerError deezerError) {
+            deezerError.printStackTrace();
+        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
+            tooManyPlayersExceptions.printStackTrace();
+        }
+    }
+
+    @Override
     public void onStopProgress() {
         DialogFactory.closeAlertDialog(getSupportFragmentManager());
     }
@@ -249,6 +284,9 @@ public class RecommendationsActivity extends AppCompatActivity implements Recomm
     public void onTypeSelected(RecommendationsTypes type) {
         Log.d(TAG, "Handle type selection");
         switch (type) {
+            case Tracks: {
+                // Node: Do the same
+            }
             case Artists: {
                 // Node: Do the same
             }

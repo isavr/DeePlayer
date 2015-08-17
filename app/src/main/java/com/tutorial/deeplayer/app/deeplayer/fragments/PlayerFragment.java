@@ -85,6 +85,7 @@ public class PlayerFragment extends BaseFragment {
     @Override
     public void onDestroy() {
         doDestroyPlayer();
+        mPlayer = null;
         ButterKnife.unbind(this);
         super.onDestroy();
         DeePlayerApp.getRefWatcher().watch(this, "Player Fragment");
@@ -116,16 +117,16 @@ public class PlayerFragment extends BaseFragment {
 
     public void setAttachedPlayer(final PlayerWrapper player) {
         mPlayer = player;
-        player.addOnBufferErrorListener(mPlayerHandler);
-        player.addOnBufferStateChangeListener(mPlayerHandler);
-        player.addOnBufferProgressListener(mPlayerHandler);
+        if (player != null) {
+            player.addOnBufferErrorListener(mPlayerHandler);
+            player.addOnBufferStateChangeListener(mPlayerHandler);
+            player.addOnBufferProgressListener(mPlayerHandler);
 
-        player.addOnPlayerErrorListener(mPlayerHandler);
-        player.addOnPlayerStateChangeListener(mPlayerHandler);
-        player.addOnPlayerProgressListener(mPlayerHandler);
+            player.addOnPlayerErrorListener(mPlayerHandler);
+            player.addOnPlayerStateChangeListener(mPlayerHandler);
+            player.addOnPlayerProgressListener(mPlayerHandler);
 
-        if (mPlayer.isAllowedToSeek()) {
-            mSeekBar.setEnabled(true);
+            mSeekBar.setEnabled(player.isAllowedToSeek());
         }
     }
 

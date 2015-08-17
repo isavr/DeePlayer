@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
-import com.tutorial.deeplayer.app.deeplayer.views.RadioItemView;
+import com.tutorial.deeplayer.app.deeplayer.views.items.RadioItemView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +91,6 @@ public class RadioAdapter extends BaseAdapter {
         Radio radio = getItem(position);
         if (convertView != null) {
             RadioItemView radioView = (RadioItemView) convertView;
-
             radioView.setListener(listener);
             radioView.bindToData(radio);
             return radioView;

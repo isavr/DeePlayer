@@ -14,6 +14,7 @@ import com.tutorial.deeplayer.app.deeplayer.adapters.ArtistAdapter;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedArtistViewModel;
+import com.tutorial.deeplayer.app.deeplayer.views.items.ArtistItemView;
 
 import java.util.List;
 

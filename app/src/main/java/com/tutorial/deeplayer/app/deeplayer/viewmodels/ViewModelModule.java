@@ -32,4 +32,9 @@ public class ViewModelModule {
     public RecommendedAlbumsViewModel provideRecommendedAlbumViewModel() {
         return new RecommendedAlbumsViewModel();
     }
+
+    @Provides
+    public RecommendedTrackViewModel provideRecommendedATrackViewModel() {
+        return new RecommendedTrackViewModel();
+    }
 }

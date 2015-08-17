@@ -40,6 +40,8 @@ public interface Graph {
 
     void inject(ArtistFragment artistFragment);
 
+    void inject(RecommendedTracksFragment tracksFragment);
+
     void inject(RestService restService);
 
     void inject(DeePlayerApp deePlayerApp);

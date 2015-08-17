@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Cute custom Notification :D
+
+     Thanks a lot for this awesome source, made my day
+     a lot brighter:
+     http://stackoverflow.com/a/18414768/1094964
+ -->
+<LinearLayout
+    android:id="@+id/notification"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <!--     <ImageView
+            android:id="@+id/notification_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/end"
+            android:contentDescription="@string/app_name_short" />
+     -->
+    <ImageButton
+        android:id="@+id/notification_button_play"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:contentDescription="@string/notification_button_play_description"
+        android:src="@drawable/ic_action_play"/>
+
+    <ImageButton
+        android:id="@+id/notification_button_skip"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:contentDescription="@string/notification_button_next_description"
+        android:src="@drawable/ic_action_next"/>
+
+    <ImageView
+        android:id="@+id/notification_item_image"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginLeft="4dp"
+        android:contentDescription="@string/notification_item_image_description"/>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_vertical"
+        android:layout_weight="1"
+        android:gravity="right|center_vertical"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/notification_text_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:gravity="right"
+            android:lines="1"
+            android:maxLines="1"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:scrollbars="horizontal"
+            android:singleLine="true"
+            android:text="placeholder text"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/notification_text_artist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:gravity="right"
+            android:lines="1"
+            android:maxLines="1"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:scrollbars="horizontal"
+            android:singleLine="true"
+            android:text="placeholder text"/>
+
+    </LinearLayout>
+
+</LinearLayout>

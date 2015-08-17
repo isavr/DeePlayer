@@ -14,6 +14,7 @@ import com.tutorial.deeplayer.app.deeplayer.adapters.AlbumAdapter;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedAlbumsViewModel;
+import com.tutorial.deeplayer.app.deeplayer.views.items.AlbumItemView;
 
 import java.util.List;
 

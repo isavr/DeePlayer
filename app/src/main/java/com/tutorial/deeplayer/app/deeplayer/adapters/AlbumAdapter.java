@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
-import com.tutorial.deeplayer.app.deeplayer.views.AlbumItemView;
+import com.tutorial.deeplayer.app.deeplayer.views.items.AlbumItemView;
 
 import java.util.ArrayList;
 import java.util.List;

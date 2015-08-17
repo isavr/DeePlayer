@@ -1,4 +1,4 @@
-package com.tutorial.deeplayer.app.deeplayer.views;
+package com.tutorial.deeplayer.app.deeplayer.views.items;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -10,7 +10,6 @@ import android.widget.*;
 
 import com.squareup.picasso.Picasso;
 import com.tutorial.deeplayer.app.deeplayer.R;
-import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 
 import butterknife.Bind;
@@ -18,9 +17,9 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 
 /**
- * Created by ilya.savritsky on 29.07.2015.
+ * Created by ilya.savritsky on 31.07.2015.
  */
-public class AlbumItemView extends RelativeLayout {
+public class ArtistItemView extends RelativeLayout {
     @Bind(R.id.icon_view)
     ImageView iconView;
     @Bind(R.id.title_text)
@@ -30,27 +29,27 @@ public class AlbumItemView extends RelativeLayout {
     @Bind(R.id.favourite_check)
     CheckBox checkFavouriteView;
 
-    private OnAlbumItemFavouriteStatusInteractionListener listener;
+    private OnArtistItemFavouriteStatusInteractionListener listener;
 
-    private Album value;
+    private Artist value;
 
-    public AlbumItemView(Context context) {
+    public ArtistItemView(Context context) {
         super(context, null);
     }
 
-    public AlbumItemView(Context context, AttributeSet attrs) {
+    public ArtistItemView(Context context, AttributeSet attrs) {
         super(context, attrs, 0);
     }
 
-    public AlbumItemView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public ArtistItemView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setupChildren();
     }
 
-    public static AlbumItemView inflate(LayoutInflater inflater, ViewGroup parent) {
-        AlbumItemView albumItemView = (AlbumItemView) inflater.inflate(R.layout.album_view, parent, false);
-        albumItemView.setupChildren();
-        return albumItemView;
+    public static ArtistItemView inflate(LayoutInflater inflater, ViewGroup parent) {
+        ArtistItemView artistItemView = (ArtistItemView) inflater.inflate(R.layout.artist_view, parent, false);
+        artistItemView.setupChildren();
+        return artistItemView;
     }
 
 
@@ -58,11 +57,11 @@ public class AlbumItemView extends RelativeLayout {
         ButterKnife.bind(this);
     }
 
-    public void bindToData(Album album) {
+    public void bindToData(Artist album) {
         this.value = album;
-        setArtist(album.getArtist());
-        setTitle(album.getTitle());
-        setIcon(album.getCoverMedium());
+        //setArtist(album.getArtist());
+        setTitle(album.getName());
+        setIcon(album.getPictureMedium());
         setFavourite(album.isFavourite());
     }
 
@@ -86,25 +85,21 @@ public class AlbumItemView extends RelativeLayout {
         checkFavouriteView.setChecked(isFavourite);
     }
 
-
-    //TODO: setup listener
-
-
     @OnCheckedChanged(R.id.favourite_check)
     public void itemStatusChanged(CompoundButton button, boolean isChecked) {
         if (this.value != null && this.value.isFavourite() != isChecked) {
             // perform change event
             if (listener != null) {
-                listener.onAlbumItemFavouriteStatusChanged(this.value, isChecked);
+                listener.onArtistItemFavouriteStatusChanged(this.value, isChecked);
             }
         }
     }
 
-    public void setListener(OnAlbumItemFavouriteStatusInteractionListener listener) {
+    public void setListener(OnArtistItemFavouriteStatusInteractionListener listener) {
         this.listener = listener;
     }
 
-    public interface OnAlbumItemFavouriteStatusInteractionListener {
-        void onAlbumItemFavouriteStatusChanged(@NonNull Album radio, boolean isFavourite);
+    public interface OnArtistItemFavouriteStatusInteractionListener {
+        void onArtistItemFavouriteStatusChanged(@NonNull Artist artist, boolean isFavourite);
     }
 }

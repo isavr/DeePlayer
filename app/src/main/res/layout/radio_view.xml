@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tutorial.deeplayer.app.deeplayer.views.RadioItemView
+<com.tutorial.deeplayer.app.deeplayer.views.items.RadioItemView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -43,4 +43,4 @@
         android:layout_marginStart="@dimen/abc_button_inset_horizontal_material"
         android:layout_marginTop="@dimen/abc_button_inset_horizontal_material"
         android:clickable="true"/>
-</com.tutorial.deeplayer.app.deeplayer.views.RadioItemView>
+</com.tutorial.deeplayer.app.deeplayer.views.items.RadioItemView>

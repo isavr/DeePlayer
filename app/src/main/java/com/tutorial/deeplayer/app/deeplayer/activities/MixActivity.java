@@ -1,35 +1,30 @@
 package com.tutorial.deeplayer.app.deeplayer.activities;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.MediaController;
 
-import com.deezer.sdk.model.Track;
-import com.deezer.sdk.network.connect.DeezerConnect;
-import com.deezer.sdk.network.connect.SessionStore;
-import com.deezer.sdk.network.request.event.DeezerError;
-import com.deezer.sdk.network.request.event.OAuthException;
-import com.deezer.sdk.player.RadioPlayer;
-import com.deezer.sdk.player.event.RadioPlayerListener;
-import com.deezer.sdk.player.exception.TooManyPlayersExceptions;
-import com.deezer.sdk.player.networkcheck.WifiOnlyNetworkStateChecker;
 import com.tutorial.deeplayer.app.deeplayer.R;
-import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
+import com.tutorial.deeplayer.app.deeplayer.controllers.MusicController;
 import com.tutorial.deeplayer.app.deeplayer.fragments.PlayerFragment;
 import com.tutorial.deeplayer.app.deeplayer.fragments.RadioFragment;
+import com.tutorial.deeplayer.app.deeplayer.kMP;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
+import com.tutorial.deeplayer.app.deeplayer.services.MusicService;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.views.RadioView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class MixActivity extends AppCompatActivity implements RadioView.OnRadioItemInteractionListener, RadioPlayerListener {
+public class MixActivity extends BaseActivity implements RadioView.OnRadioItemInteractionListener,
+        MediaController.MediaPlayerControl/*, RadioPlayerListener*/ {
     public static final String TAG = MixActivity.class.getSimpleName();
 
     @Bind(R.id.fragment_container)
@@ -39,9 +34,16 @@ public class MixActivity extends AppCompatActivity implements RadioView.OnRadioI
     View playerContainer;
 
     private PlayerFragment playerFragment;
+    private MusicService musicService;
+    private Intent playIntent;
+    private boolean musicBound = false;
+    private Radio radioItem;
+    private MusicController musicController;
 
-    private RadioPlayer mRadioPlayer;
-    private DeezerConnect deezerConnect;
+    private boolean paused = false;
+    private boolean playbackPaused = false;
+    //private RadioPlayer mRadioPlayer;
+    //private DeezerConnect deezerConnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,11 +53,84 @@ public class MixActivity extends AppCompatActivity implements RadioView.OnRadioI
         addFragment();
         addPlayerFragment();
         playerContainer.setVisibility(View.GONE);
+        setMusicController();
 
-        deezerConnect = new DeezerConnect(DeePlayerApp.get(), getString(R.string.app_id));
-        SessionStore sessionStore = new SessionStore();
-        sessionStore.restore(deezerConnect, getApplicationContext());
+        if (playbackPaused) {
+            setMusicController();
+            playbackPaused = false;
+        }
+        //kMP.initialize(this);
+//        if (playIntent == null) {
+//            playIntent = new Intent(this, MusicService.class);
+//            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+//            startService(playIntent);
+//        }
+        //deezerConnect = new DeezerConnect(DeePlayerApp.get(), getString(R.string.app_id));
+        //SessionStore sessionStore = new SessionStore();
+        //sessionStore.restore(deezerConnect, getApplicationContext());
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (paused) {
+            // Ensure that the controller
+            // is shown when the user returns to the app
+            setMusicController();
+            paused = false;
+        }
+    }
+
+    /**
+     * (Re)Starts the musicController.
+     */
+    private void setMusicController() {
+        musicController = new MusicController(MixActivity.this);
+
+        // What will happen when the user presses the
+        // next/previous buttons?
+        musicController.setPrevNextListeners(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Calling method defined on ActivityNowPlaying
+                playNext();
+            }
+        }, new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // Calling method defined on ActivityNowPlaying
+                playPrevious();
+            }
+        });
+
+        // Binding to our media player
+        musicController.setMediaPlayer(this);
+        musicController
+                .setAnchorView(findViewById(R.id.player));
+        musicController.setEnabled(true);
+    }
+
+    //connect to the service
+//    private ServiceConnection musicConnection = new ServiceConnection() {
+//
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder service) {
+//            MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
+//            //get service
+//            musicService = binder.getService();
+//            //TODO: check
+//            //pass radio
+////            musicService.setRadio(radioItem);
+////            musicService.playRadio();
+//            musicBound = true;
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName name) {
+//            musicBound = false;
+//        }
+//    };
 
     private void addFragment() {
         RadioFragment radioFragment = (RadioFragment) getSupportFragmentManager().findFragmentByTag(RadioFragment.TAG);
@@ -110,6 +185,12 @@ public class MixActivity extends AppCompatActivity implements RadioView.OnRadioI
 
     @Override
     protected void onStop() {
+//        stopService(playIntent);
+//        if (musicConnection != null) {
+//            unbindService(musicConnection);
+//        }
+//        musicService = null;
+        musicController.hide();
         super.onStop();
     }
 
@@ -118,94 +199,178 @@ public class MixActivity extends AppCompatActivity implements RadioView.OnRadioI
         super.onDestroy();
     }
 
-    @Override
-    public void onTooManySkipsException() {
-
-    }
-
-    @Override
-    public void onAllTracksEnded() {
-
-    }
-
-    @Override
-    public void onPlayTrack(Track track) {
-        playerFragment.displayTrack(track);
-    }
-
-    @Override
-    public void onTrackEnded(Track track) {
-
-    }
-
-    @Override
-    public void onRequestException(Exception e, Object o) {
-
-    }
+//    @Override
+//    public void onTooManySkipsException() {
+//
+//    }
+//
+//    @Override
+//    public void onAllTracksEnded() {
+//
+//    }
+//
+//    @Override
+//    public void onPlayTrack(Track track) {
+//        playerFragment.displayTrack(track);
+//    }
+//
+//    @Override
+//    public void onTrackEnded(Track track) {
+//
+//    }
+//
+//    @Override
+//    public void onRequestException(Exception e, Object o) {
+//
+//    }
 
     @Override
     public void onRadioItemInteraction(@NonNull Radio radio) {
         playerContainer.setVisibility(View.VISIBLE);
-        try {
-            Log.d(TAG, "play radio " + radio.getTitle());
+//        try {
+        Log.d(TAG, "play radio " + radio.getTitle());
+        radioItem = radio;
+        if (kMP.musicService != null) {
+            kMP.musicService.setRadio(radioItem);
+            kMP.musicService.playRadio();
+        }
+//        if (musicService != null && musicBound) {
+//            musicService.setRadio(radio);
+//            musicService.playRadio();
+//            //playerFragment.setAttachedPlayer(musicService.getPlayer());
+//        }
 
-            if (mRadioPlayer != null) {
-                mRadioPlayer.stop();
-            }
+//            if (mRadioPlayer != null) {
+//                mRadioPlayer.stop();
+//            }
+//
+//            // TODO: update it
+//            mRadioPlayer = new RadioPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker());
+//            mRadioPlayer.addPlayerListener(this);
+//            mRadioPlayer.playRadio(RadioPlayer.RadioType.RADIO, radio.getId());
+//            playerFragment.setAttachedPlayer(mRadioPlayer);
 
-            mRadioPlayer = new RadioPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker());
-            mRadioPlayer.addPlayerListener(this);
-            mRadioPlayer.playRadio(RadioPlayer.RadioType.RADIO, radio.getId());
-            playerFragment.setAttachedPlayer(mRadioPlayer);
+//        } catch (OAuthException e) {
+//            e.printStackTrace();
+//        } catch (DeezerError deezerError) {
+//            deezerError.printStackTrace();
+//        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
+//            tooManyPlayersExceptions.printStackTrace();
+//        }
+    }
 
-        } catch (OAuthException e) {
-            e.printStackTrace();
-        } catch (DeezerError deezerError) {
-            deezerError.printStackTrace();
-        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
-            tooManyPlayersExceptions.printStackTrace();
+    @Override
+    public void start() {
+        kMP.musicService.unpausePlayer();
+    }
+
+    /**
+     * Callback to when the user pressed the `pause` button.
+     */
+    @Override
+    public void pause() {
+        kMP.musicService.pausePlayer();
+    }
+
+    @Override
+    public int getDuration() {
+        if (kMP.musicService != null && kMP.musicService.musicBound
+                && kMP.musicService.isPlaying())
+            return kMP.musicService.getTrackDuration();
+        else
+            return 0;
+    }
+
+    @Override
+    public int getCurrentPosition() {
+        if (kMP.musicService != null && kMP.musicService.musicBound
+                && kMP.musicService.isPlaying()) {
+            // TODO: // FIXME: 14.08.2015
+            return 0;
+            //return kMP.musicService.getPosition();
+        } else {
+            return 0;
         }
     }
 
-//    // TODO: move from here to model
-//    @Override
-//    public void onRadioItemFavouriteStatusChanged(@NonNull Radio radio, boolean isFavourite) {
-//        if (isFavourite) {
-//            // add to favourites
-//            new RestService().fetchResultRadioAddToFavourite(radio.getId()).subscribe(new Observer<Boolean>() {
-//                @Override
-//                public void onCompleted() {
-//                    Log.d(TAG, "completed !!!");
-//                }
-//
-//                @Override
-//                public void onError(Throwable e) {
-//                    e.printStackTrace();
-//                }
-//
-//                @Override
-//                public void onNext(Boolean aBoolean) {
-//                    Log.d(TAG, "onNext !!!" + aBoolean);
-//                }
-//            });
-//        } else {
-//            // remove from favourites
-//            new RestService().fetchResultRadioRemoveFromFavourite(radio.getId()).subscribe(new Observer<Boolean>() {
-//                @Override
-//                public void onCompleted() {
-//                    Log.d(TAG, "completed !!!");
-//                }
-//
-//                @Override
-//                public void onError(Throwable e) {
-//                    e.printStackTrace();
-//                }
-//
-//                @Override
-//                public void onNext(Boolean aBoolean) {
-//                    Log.d(TAG, "onNext !!!" + aBoolean);
-//                }
-//            });
-//        }
-//    }
+    @Override
+    public void seekTo(int position) {
+        // NOTE: not allowed for radios
+        //kMP.musicService.seekTo(position);
+    }
+
+    @Override
+    public boolean isPlaying() {
+        if (kMP.musicService != null && kMP.musicService.musicBound)
+            return kMP.musicService.isPlaying();
+
+        return false;
+    }
+
+    @Override
+    public int getBufferPercentage() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public boolean canPause() {
+        return true;
+    }
+
+    @Override
+    public boolean canSeekBackward() {
+        return true;
+    }
+
+    @Override
+    public boolean canSeekForward() {
+        return true;
+    }
+
+    @Override
+    public int getAudioSessionId() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    // Back to the normal methods
+
+    /**
+     * Jumps to the next song and starts playing it right now.
+     */
+    public void playNext() {
+        kMP.musicService.next(true);
+        //kMP.musicService.playSong();
+
+        //refreshActionBarSubtitle();
+
+        // To prevent the MusicPlayer from behaving
+        // unexpectedly when we pause the song playback.
+        if (playbackPaused) {
+            setMusicController();
+            playbackPaused = false;
+        }
+
+        musicController.show();
+    }
+
+    /**
+     * Jumps to the previous song and starts playing it right now.
+     */
+    public void playPrevious() {
+        kMP.musicService.previous(true);
+        //kMP.musicService.playRadio();
+
+        //refreshActionBarSubtitle();
+
+        // To prevent the MusicPlayer from behaving
+        // unexpectedly when we pause the song playback.
+        if (playbackPaused) {
+            setMusicController();
+            playbackPaused = false;
+        }
+
+        musicController.show();
+    }
 }

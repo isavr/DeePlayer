@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.tutorial.deeplayer.app.deeplayer.views.items.ArtistItemView
+<com.tutorial.deeplayer.app.deeplayer.views.items.TrackItemView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:descendantFocusability="blocksDescendants"
-    android:gravity="center">
+    android:layout_gravity="center"
+    android:descendantFocusability="blocksDescendants">
 
     <ImageButton
         android:id="@+id/icon_view"
@@ -15,7 +15,7 @@
         android:layout_margin="@dimen/radio_item_border"
         android:background="@null"
         android:clickable="false"
-        android:contentDescription="Artist icon"/>
+        android:contentDescription="Track icon"/>
 
     <CheckBox
         android:id="@+id/favourite_check"
@@ -53,6 +53,22 @@
             android:textColor="@android:color/white"/>
 
         <TextView
+            android:id="@+id/album_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:gravity="center"
+            android:maxWidth="@dimen/radio_item_width"
+            android:padding="4dp"
+            android:shadowColor="@android:color/black"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="1"
+            android:text="Classic Rock"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@android:color/white"/>
+
+        <TextView
             android:id="@+id/artist_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -68,5 +84,4 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             android:textColor="@android:color/white"/>
     </LinearLayout>
-
-</com.tutorial.deeplayer.app.deeplayer.views.items.ArtistItemView>
+</com.tutorial.deeplayer.app.deeplayer.views.items.TrackItemView>

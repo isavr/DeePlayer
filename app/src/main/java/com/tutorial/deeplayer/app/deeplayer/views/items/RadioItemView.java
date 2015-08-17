@@ -1,4 +1,4 @@
-package com.tutorial.deeplayer.app.deeplayer.views;
+package com.tutorial.deeplayer.app.deeplayer.views.items;
 
 import android.content.Context;
 import android.support.annotation.NonNull;

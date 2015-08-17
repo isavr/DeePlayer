@@ -157,4 +157,30 @@ public class RestService {
         return userAPI.removeArtistFromFavourite(artistId);
     }
 
+    public Observable<DataList<Track>> fetchTracksRecommendedForUser() {
+        return userAPI.getTracksRecommendedForUser().flatMap(trackDataList -> {
+            if (trackDataList.getError() != null) {
+                return Observable.error(trackDataList.getError());
+            }
+            return Observable.just(trackDataList);
+        });
+    }
+
+    public Observable<DataList<Track>> fetchUserTrack() {
+        return userAPI.getUserTracks().flatMap(trackDataList -> {
+            if (trackDataList.getError() != null) {
+                return Observable.error(trackDataList.getError());
+            }
+            return Observable.just(trackDataList);
+        });
+    }
+
+    public Observable<Boolean> fetchResultTrackAddToFavourite(long trackId) {
+        return userAPI.addArtistToFavourite(trackId);
+    }
+
+    public Observable<Boolean> fetchResultTrackRemoveFromFavourite(long trackId) {
+        return userAPI.removeArtistFromFavourite(trackId);
+    }
+
 }

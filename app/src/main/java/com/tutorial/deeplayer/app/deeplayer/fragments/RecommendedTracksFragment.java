@@ -10,22 +10,24 @@ import android.view.ViewGroup;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
-import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedArtistViewModel;
-import com.tutorial.deeplayer.app.deeplayer.views.RecommendedArtistsView;
+import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedTrackViewModel;
+import com.tutorial.deeplayer.app.deeplayer.views.RecommendedTracksView;
 
 import javax.inject.Inject;
 
+/**
+ * Created by ilya.savritsky on 17.08.2015.
+ */
+public class RecommendedTracksFragment extends Fragment {
+    public static final String TAG = RecommendedTracksFragment.class.getSimpleName();
 
-public class ArtistFragment extends Fragment {
-    public static final String TAG = ArtistFragment.class.getSimpleName();
-
-    private RecommendedArtistsView recommendedArtistsView;
+    private RecommendedTracksView recommendedTrackView;
     @Inject
-    RecommendedArtistViewModel artistViewModel;
+    RecommendedTrackViewModel trackViewModel;
 //    @Inject
 //    Instrumentation instrumentation;
 
-    private RecommendedArtistsView.OnArtistItemInteractionListener listener;
+    private RecommendedTracksView.OnTrackItemInteractionListener listener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,50 +37,50 @@ public class ArtistFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_artist, container, false);
+        return inflater.inflate(R.layout.fragment_tracks, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recommendedArtistsView = (RecommendedArtistsView) view.findViewById(R.id.artist_view);
+        recommendedTrackView = (RecommendedTracksView) view.findViewById(R.id.tracks_view);
         DialogFactory.showProgressDialog(this.getActivity(),
                 getActivity().getSupportFragmentManager());
-        artistViewModel.subscribeToDataStore();
+        trackViewModel.subscribeToDataStore();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        recommendedArtistsView.setViewModel(artistViewModel);
-        recommendedArtistsView.setListener(listener);
+        recommendedTrackView.setViewModel(trackViewModel);
+        recommendedTrackView.setListener(listener);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        recommendedArtistsView.setViewModel(null);
-        recommendedArtistsView.setListener(null);
+        recommendedTrackView.setViewModel(null);
+        recommendedTrackView.setListener(null);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        artistViewModel.unsubscribeFromDataStore();
-        artistViewModel.dispose();
-        artistViewModel = null;
+        trackViewModel.unsubscribeFromDataStore();
+        trackViewModel.dispose();
+        trackViewModel = null;
         //instrumentation.getLeakTracing().traceLeakage(this);
-        DeePlayerApp.getRefWatcher().watch(this, "Recommended Albums Fragment");
+        DeePlayerApp.getRefWatcher().watch(this, "Recommended Tracks Fragment");
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            listener = (RecommendedArtistsView.OnArtistItemInteractionListener) activity;
+            listener = (RecommendedTracksView.OnTrackItemInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnAlbumItemInteractionListener");
+                    + " must implement OnTrackItemInteractionListener");
         }
     }
 
@@ -86,9 +88,8 @@ public class ArtistFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         listener = null;
-        recommendedArtistsView.clean();
-        recommendedArtistsView.setListener(null);
+        recommendedTrackView.clean();
+        recommendedTrackView.setListener(null);
         //instrumentation.getLeakTracing().traceLeakage(this);
     }
-
 }

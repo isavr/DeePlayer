@@ -26,6 +26,7 @@ public interface UserAPI {
     @DELETE("/user/me/radios")
     Observable<Boolean> removeRadioFromFavourite(@Query("radio_id") long radioId);
 
+
     @GET("/user/me/recommendations/albums")
     Observable<DataList<Album>> getAlbumsRecommendedForUser();
 
@@ -39,12 +40,12 @@ public interface UserAPI {
     @DELETE("/user/me/albums")
     Observable<Boolean> removeAlbumFromFavourite(@Query("album_id") long albumId);
 
+
     @GET("/user/me/artists")
     Observable<DataList<Artist>> getUserArtists();
 
     @GET("/user/me/recommendations/artists")
     Observable<DataList<Artist>> getArtistsRecommendedForUser();
-
 
     @POST("/user/me/artists")
     @FormUrlEncoded
@@ -52,4 +53,18 @@ public interface UserAPI {
 
     @DELETE("/user/me/artists")
     Observable<Boolean> removeArtistFromFavourite(@Query("artist_id") long artistId);
+
+
+    @GET("/user/me/tracks")
+    Observable<DataList<Track>> getUserTracks();
+
+    @GET("/user/me/recommendations/tracks")
+    Observable<DataList<Track>> getTracksRecommendedForUser();
+
+    @POST("/user/me/tracks")
+    @FormUrlEncoded
+    Observable<Boolean> addTrackToFavourite(@Field("track_id") long trackId);
+
+    @DELETE("/user/me/tracks")
+    Observable<Boolean> removeTrackFromFavourite(@Query("track_id") long trackId);
 }
