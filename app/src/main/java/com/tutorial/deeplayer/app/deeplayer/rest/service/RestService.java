@@ -1,7 +1,5 @@
 package com.tutorial.deeplayer.app.deeplayer.rest.service;
 
-import android.util.Log;
-
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.pojo.*;
 import com.tutorial.deeplayer.app.deeplayer.rest.interfaces.RadioAPI;
@@ -34,10 +32,11 @@ public class RestService {
                 .setRequestInterceptor(requestInterceptor)
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
-
-        token = DeePlayerApp.get().getApplicationContext().
-                getSharedPreferences("deezer-session", 0).getString("access_token", null);
-        Log.d(TAG, "");
+        if (DeePlayerApp.get() != null) {
+            // we are not testing
+            token = DeePlayerApp.get().getApplicationContext().
+                    getSharedPreferences("deezer-session", 0).getString("access_token", null);
+        }
         userAPI = restAdapter.create(UserAPI.class);
         radioAPI = restAdapter.create(RadioAPI.class);
     }
@@ -62,16 +61,23 @@ public class RestService {
     }
 
     public Observable<DataList<Radio>> fetchRadioInfo() {
-        return radioAPI.getRadios().flatMap(radioList -> {
-            if (radioList.getError() != null) {
-                return Observable.error(radioList.getError());
-            }
-            return Observable.just(radioList);
-        });
+        return prepareRadioInfoData(radioAPI.getRadios());
     }
 
     public Observable<DataList<Radio>> fetchUserRadioInfo() {
-        return userAPI.getUserRadios().flatMap(radioList -> {
+        return prepareRadioInfoData(userAPI.getUserRadios());
+    }
+
+    public Observable<Boolean> fetchResultRadioAddToFavourite(long radioId) {
+        return userAPI.addRadioToFavourite(radioId);
+    }
+
+    public Observable<Boolean> fetchResultRadioRemoveFromFavourite(long radioId) {
+        return userAPI.removeRadioFromFavourite(radioId);
+    }
+
+    protected Observable<DataList<Radio>> prepareRadioInfoData(Observable<DataList<Radio>> radioInfo) {
+        return radioInfo.flatMap(radioList -> {
             if (radioList.getError() != null) {
                 return Observable.error(radioList.getError());
             }
@@ -97,30 +103,12 @@ public class RestService {
         });
     }
 
-    public Observable<Boolean> fetchResultRadioAddToFavourite(long radioId) {
-        return userAPI.addRadioToFavourite(radioId);
-    }
-
-    public Observable<Boolean> fetchResultRadioRemoveFromFavourite(long radioId) {
-        return userAPI.removeRadioFromFavourite(radioId);
-    }
-
     public Observable<DataList<Album>> fetchAlbumsRecommendedForUser() {
-        return userAPI.getAlbumsRecommendedForUser().flatMap(albumDataList -> {
-            if (albumDataList.getError() != null) {
-                return Observable.error(albumDataList.getError());
-            }
-            return Observable.just(albumDataList);
-        });
+        return prepareAlbumsData(userAPI.getAlbumsRecommendedForUser());
     }
 
     public Observable<DataList<Album>> fetchUserAlbums() {
-        return userAPI.getUserAlbums().flatMap(albumDataList -> {
-            if (albumDataList.getError() != null) {
-                return Observable.error(albumDataList.getError());
-            }
-            return Observable.just(albumDataList);
-        });
+        return prepareAlbumsData(userAPI.getUserAlbums());
     }
 
     public Observable<Boolean> fetchResultAlbumAddToFavourite(long albumId) {
@@ -131,22 +119,21 @@ public class RestService {
         return userAPI.removeAlbumFromFavourite(albumId);
     }
 
-    public Observable<DataList<Artist>> fetchArtistsRecommendedForUser() {
-        return userAPI.getArtistsRecommendedForUser().flatMap(artistDataList -> {
-            if (artistDataList.getError() != null) {
-                return Observable.error(artistDataList.getError());
+    protected Observable<DataList<Album>> prepareAlbumsData(Observable<DataList<Album>> dataObservable) {
+        return dataObservable.flatMap(albumDataList -> {
+            if (albumDataList.getError() != null) {
+                return Observable.error(albumDataList.getError());
             }
-            return Observable.just(artistDataList);
+            return Observable.just(albumDataList);
         });
     }
 
+    public Observable<DataList<Artist>> fetchArtistsRecommendedForUser() {
+        return prepareArtistsData(userAPI.getArtistsRecommendedForUser());
+    }
+
     public Observable<DataList<Artist>> fetchUserArtists() {
-        return userAPI.getUserArtists().flatMap(artistDataList -> {
-            if (artistDataList.getError() != null) {
-                return Observable.error(artistDataList.getError());
-            }
-            return Observable.just(artistDataList);
-        });
+        return prepareArtistsData(userAPI.getUserArtists());
     }
 
     public Observable<Boolean> fetchResultArtistAddToFavourite(long artistId) {
@@ -157,22 +144,21 @@ public class RestService {
         return userAPI.removeArtistFromFavourite(artistId);
     }
 
-    public Observable<DataList<Track>> fetchTracksRecommendedForUser() {
-        return userAPI.getTracksRecommendedForUser().flatMap(trackDataList -> {
-            if (trackDataList.getError() != null) {
-                return Observable.error(trackDataList.getError());
+    protected Observable<DataList<Artist>> prepareArtistsData(Observable<DataList<Artist>> dataObservable) {
+        return dataObservable.flatMap(artistDataList -> {
+            if (artistDataList.getError() != null) {
+                return Observable.error(artistDataList.getError());
             }
-            return Observable.just(trackDataList);
+            return Observable.just(artistDataList);
         });
     }
 
+    public Observable<DataList<Track>> fetchTracksRecommendedForUser() {
+        return prepareTracksData(userAPI.getTracksRecommendedForUser());
+    }
+
     public Observable<DataList<Track>> fetchUserTrack() {
-        return userAPI.getUserTracks().flatMap(trackDataList -> {
-            if (trackDataList.getError() != null) {
-                return Observable.error(trackDataList.getError());
-            }
-            return Observable.just(trackDataList);
-        });
+        return prepareTracksData(userAPI.getUserTracks());
     }
 
     public Observable<Boolean> fetchResultTrackAddToFavourite(long trackId) {
@@ -183,4 +169,12 @@ public class RestService {
         return userAPI.removeArtistFromFavourite(trackId);
     }
 
+    protected Observable<DataList<Track>> prepareTracksData(Observable<DataList<Track>> dataObservable) {
+        return dataObservable.flatMap(trackDataList -> {
+            if (trackDataList.getError() != null) {
+                return Observable.error(trackDataList.getError());
+            }
+            return Observable.just(trackDataList);
+        });
+    }
 }

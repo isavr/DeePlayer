@@ -72,4 +72,9 @@ public class Artist extends BaseItemWithPicture {
     public void setTracklist(String tracklist) {
         this.tracklist = tracklist;
     }
+
+    @Override
+    public String getTitle() {
+        return getName();
+    }
 }

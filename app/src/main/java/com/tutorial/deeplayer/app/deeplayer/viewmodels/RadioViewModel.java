@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.tutorial.deeplayer.app.deeplayer.pojo.BaseTypedItem;
+import com.tutorial.deeplayer.app.deeplayer.pojo.DataList;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService;
 
@@ -29,8 +30,41 @@ public class RadioViewModel extends AbstractViewModel {
         compositeSubscription.add(getRadiosWithStatuses());
     }
 
+    protected RestService getRestService() {
+        return new RestService();
+    }
+
+    private Observable<Radio> getRadiosDataObservable(RestService service) {
+        return warpToIoThread(service.fetchRadioInfo())
+                .flatMap(item -> Observable.from(item.getData()));
+    }
+
+    private Observable<Radio> getUserFavouritesObservable(RestService service) {
+        return warpToIoThread(service.fetchUserRadioInfo())
+                .flatMap(item -> Observable.from(item.getUserData()));
+    }
+
+    protected Observable<DataList<Radio>> warpToIoThread(Observable<DataList<Radio>> dataObservable) {
+        return dataObservable.subscribeOn(Schedulers.io());
+    }
+
+    protected Observable<List<Radio>> getRadiosWithStatusesObservable() {
+        RestService service = getRestService();
+        return Observable.concat(getUserFavouritesObservable(service), getRadiosDataObservable(service)).distinct(BaseTypedItem::getId)
+                .toSortedList((radio, radio2) -> {
+                    if (radio.getTitle() != null && radio2.getTitle() != null) {
+                        String title1 = radio.getTitle().trim();
+                        String title2 = radio2.getTitle().trim();
+                        return title1.compareTo(title2);
+                    } else if (radio.getTitle() != null) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                });
+    }
+
     private Subscription getRadiosWithStatuses() {
-        //DialogFactory.showProgressDialog(getActivity(), getChildFragmentManager());
         Observer<List<Radio>> radioObserver = new Observer<List<Radio>>() {
             @Override
             public void onCompleted() {
@@ -51,23 +85,7 @@ public class RadioViewModel extends AbstractViewModel {
                 //rxCupboard.put(radio);
             }
         };
-        RestService service = new RestService();
-        Observable<Radio> radioObservable = service.fetchRadioInfo().subscribeOn(Schedulers.io())
-                .flatMap(item -> Observable.from(item.getData()));
-        Observable<Radio> userFavourites = service.fetchUserRadioInfo().subscribeOn(Schedulers.io())
-                .flatMap(item -> Observable.from(item.getUserData()));
-        return Observable.concat(userFavourites, radioObservable).distinct(BaseTypedItem::getId)
-                .toSortedList((radio, radio2) -> {
-                    if (radio.getTitle() != null && radio2.getTitle() != null) {
-                        String title1 = radio.getTitle().trim();
-                        String title2 = radio2.getTitle().trim();
-                        return title1.compareTo(title2);
-                    } else if (radio.getTitle() != null) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
-                }).observeOn(AndroidSchedulers.mainThread())
+        return getRadiosWithStatusesObservable().observeOn(AndroidSchedulers.mainThread())
                 .subscribe(radioObserver);
     }
 
@@ -81,9 +99,9 @@ public class RadioViewModel extends AbstractViewModel {
 
     private Observable<Boolean> changeRadioFavouriteStatus(Radio radio, boolean isChecked) {
         if (isChecked) {
-            return new RestService().fetchResultRadioAddToFavourite(radio.getId());
+            return getRestService().fetchResultRadioAddToFavourite(radio.getId());
         } else {
-            return new RestService().fetchResultRadioRemoveFromFavourite(radio.getId());
+            return getRestService().fetchResultRadioRemoveFromFavourite(radio.getId());
         }
     }
 

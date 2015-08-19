@@ -44,6 +44,7 @@ public class Album extends FavouriteItem {
     private String tracklist;
     private DataList<Track> tracks;
 
+    @Override
     public String getTitle() {
         return title;
     }

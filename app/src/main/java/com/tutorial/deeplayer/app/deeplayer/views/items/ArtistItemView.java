@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.util.Patterns;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
@@ -59,7 +60,7 @@ public class ArtistItemView extends RelativeLayout {
 
     public void bindToData(Artist album) {
         this.value = album;
-        //setArtist(album.getArtist());
+        artistView.setVisibility(View.GONE);
         setTitle(album.getName());
         setIcon(album.getPictureMedium());
         setFavourite(album.isFavourite());

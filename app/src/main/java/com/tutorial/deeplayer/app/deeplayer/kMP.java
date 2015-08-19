@@ -7,8 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.IBinder;
 import android.util.Log;
 
-import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
-import com.tutorial.deeplayer.app.deeplayer.services.PlayRadioService;
+import com.tutorial.deeplayer.app.deeplayer.services.MusicService;
 
 /**
  * Big class that contains the main logic behind kure Music Player.
@@ -20,11 +19,7 @@ import com.tutorial.deeplayer.app.deeplayer.services.PlayRadioService;
  * http://stackoverflow.com/a/6593822
  */
 public class kMP {
-
-    /**
-     * All the songs on the device.
-     */
-    public static Radio radio = new Radio();
+    public static final String TAG = kMP.class.getSimpleName();
 
 //    /**
 //     * All the app's configurations/preferences/settings.
@@ -35,7 +30,7 @@ public class kMP {
      * Our custom service that allows the music to play
      * even when the app is not on focus.
      */
-    public static PlayRadioService musicService = null;
+    public static MusicService musicService = null;
 
 //    /**
 //     * Contains the songs that are going to be shown to
@@ -48,15 +43,6 @@ public class kMP {
 //     * to display it.
 //     */
 //    public static ArrayList<Song> musicList = null;
-
-//    /**
-//     * List of the songs being currently played by the user.
-//     *
-//     * (independent of the UI)
-//     *
-//     * TODO remove this shit
-//     */
-//    public static ArrayList<Song> nowPlayingList = null;
 
     /**
      * Flag that tells if the Main Menu has an item that
@@ -109,7 +95,6 @@ public class kMP {
      * being destroyed.
      */
     public static void destroy() {
-        radio = null;
     }
 
     /**
@@ -124,11 +109,11 @@ public class kMP {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            PlayRadioService.MusicBinder binder = (PlayRadioService.MusicBinder) service;
+            MusicService.MusicBinder binder = (MusicService.MusicBinder) service;
             Log.d(kMP.class.getSimpleName(), "on Service connected");
             // Here's where we finally create the MusicService
             musicService = binder.getService();
-            musicService.setRadio(radio);
+//            musicService.setRadio(radio);
             musicService.musicBound = true;
         }
 
@@ -152,16 +137,18 @@ public class kMP {
      * called multiple times.
      */
     public static void startMusicService(Context c) {
-
+        Log.d(TAG, "start service");
         if (musicServiceIntent != null)
             return;
 
-        if (kMP.musicService != null)
+        if (kMP.musicService != null) {
+            Log.d(TAG, "service is null");
             return;
+        }
 
         // Create an intent to bind our Music Connection to
         // the MusicService.
-        musicServiceIntent = new Intent(c, PlayRadioService.class);
+        musicServiceIntent = new Intent(c, MusicService.class);
         c.bindService(musicServiceIntent, musicConnection, Context.BIND_AUTO_CREATE);
         c.startService(musicServiceIntent);
     }
@@ -171,7 +158,7 @@ public class kMP {
      * Activity/Context c.
      */
     public static void stopMusicService(Context c) {
-
+        Log.d(TAG, "stop service");
         if (musicServiceIntent == null)
             return;
 

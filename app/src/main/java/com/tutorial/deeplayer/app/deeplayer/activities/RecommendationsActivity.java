@@ -1,5 +1,7 @@
 package com.tutorial.deeplayer.app.deeplayer.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,24 +11,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.deezer.sdk.model.Track;
 import com.deezer.sdk.network.connect.DeezerConnect;
 import com.deezer.sdk.network.connect.SessionStore;
-import com.deezer.sdk.network.request.event.DeezerError;
-import com.deezer.sdk.network.request.event.OAuthException;
-import com.deezer.sdk.player.*;
-import com.deezer.sdk.player.event.RadioPlayerListener;
-import com.deezer.sdk.player.exception.TooManyPlayersExceptions;
-import com.deezer.sdk.player.networkcheck.WifiOnlyNetworkStateChecker;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.fragments.*;
+import com.tutorial.deeplayer.app.deeplayer.kMP;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
+import com.tutorial.deeplayer.app.deeplayer.services.MusicService;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.views.*;
-
-import java.lang.ref.WeakReference;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -36,9 +31,8 @@ import butterknife.ButterKnife;
  */
 public class RecommendationsActivity extends BaseActivity implements RecommendedAlbumsView.OnAlbumItemInteractionListener,
         RecommendedArtistsView.OnArtistItemInteractionListener,
-        RecommendationsControlsView.OnTypeSelectedListener,
         RecommendedTracksView.OnTrackItemInteractionListener,
-        RadioPlayerListener {
+        RecommendationsControlsView.OnTypeSelectedListener {
     public static final String TAG = RecommendationsActivity.class.getSimpleName();
 
     @Bind(R.id.fragment_container)
@@ -47,14 +41,11 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
     @Bind(R.id.player)
     View playerContainer;
 
-//    @Bind(R.id.controls)
-//    View recommendationsControlsContainer;
+//    private PlayerFragment playerFragment;
 
-    private PlayerFragment playerFragment;
+//    private WeakReference<AbstractPlayerWrapper> weakPlayer;
 
-    private WeakReference<AbstractPlayerWrapper> weakPlayer;
-
-    private AlbumPlayer mAlbumPlayer;
+    //    private AlbumPlayer mAlbumPlayer;
     private DeezerConnect deezerConnect;
 
     @Override
@@ -63,7 +54,7 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
         setContentView(R.layout.activity_recommendations);
         ButterKnife.bind(this);
         addControlsFragment();
-        addPlayerFragment();
+//        addPlayerFragment();
         playerContainer.setVisibility(View.GONE);
 
         deezerConnect = new DeezerConnect(DeePlayerApp.get(), getString(R.string.app_id));
@@ -71,11 +62,39 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
         sessionStore.restore(deezerConnect, getApplicationContext());
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, MusicService.class);
+        bindService(intent, kMP.musicConnection, Context.BIND_AUTO_CREATE);
+        startService(intent);
+    }
+
     private void addFragment(RecommendationsTypes type) {
         Fragment fragment = getFragmentForType(type);
         if (fragment != null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragment)
                     .commit();
+        }
+    }
+
+    private void initMusicService(RecommendationsTypes type) {
+        switch (type) {
+            case Artists: {
+                kMP.musicService.initPlayer(MusicService.PlayerType.ARTIST);
+                break;
+            }
+            case Albums: {
+                kMP.musicService.initPlayer(MusicService.PlayerType.ALBUM);
+                break;
+            }
+            case Tracks: {
+                kMP.musicService.initPlayer(MusicService.PlayerType.TRACK);
+                break;
+            }
+            default: {
+
+            }
         }
     }
 
@@ -131,14 +150,14 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
                 .commit();
     }
 
-    private void addPlayerFragment() {
-        playerFragment = (PlayerFragment) getSupportFragmentManager().findFragmentByTag(PlayerFragment.TAG);
-        if (playerFragment == null) {
-            playerFragment = new PlayerFragment();
-        }
-        getSupportFragmentManager().beginTransaction().replace(R.id.player, playerFragment)
-                .commit();
-    }
+//    private void addPlayerFragment() {
+//        playerFragment = (PlayerFragment) getSupportFragmentManager().findFragmentByTag(PlayerFragment.TAG);
+//        if (playerFragment == null) {
+//            playerFragment = new PlayerFragment();
+//        }
+//        getSupportFragmentManager().beginTransaction().replace(R.id.player, playerFragment)
+//                .commit();
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -163,111 +182,59 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
     }
 
     @Override
-    public void onTooManySkipsException() {
-
-    }
-
-    @Override
-    public void onAllTracksEnded() {
-
-    }
-
-    @Override
-    public void onPlayTrack(Track track) {
-        playerContainer.setVisibility(View.VISIBLE);
-        playerFragment.displayTrack(track);
-    }
-
-    @Override
-    public void onTrackEnded(Track track) {
-
-    }
-
-    @Override
-    public void onRequestException(Exception e, Object o) {
-
-    }
-
-    @Override
     public void onError(Throwable err) {
         DialogFactory.showSimpleErrorMessage(this, getSupportFragmentManager(), err.getMessage());
     }
 
     @Override
     public void onAlbumItemInteraction(@NonNull Album album) {
-        try {
-            Log.d(TAG, "play album " + album.getTitle());
-
-            if (weakPlayer != null && weakPlayer.get() != null) {
-                weakPlayer.get().stop();
-            }
-            playerContainer.setVisibility(View.VISIBLE);
-            if (weakPlayer == null || weakPlayer.get() == null || !(weakPlayer.get() instanceof AlbumPlayer)) {
-                weakPlayer = new WeakReference<>(new AlbumPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker()));
-                weakPlayer.get().addPlayerListener(this);
-            }
-            ((AlbumPlayer) weakPlayer.get()).playAlbum(album.getId());
-            playerFragment.setAttachedPlayer(weakPlayer.get());
-
-        } catch (OAuthException e) {
-            e.printStackTrace();
-        } catch (DeezerError deezerError) {
-            deezerError.printStackTrace();
-        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
-            tooManyPlayersExceptions.printStackTrace();
+        initMusicService(RecommendationsTypes.Artists);
+        if (kMP.musicService != null) {
+            kMP.musicService.setAlbum(album);
+//            kMP.musicService.playAlbum();
         }
     }
 
     @Override
     public void onArtistItemInteraction(@NonNull Artist artist) {
-        try {
-            Log.d(TAG, "play artist " + artist.getName());
 
-            if (weakPlayer != null && weakPlayer.get() != null) {
-                weakPlayer.get().stop();
-            }
-            playerContainer.setVisibility(View.VISIBLE);
-
-            if (weakPlayer == null || weakPlayer.get() == null || !(weakPlayer.get() instanceof ArtistRadioPlayer)) {
-                weakPlayer = new WeakReference<>(new ArtistRadioPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker()));
-                weakPlayer.get().addPlayerListener(this);
-            }
-            ((ArtistRadioPlayer) weakPlayer.get()).playArtistRadio(artist.getId());
-            playerFragment.setAttachedPlayer(weakPlayer.get());
-
-        } catch (OAuthException e) {
-            e.printStackTrace();
-        } catch (DeezerError deezerError) {
-            deezerError.printStackTrace();
-        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
-            tooManyPlayersExceptions.printStackTrace();
+        if (kMP.musicService != null) {
+            initMusicService(RecommendationsTypes.Artists);
+            kMP.musicService.setArtist(artist);
+            kMP.musicService.playArtist();
         }
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(kMP.musicConnection);
+    }
+
+    @Override
     public void onTrackItemInteraction(@NonNull com.tutorial.deeplayer.app.deeplayer.pojo.Track track) {
-        try {
-            Log.d(TAG, "play track " + track.getTitle());
-
-            if (weakPlayer != null && weakPlayer.get() != null) {
-                weakPlayer.get().stop();
-            }
-            playerContainer.setVisibility(View.VISIBLE);
-
-            if (weakPlayer == null || weakPlayer.get() == null || !(weakPlayer.get() instanceof TrackPlayer)) {
-                weakPlayer = new WeakReference<>(new TrackPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker()));
-                weakPlayer.get().addPlayerListener(this);
-            }
-            ((TrackPlayer) weakPlayer.get()).playTrack(track.getId());
-            playerFragment.setAttachedPlayer(weakPlayer.get());
-
-        } catch (OAuthException e) {
-            e.printStackTrace();
-        } catch (DeezerError deezerError) {
-            deezerError.printStackTrace();
-        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
-            tooManyPlayersExceptions.printStackTrace();
-        }
+//        try {
+//            Log.d(TAG, "play track " + track.getTitle());
+//
+//            if (weakPlayer != null && weakPlayer.get() != null) {
+//                weakPlayer.get().stop();
+//            }
+//            playerContainer.setVisibility(View.VISIBLE);
+//
+//            if (weakPlayer == null || weakPlayer.get() == null || !(weakPlayer.get() instanceof TrackPlayer)) {
+//                weakPlayer = new WeakReference<>(new TrackPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker()));
+//                weakPlayer.get().addPlayerListener(this);
+//            }
+//            ((TrackPlayer) weakPlayer.get()).playTrack(track.getId());
+////            playerFragment.setAttachedPlayer(weakPlayer.get());
+//
+//        } catch (OAuthException e) {
+//            e.printStackTrace();
+//        } catch (DeezerError deezerError) {
+//            deezerError.printStackTrace();
+//        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
+//            tooManyPlayersExceptions.printStackTrace();
+//        }
     }
 
     @Override

@@ -13,4 +13,27 @@ public class FavouriteItem extends BaseTypedItem {
     public void setFavourite(boolean favourite) {
         this.favourite = favourite;
     }
+
+    public String getTitle() {
+        return "";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FavouriteItem)) return false;
+        if (!super.equals(o)) return false;
+
+        FavouriteItem that = (FavouriteItem) o;
+
+        return favourite == that.favourite;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        result = 31 * result + (favourite ? 1 : 0);
+        return result;
+    }
 }

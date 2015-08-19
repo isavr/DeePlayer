@@ -4,13 +4,16 @@ import android.app.*;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.deezer.sdk.model.Track;
 import com.squareup.picasso.Picasso;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.activities.MixActivity;
+import com.tutorial.deeplayer.app.deeplayer.activities.RecommendationsActivity;
 import com.tutorial.deeplayer.app.deeplayer.kMP;
+import com.tutorial.deeplayer.app.deeplayer.pojo.FavouriteItem;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 
 /**
@@ -28,6 +31,7 @@ import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
  * http://stackoverflow.com/a/21927248
  */
 public class NotificationMusic extends NotificationSimple {
+    private static final String TAG = NotificationMusic.class.getSimpleName();
 
     /**
      * Reference to the context that notified.
@@ -70,37 +74,37 @@ public class NotificationMusic extends NotificationSimple {
      * @param service Service that calls this function.
      *                Required so the Notification can
      *                run on the background.
-     * @param radio   Song which we'll display information.
-     * @param track
+     * @param data
+     * @param track   Current track info
      * @note By calling this function multiple times, it'll
      * update the old notification.
      */
-    public void notifyRadio(Context context, Service service, Radio radio, Track track) {
-
-        if (this.context == null)
+    public void notifyPlayer(Context context, Service service, FavouriteItem data, Track track) {
+        if (this.context == null) {
             this.context = context;
-        if (this.service == null)
+        }
+        if (this.service == null) {
             this.service = service;
+        }
 
-        // Intent that launches the "Now Playing" Activity
-        Intent notifyIntent = new Intent(context, MixActivity.class);
+        Intent notifyIntent;
+        if (data instanceof Radio) {
+            notifyIntent = new Intent(context, MixActivity.class);
+        } else {
+            notifyIntent = new Intent(context, RecommendationsActivity.class);
+        }
         notifyIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        // Letting the Intent be executed later by other application.
         PendingIntent pendingIntent = PendingIntent.getActivity
                 (context, 0, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Setting our custom appearance for the notification
         notificationView = new RemoteViews(kMP.packageName, R.layout.notification);
-
         // Manually settings the buttons and text
         // (ignoring the defaults on the XML)
-//        notificationView.setImageViewResource(R.id.notification_button_play, R.drawable.ic_action_play);
-//        notificationView.setImageViewResource(R.id.notification_button_skip, R.drawable.ic_action_next);
-        notificationView.setTextViewText(R.id.notification_text_title, radio.getTitle());
+        notificationView.setTextViewText(R.id.notification_text_title, data.getType());
         String artistText = track.getTitle() + " by " + track.getArtist().getName();
         notificationView.setTextViewText(R.id.notification_text_artist, artistText);
-
 
         // On the notification we have two buttons - Play and Skip
         // Here we make sure the class `NotificationButtonHandler`
@@ -119,8 +123,7 @@ public class NotificationMusic extends NotificationSimple {
 
         PendingIntent buttonSkipPendingIntent = PendingIntent.getBroadcast(context, 0, buttonSkipIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.notification_button_skip, buttonSkipPendingIntent);
-
-//        Intent cancelNotificationIntent = new Intent(context, NotificationCancelHandler.class);
+        //        Intent cancelNotificationIntent = new Intent(context, NotificationCancelHandler.class);
 //        cancelNotificationIntent.putExtra("action", "stop");
 //
 //        PendingIntent cancelNotificationPendingIntent = PendingIntent.getBroadcast(context, 0,
@@ -130,19 +133,18 @@ public class NotificationMusic extends NotificationSimple {
         notificationBuilder = new Notification.Builder(context);
         notificationBuilder.setContentIntent(pendingIntent)
                 .setSmallIcon(R.drawable.ic_launcher)
-                .setTicker("DeePlayer: Playing " + radio.getType() + " - " + radio.getTitle() + " Track: " + artistText + "'")
+                .setTicker("DeePlayer: Playing " + data.getType() + " - " + data.getTitle() + " Track: " + artistText + "'")
                 .setOngoing(true)
-//                .setAutoCancel(true)
-//                .setDeleteIntent(cancelNotificationPendingIntent)
-                .setContentTitle(radio.getTitle())
+                .setContentTitle(data.getTitle())
                 .setContentText(artistText)
                 .setContent(notificationView);
 
         Notification notification = notificationBuilder.build();
+        //track.getAlbum().getCoverUrl()
 
         Picasso.with(context).load(R.drawable.ic_action_play).into(notificationView, R.id.notification_button_play, NOTIFICATION_ID, notification);
         Picasso.with(context).load(R.drawable.ic_action_next).into(notificationView, R.id.notification_button_skip, NOTIFICATION_ID, notification);
-        Picasso.with(context).load(radio.getPictureSmall()).into(notificationView, R.id.notification_item_image, NOTIFICATION_ID, notification);
+        //Picasso.with(context).load(radio.getPictureSmall()).into(notificationView, R.id.notification_item_image, NOTIFICATION_ID, notification);
 
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -153,13 +155,16 @@ public class NotificationMusic extends NotificationSimple {
         service.startForeground(NOTIFICATION_ID, notification);
     }
 
+
     /**
      * Called when user clicks the "play/pause" button on the on-going system Notification.
      */
     public static class NotificationPlayButtonHandler extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            kMP.musicService.togglePlayback();
+            if (kMP.musicService != null) {
+                kMP.musicService.togglePlayback();
+            }
         }
     }
 
@@ -169,8 +174,11 @@ public class NotificationMusic extends NotificationSimple {
     public static class NotificationSkipButtonHandler extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
-            kMP.musicService.next(true);
-            //kMP.musicService.playRadio();
+
+            if (kMP.musicService != null) {
+                kMP.musicService.next(true);
+                //kMP.musicService.playRadio();
+            }
         }
     }
 
@@ -188,8 +196,10 @@ public class NotificationMusic extends NotificationSimple {
      * Updates the Notification icon if the music is paused.
      */
     public void notifyPaused(boolean isPaused) {
-        if ((notificationView == null) || (notificationBuilder == null))
+        if ((notificationView == null) || (notificationBuilder == null)) {
+            Log.d(TAG, "nothing to pause");
             return;
+        }
 
         int iconID = ((isPaused) ?
                 R.drawable.ic_action_play :

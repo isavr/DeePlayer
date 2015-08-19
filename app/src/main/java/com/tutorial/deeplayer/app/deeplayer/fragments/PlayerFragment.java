@@ -23,6 +23,8 @@ import butterknife.ButterKnife;
 /**
  * Created by ilya.savritsky on 23.07.2015.
  */
+@Deprecated
+// use service for playing music
 public class PlayerFragment extends BaseFragment {
     public static final String TAG = PlayerFragment.class.getSimpleName();
 

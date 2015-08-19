@@ -27,6 +27,27 @@ public class BaseTypedItem {
         return type;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BaseTypedItem)) return false;
+
+        BaseTypedItem that = (BaseTypedItem) o;
+
+        if (error != null ? !error.equals(that.error) : that.error != null) return false;
+        if (_id != null ? !_id.equals(that._id) : that._id != null) return false;
+        return !(type != null ? !type.equals(that.type) : that.type != null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = error != null ? error.hashCode() : 0;
+        result = 31 * result + (_id != null ? _id.hashCode() : 0);
+        result = 31 * result + (type != null ? type.hashCode() : 0);
+        return result;
+    }
+
     public void setType(String type) {
         this.type = type;
     }
@@ -38,4 +59,6 @@ public class BaseTypedItem {
     public void setError(DeezerError error) {
         this.error = error;
     }
+
+
 }

@@ -39,6 +39,7 @@ public class Track extends FavouriteItem {
         this.readable = readable;
     }
 
+    @Override
     public String getTitle() {
         return title;
     }

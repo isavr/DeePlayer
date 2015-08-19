@@ -50,12 +50,12 @@ public class PlayRadioService extends Service implements AudioManager.OnAudioFoc
     /**
      * String used to get the current state Extra on the Broadcast Intent
      */
-    public static final String BROADCAST_EXTRA_STATE = "x_japan";
+    public static final String BROADCAST_EXTRA_STATE = "current_state";
 
     /**
      * String used to get the song ID Extra on the Broadcast Intent
      */
-    public static final String BROADCAST_EXTRA_SONG_ID = "tenacious_d";
+    public static final String BROADCAST_EXTRA_RADIO_ID = "radio_id";
 
     // All possible messages this Service will broadcast
     // Ignore the actual values
@@ -63,39 +63,38 @@ public class PlayRadioService extends Service implements AudioManager.OnAudioFoc
     /**
      * Broadcast for when some music started playing
      */
-    public static final String BROADCAST_EXTRA_PLAYING = "beatles";
+    public static final String BROADCAST_EXTRA_PLAYING = "playing";
 
     /**
      * Broadcast for when some music just got paused
      */
-    public static final String BROADCAST_EXTRA_PAUSED = "santana";
+    public static final String BROADCAST_EXTRA_PAUSED = "paused";
 
     /**
      * Broadcast for when a paused music got unpaused
      */
-    public static final String BROADCAST_EXTRA_UNPAUSED = "iron_maiden";
+    public static final String BROADCAST_EXTRA_UNPAUSED = "unpaused";
 
     /**
      * Broadcast for when current music got played until the end
      */
-    public static final String BROADCAST_EXTRA_COMPLETED = "los_hermanos";
+    public static final String BROADCAST_EXTRA_COMPLETED = "completed";
 
     /**
      * Broadcast for when the user skipped to the next song
      */
-    public static final String BROADCAST_EXTRA_SKIP_NEXT = "paul_gilbert";
+    public static final String BROADCAST_EXTRA_SKIP_NEXT = "next";
 
     /**
      * Broadcast for when the user skipped to the previous song
      */
-    public static final String BROADCAST_EXTRA_SKIP_PREVIOUS = "john_petrucci";
+    public static final String BROADCAST_EXTRA_SKIP_PREVIOUS = "previous";
 
 
     private RadioPlayer mRadioPlayer;
     private Radio radio;
     private DeezerConnect deezerConnect;
 
-    //TODO: fix values and names
     // These are the Intent actions that we are prepared to handle. Notice that the fact these
     // constants exist in our class is a mere convenience: what really defines the actions our
     // service can handle are the <action> tags in the <intent-filters> tag for our service in
@@ -280,11 +279,6 @@ public class PlayRadioService extends Service implements AudioManager.OnAudioFoc
                 .putString(android.media.MediaMetadataRetriever.METADATA_KEY_TITLE, radio.getTitle())
                 .putLong(android.media.MediaMetadataRetriever.METADATA_KEY_DURATION, mRadioPlayer.getTrackDuration())
 
-                        // TODO: fetch real item artwork
-                        //.putBitmap(
-                        //        RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK,
-                        //        mDummyAlbumArt)
-
                         // Saves (after #editMetadata())
                 .apply();
 
@@ -312,7 +306,7 @@ public class PlayRadioService extends Service implements AudioManager.OnAudioFoc
      * Disables the hability to notify things on the
      * status bar.
      *
-     * @see #notifyCurrentRadio()
+     * @see #notifyCurrentRadio(Track track)
      */
     public void cancelNotification() {
         if (notification == null)
@@ -336,7 +330,7 @@ public class PlayRadioService extends Service implements AudioManager.OnAudioFoc
             notification = new NotificationMusic();
         }
 
-        notification.notifyRadio(this, this, radio, track);
+        //notification.notifyRadio(this, this, radio, track);
     }
 
     /**
@@ -424,7 +418,6 @@ public class PlayRadioService extends Service implements AudioManager.OnAudioFoc
                         break;
 
                     case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                        // TODO: ensure that doing this in rapid succession actually plays the
                         // previous song
                         intentValue = PlayRadioService.BROADCAST_ORDER_REWIND;
                         Log.w(TAG, "media previous");
@@ -615,7 +608,7 @@ public class PlayRadioService extends Service implements AudioManager.OnAudioFoc
         Intent broadcastIntent = new Intent(PlayRadioService.BROADCAST_ACTION);
 
         broadcastIntent.putExtra(PlayRadioService.BROADCAST_EXTRA_STATE, state);
-        broadcastIntent.putExtra(PlayRadioService.BROADCAST_EXTRA_SONG_ID, radio.getId());
+        broadcastIntent.putExtra(PlayRadioService.BROADCAST_EXTRA_RADIO_ID, radio.getId());
 
         LocalBroadcastManager
                 .getInstance(getApplicationContext())
