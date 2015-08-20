@@ -331,6 +331,32 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         }
     }
 
+    public void playAlbum() {
+        Log.d(TAG, "playAlbum");
+        if (data != null && data instanceof Album
+                && mDeezerPlayer != null && mDeezerPlayer instanceof AlbumPlayer) {
+            Log.d(TAG, "Playing Album radio -> " + data.getTitle());
+            mDeezerPlayer.stop();
+            ((AlbumPlayer) mDeezerPlayer).playAlbum(data.getId());
+
+            broadcastState(MusicService.BROADCAST_EXTRA_PLAYING);
+            updateLockScreenWidget(data, RemoteControlClient.PLAYSTATE_PLAYING);
+        }
+    }
+
+    public void playTrack() {
+        Log.d(TAG, "playTrack");
+        if (data != null && data instanceof com.tutorial.deeplayer.app.deeplayer.pojo.Track
+                && mDeezerPlayer != null && mDeezerPlayer instanceof TrackPlayer) {
+            Log.d(TAG, "Playing Track -> " + data.getTitle());
+            mDeezerPlayer.stop();
+            ((TrackPlayer) mDeezerPlayer).playTrack(data.getId());
+
+            broadcastState(MusicService.BROADCAST_EXTRA_PLAYING);
+            updateLockScreenWidget(data, RemoteControlClient.PLAYSTATE_PLAYING);
+        }
+    }
+
     /**
      * Tells if this service is bound to an Activity.
      */
@@ -638,6 +664,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
             broadcastState(MusicService.BROADCAST_EXTRA_SKIP_NEXT);
         }
         mDeezerPlayer.skipToNextTrack();
+        notification.notifyPaused(isPaused());
 
         // Updates Lock-Screen Widget
         if (lockscreenController != null) {
@@ -661,6 +688,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
             broadcastState(MusicService.BROADCAST_EXTRA_SKIP_PREVIOUS);
         }
         mDeezerPlayer.skipToPreviousTrack();
+        notification.notifyPaused(isPaused());
 
         // Updates Lock-Screen Widget
         if (lockscreenController != null) {

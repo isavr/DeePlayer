@@ -12,56 +12,91 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:gravity="center"
-    android:orientation="horizontal">
+    android:orientation="vertical"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp">
 
-    <!--     <ImageView
-            android:id="@+id/notification_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:src="@drawable/end"
-            android:contentDescription="@string/app_name_short" />
-     -->
-    <ImageButton
-        android:id="@+id/notification_button_play"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:contentDescription="@string/notification_button_play_description"
-        android:src="@drawable/ic_action_play"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp">
 
-    <ImageButton
-        android:id="@+id/notification_button_skip"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:contentDescription="@string/notification_button_next_description"
-        android:src="@drawable/ic_action_next"/>
+        <ImageView
+            android:id="@+id/notification_item_image"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="4dp"
+            android:contentDescription="@string/notification_item_image_description"/>
 
-    <ImageView
-        android:id="@+id/notification_item_image"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_marginLeft="4dp"
-        android:contentDescription="@string/notification_item_image_description"/>
 
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_vertical"
-        android:layout_weight="1"
-        android:gravity="right|center_vertical"
+        <ImageButton
+            android:id="@+id/notification_button_play"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_centerInParent="true"
+            android:contentDescription="@string/notification_button_play_description"
+            android:src="@drawable/ic_action_play"/>
+
+        <ImageButton
+            android:id="@+id/notification_button_previous"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_toLeftOf="@+id/notification_button_play"
+            android:contentDescription="@string/notification_button_previous_description"
+            android:src="@drawable/ic_action_previous"/>
+
+        <ImageButton
+            android:id="@+id/notification_button_skip"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_toRightOf="@+id/notification_button_play"
+            android:contentDescription="@string/notification_button_next_description"
+            android:src="@drawable/ic_action_next"/>
+
+        <ImageButton
+            android:id="@+id/notification_button_like"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_toRightOf="@+id/notification_button_skip"
+            android:contentDescription="@string/notification_button_next_description"
+            android:src="@drawable/ic_action_like"/>
+    </RelativeLayout>
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="4dp"
+        android:columnCount="2"
         android:orientation="vertical"
-        android:padding="10dp">
+        android:rowCount="4">
 
         <TextView
-            android:id="@+id/notification_text_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/notification_title_type"
+            android:text="Type:"
+            android:textStyle="italic"/>
+
+        <TextView
+            android:id="@+id/notification_title_artist"
+            android:text="Artist:"
+            android:textStyle="italic"/>
+
+        <TextView
+            android:id="@+id/notification_title_album"
+            android:text="Album:"
+            android:textStyle="italic"/>
+
+        <TextView
+            android:id="@+id/notification_title_track"
+            android:text="Track Name:"
+            android:textStyle="italic"/>
+
+        <TextView
+            android:id="@+id/notification_text_type"
             android:ellipsize="marquee"
-            android:gravity="right"
             android:lines="1"
-            android:maxLines="1"
             android:marqueeRepeatLimit="marquee_forever"
+            android:maxLines="1"
             android:scrollHorizontally="true"
             android:scrollbars="horizontal"
             android:singleLine="true"
@@ -70,18 +105,39 @@
 
         <TextView
             android:id="@+id/notification_text_artist"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:ellipsize="marquee"
-            android:gravity="right"
             android:lines="1"
-            android:maxLines="1"
             android:marqueeRepeatLimit="marquee_forever"
+            android:maxLines="1"
             android:scrollHorizontally="true"
             android:scrollbars="horizontal"
             android:singleLine="true"
-            android:text="placeholder text"/>
+            android:text="placeholder text"
+            android:textStyle="bold"/>
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/notification_text_album"
+            android:ellipsize="marquee"
+            android:lines="1"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:maxLines="1"
+            android:scrollHorizontally="true"
+            android:scrollbars="horizontal"
+            android:singleLine="true"
+            android:text="placeholder text"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/notification_text_track"
+            android:ellipsize="marquee"
+            android:lines="1"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:maxLines="1"
+            android:scrollHorizontally="true"
+            android:scrollbars="horizontal"
+            android:singleLine="true"
+            android:text="placeholder text"
+            android:textStyle="bold"/>
+    </GridLayout>
 
 </LinearLayout>

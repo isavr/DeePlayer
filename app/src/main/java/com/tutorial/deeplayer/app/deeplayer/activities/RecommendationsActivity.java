@@ -188,16 +188,15 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
 
     @Override
     public void onAlbumItemInteraction(@NonNull Album album) {
-        initMusicService(RecommendationsTypes.Artists);
         if (kMP.musicService != null) {
+            initMusicService(RecommendationsTypes.Albums);
             kMP.musicService.setAlbum(album);
-//            kMP.musicService.playAlbum();
+            kMP.musicService.playAlbum();
         }
     }
 
     @Override
     public void onArtistItemInteraction(@NonNull Artist artist) {
-
         if (kMP.musicService != null) {
             initMusicService(RecommendationsTypes.Artists);
             kMP.musicService.setArtist(artist);
@@ -206,35 +205,18 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
-        unbindService(kMP.musicConnection);
+    public void onTrackItemInteraction(@NonNull com.tutorial.deeplayer.app.deeplayer.pojo.Track track) {
+        if (kMP.musicService != null) {
+            initMusicService(RecommendationsTypes.Tracks);
+            kMP.musicService.setTrack(track);
+            kMP.musicService.playTrack();
+        }
     }
 
     @Override
-    public void onTrackItemInteraction(@NonNull com.tutorial.deeplayer.app.deeplayer.pojo.Track track) {
-//        try {
-//            Log.d(TAG, "play track " + track.getTitle());
-//
-//            if (weakPlayer != null && weakPlayer.get() != null) {
-//                weakPlayer.get().stop();
-//            }
-//            playerContainer.setVisibility(View.VISIBLE);
-//
-//            if (weakPlayer == null || weakPlayer.get() == null || !(weakPlayer.get() instanceof TrackPlayer)) {
-//                weakPlayer = new WeakReference<>(new TrackPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker()));
-//                weakPlayer.get().addPlayerListener(this);
-//            }
-//            ((TrackPlayer) weakPlayer.get()).playTrack(track.getId());
-////            playerFragment.setAttachedPlayer(weakPlayer.get());
-//
-//        } catch (OAuthException e) {
-//            e.printStackTrace();
-//        } catch (DeezerError deezerError) {
-//            deezerError.printStackTrace();
-//        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
-//            tooManyPlayersExceptions.printStackTrace();
-//        }
+    protected void onStop() {
+        super.onStop();
+        unbindService(kMP.musicConnection);
     }
 
     @Override
