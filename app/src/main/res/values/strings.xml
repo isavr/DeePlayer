@@ -20,6 +20,9 @@
     <string name="menu_main_now_playing">Now playing</string>
     <string name="notification_button_play_description">Play</string>
     <string name="notification_button_next_description">Next</string>
+    <string name="notification_toggle_like_status_description">Toggle like status for the track</string>
     <string name="notification_button_previous_description">Previous</string>
     <string name="notification_item_image_description">Associated image</string>
+    <string name="flow_header_text">Want to hear something new? Flow can help.</string>
+    <string name="start_flow_text">START FLOW</string>
 </resources>

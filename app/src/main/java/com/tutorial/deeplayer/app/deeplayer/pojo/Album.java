@@ -12,20 +12,20 @@ public class Album extends FavouriteItem {
     private String upc;
     private String link;
     private String share;
-    private String cover;
+    @SerializedName("picture")
+    private String picture;
     @SerializedName("cover_small")
-    private String coverSmall;
+    private String pictureSmall;
     @SerializedName("cover_medium")
-    private String coverMedium;
+    private String pictureMedium;
     @SerializedName("cover_big")
-    private String coverBig;
+    private String pictureBig;
     @SerializedName("genre_id")
     private int genreID;
     private DataList<Genre> genres;
     private String label;
     @SerializedName("nb_tracks")
-    private
-    int tracksCount;
+    private int tracksCount;
     private int duration;
     @SerializedName("nb_fans")
     private int fansCount;
@@ -44,7 +44,6 @@ public class Album extends FavouriteItem {
     private String tracklist;
     private DataList<Track> tracks;
 
-    @Override
     public String getTitle() {
         return title;
     }
@@ -77,36 +76,44 @@ public class Album extends FavouriteItem {
         this.share = share;
     }
 
-    public String getCover() {
-        return cover;
+    @Override
+    public String getPicture() {
+        return picture;
     }
 
-    public void setCover(String cover) {
-        this.cover = cover;
+    @Override
+    public void setPicture(String picture) {
+        this.picture = picture;
     }
 
-    public String getCoverSmall() {
-        return coverSmall;
+    @Override
+    public String getPictureSmall() {
+        return pictureSmall;
     }
 
-    public void setCoverSmall(String coverSmall) {
-        this.coverSmall = coverSmall;
+    @Override
+    public void setPictureSmall(String pictureSmall) {
+        this.pictureSmall = pictureSmall;
     }
 
-    public String getCoverMedium() {
-        return coverMedium;
+    @Override
+    public String getPictureMedium() {
+        return pictureMedium;
     }
 
-    public void setCoverMedium(String coverMedium) {
-        this.coverMedium = coverMedium;
+    @Override
+    public void setPictureMedium(String pictureMedium) {
+        this.pictureMedium = pictureMedium;
     }
 
-    public String getCoverBig() {
-        return coverBig;
+    @Override
+    public String getPictureBig() {
+        return pictureBig;
     }
 
-    public void setCoverBig(String coverBig) {
-        this.coverBig = coverBig;
+    @Override
+    public void setPictureBig(String pictureBig) {
+        this.pictureBig = pictureBig;
     }
 
     public int getGenreID() {

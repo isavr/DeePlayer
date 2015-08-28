@@ -18,13 +18,9 @@ public class LoginViewModel extends AbstractViewModel {
 
     private final BehaviorSubject<Bundle> subject = BehaviorSubject.create();
 
-    // TODO: add data layer properties
-
-    // TODO: listener setup refactoring
     private final DeezerDialogListener listener;
 
     public LoginViewModel() {
-        // Data layers setup
         listener = new DeezerDialogListener(new Observer<Bundle>() {
             @Override
             public void onCompleted() {
@@ -45,7 +41,6 @@ public class LoginViewModel extends AbstractViewModel {
             }
         });
         Log.v(TAG, "LoginViewModel");
-
     }
 
     @Override
@@ -56,11 +51,6 @@ public class LoginViewModel extends AbstractViewModel {
     public DeezerDialogListener getListener() {
         return listener;
     }
-
-//    @NonNull
-//    public Observable<Bundle> getRepository() {
-//        return subject.asObservable();
-//    }
 
     @NonNull
     public BehaviorSubject<Bundle> getSubject() {

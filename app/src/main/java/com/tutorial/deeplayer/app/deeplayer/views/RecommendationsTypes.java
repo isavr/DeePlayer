@@ -8,6 +8,7 @@ public enum RecommendationsTypes {
     Albums,
     Playlists,
     Tracks,
+    Flow,
     Unknown;
 
     public static RecommendationsTypes fromId(int id) {
@@ -23,6 +24,9 @@ public enum RecommendationsTypes {
             }
             case 3: {
                 return Tracks;
+            }
+            case 4: {
+                return Flow;
             }
             default: {
                 return Unknown;

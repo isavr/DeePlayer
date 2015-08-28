@@ -54,6 +54,6 @@ public class BaseFragment extends Fragment {
         lifecycleSubject.onNext(LifecycleEvent.DESTROY);
         super.onDestroy();
         DeePlayerApp.getRefWatcher().watch(this);
-        DeePlayerApp.getRefWatcher().watch(lifecycleSubject);
+        //DeePlayerApp.getRefWatcher().watch(lifecycleSubject);
     }
 }

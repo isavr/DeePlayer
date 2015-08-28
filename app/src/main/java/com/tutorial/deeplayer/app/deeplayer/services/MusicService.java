@@ -27,6 +27,12 @@ import com.tutorial.deeplayer.app.deeplayer.external.RemoteControlClientCompat;
 import com.tutorial.deeplayer.app.deeplayer.external.RemoteControlHelper;
 import com.tutorial.deeplayer.app.deeplayer.notifications.NotificationMusic;
 import com.tutorial.deeplayer.app.deeplayer.pojo.*;
+import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * Created by ilya.savritsky on 11.08.2015.
@@ -92,14 +98,13 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     public enum PlayerType {
         RADIO,
+        FLOW,
         ARTIST,
         ALBUM,
         TRACK,
         PLAYLIST,
         UNKNOWN        // Create according to data
     }
-
-    ;
 
     private PlayerType playerType = PlayerType.UNKNOWN;
 
@@ -150,6 +155,9 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
      */
     AudioManager audioManager;
 
+
+    private Set<Long> favouriteTracksIds = new HashSet<>();
+
     /**
      * Spawns an on-going notification with our current
      * playing song.
@@ -186,18 +194,6 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     private void initPlayer() {
         initPlayer(PlayerType.UNKNOWN);
-//        Log.d(TAG, "initPlayer");
-//        try {
-//            mDeezerPlayer = new RadioPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker());
-//            mDeezerPlayer.addPlayerListener(this);
-//            // mDeezerPlayer.playRadio(RadioPlayer.RadioType.RADIO, radio.getId());
-//        } catch (OAuthException e) {
-//            e.printStackTrace();
-//        } catch (DeezerError deezerError) {
-//            deezerError.printStackTrace();
-//        } catch (TooManyPlayersExceptions tooManyPlayersExceptions) {
-//            tooManyPlayersExceptions.printStackTrace();
-//        }
     }
 
     public void initPlayer(PlayerType type) {
@@ -209,6 +205,10 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         try {
             switch (type) {
                 case RADIO: {
+                    initRadioPlayer();
+                    break;
+                }
+                case FLOW: {
                     initRadioPlayer();
                     break;
                 }
@@ -253,6 +253,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     private void initRadioPlayer() throws DeezerError, TooManyPlayersExceptions {
         mDeezerPlayer = new RadioPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker());
+        //((RadioPlayer)mDeezerPlayer).playRadio(RadioPlayer.RadioType.USER, userID);
         mDeezerPlayer.addPlayerListener(this);
     }
 
@@ -286,23 +287,11 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
     /**
      * Sets radio to play
      *
-     * @param radio Radio that will be played from now on
+     * @param data data , that will be used to determine what to play
      * @note make sure to call (@link #playRadio()) after this
      */
-    public void setRadio(Radio radio) {
-        this.data = radio;
-    }
-
-    public void setArtist(Artist artist) {
-        this.data = artist;
-    }
-
-    public void setAlbum(Album album) {
-        this.data = album;
-    }
-
-    public void setTrack(com.tutorial.deeplayer.app.deeplayer.pojo.Track track) {
-        this.data = track;
+    public void setData(FavouriteItem data) {
+        this.data = data;
     }
 
     public void playRadio() {
@@ -312,6 +301,20 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
             Log.d(TAG, "Playing radio -> " + data.getTitle());
             mDeezerPlayer.stop();
             ((RadioPlayer) mDeezerPlayer).playRadio(RadioPlayer.RadioType.RADIO, data.getId());
+
+            broadcastState(MusicService.BROADCAST_EXTRA_PLAYING);
+            updateLockScreenWidget(data, RemoteControlClient.PLAYSTATE_PLAYING);
+        }
+    }
+
+    public void playFlow() {
+        Log.d(TAG, "playFlow");
+        //TODO: fix use user id
+        if (data != null && data instanceof Radio
+                && mDeezerPlayer != null && mDeezerPlayer instanceof RadioPlayer) {
+            Log.d(TAG, "Playing radio -> " + data.getTitle());
+            mDeezerPlayer.stop();
+            ((RadioPlayer) mDeezerPlayer).playRadio(RadioPlayer.RadioType.USER, data.getId());
 
             broadcastState(MusicService.BROADCAST_EXTRA_PLAYING);
             updateLockScreenWidget(data, RemoteControlClient.PLAYSTATE_PLAYING);
@@ -474,6 +477,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         }
 
         notification.notifyPlayer(this, this, data, track);
+        notification.notifyIsFavourite(favouriteTracksIds.contains(track.getId()));
     }
 
     /**
@@ -819,6 +823,55 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         }
     }
 
+    public void updateFavouriteTracksList() {
+        // TODO: refactor this later
+        new RestService().fetchUserTrackIds().doOnNext(ids -> {
+            Log.d(TAG, "Items received - " + ids.size());
+            favouriteTracksIds.clear();
+            if (ids != null) {
+                favouriteTracksIds.addAll(ids);
+            }
+        }).subscribe();
+    }
+
+    public void toggleTrackFavouriteStatus(final long trackId) {
+        // TODO: refactor this later
+        Log.d(TAG, "try to like track with ID - " + trackId);
+        if (trackId != -1) {
+            if (favouriteTracksIds.contains(trackId)) {
+                new RestService().fetchResultTrackRemoveFromFavourite(trackId).observeOn(AndroidSchedulers.mainThread())
+                        .doOnNext(item -> {
+                                    Log.d(TAG, "unlike succeeded - " + item);
+                                    favouriteTracksIds.remove(trackId);
+                                }
+                        )
+                        .doOnError(error -> {
+                            Log.d(TAG, "error occured");
+                            error.printStackTrace();
+                        })
+                        .doOnCompleted(() -> {
+                            Log.d(TAG, "UnLike Completed");
+                            notification.notifyIsFavourite(favouriteTracksIds.contains(trackId));
+                        }).subscribe();
+            } else {
+                new RestService().fetchResultTrackAddToFavourite(trackId).observeOn(AndroidSchedulers.mainThread())
+                        .doOnNext(item -> {
+                                    Log.d(TAG, "like succeeded - " + item);
+                                    favouriteTracksIds.add(trackId);
+                                }
+                        )
+                        .doOnError(error -> {
+                            Log.d(TAG, "error occured");
+                            error.printStackTrace();
+                        })
+                        .doOnCompleted(() -> {
+                            Log.d(TAG, "Like Completed");
+                            notification.notifyIsFavourite(favouriteTracksIds.contains(trackId));
+                        }).subscribe();
+            }
+        }
+    }
+
     public int getTrackDuration() {
         if (mDeezerPlayer != null) {
             return (int) mDeezerPlayer.getTrackDuration();
@@ -844,6 +897,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     @Override
     public void onAllTracksEnded() {
+        cancelNotification();
     }
 
     @Override

@@ -6,11 +6,14 @@ import com.google.gson.annotations.SerializedName;
  * Created by ilya.savritsky on 17.07.2015.
  */
 public class BaseItemWithPicture extends FavouriteItem {
+    @SerializedName("picture")
     protected String picture;
     @SerializedName("picture_small")
     protected String pictureSmall;
     @SerializedName("picture_medium")
     protected String pictureMedium;
+    @SerializedName("picture_big")
+    protected String pictureBig;
 
     @Override
     public boolean equals(Object o) {
@@ -26,7 +29,6 @@ public class BaseItemWithPicture extends FavouriteItem {
         if (pictureMedium != null ? !pictureMedium.equals(that.pictureMedium) : that.pictureMedium != null)
             return false;
         return !(pictureBig != null ? !pictureBig.equals(that.pictureBig) : that.pictureBig != null);
-
     }
 
     @Override
@@ -39,37 +41,43 @@ public class BaseItemWithPicture extends FavouriteItem {
         return result;
     }
 
-    @SerializedName("picture_big")
-    protected String pictureBig;
 
+    @Override
     public String getPicture() {
         return picture;
     }
 
+    @Override
     public void setPicture(String picture) {
         this.picture = picture;
     }
 
+    @Override
     public String getPictureSmall() {
         return pictureSmall;
     }
 
+    @Override
     public void setPictureSmall(String pictureSmall) {
         this.pictureSmall = pictureSmall;
     }
 
+    @Override
     public String getPictureMedium() {
         return pictureMedium;
     }
 
+    @Override
     public void setPictureMedium(String pictureMedium) {
         this.pictureMedium = pictureMedium;
     }
 
+    @Override
     public String getPictureBig() {
         return pictureBig;
     }
 
+    @Override
     public void setPictureBig(String pictureBig) {
         this.pictureBig = pictureBig;
     }

@@ -62,7 +62,7 @@ public class AlbumItemView extends RelativeLayout {
         this.value = album;
         setArtist(album.getArtist());
         setTitle(album.getTitle());
-        setIcon(album.getCoverMedium());
+        setIcon(album.getPictureMedium());
         setFavourite(album.isFavourite());
     }
 

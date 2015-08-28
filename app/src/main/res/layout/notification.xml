@@ -44,7 +44,8 @@
             android:layout_height="56dp"
             android:layout_toLeftOf="@+id/notification_button_play"
             android:contentDescription="@string/notification_button_previous_description"
-            android:src="@drawable/ic_action_previous"/>
+            android:src="@drawable/ic_action_previous"
+            />
 
         <ImageButton
             android:id="@+id/notification_button_skip"
@@ -59,17 +60,19 @@
             android:layout_width="56dp"
             android:layout_height="56dp"
             android:layout_toRightOf="@+id/notification_button_skip"
-            android:contentDescription="@string/notification_button_next_description"
-            android:src="@drawable/ic_action_like"/>
+            android:contentDescription="@string/notification_toggle_like_status_description"
+            android:src="@drawable/ic_action_like_deselected"/>
+
     </RelativeLayout>
 
     <GridLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="4dp"
+        android:layout_marginLeft="4dp"
         android:columnCount="2"
         android:orientation="vertical"
-        android:rowCount="4">
+        android:rowCount="4" >
 
         <TextView
             android:id="@+id/notification_title_type"

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
+import android.util.Patterns;
 import android.widget.RemoteViews;
 
 import com.deezer.sdk.model.Track;
@@ -32,6 +33,13 @@ import com.tutorial.deeplayer.app.deeplayer.pojo.*;
  */
 public class NotificationMusic extends NotificationSimple {
     private static final String TAG = NotificationMusic.class.getSimpleName();
+
+    public static final String ACTION_KEY = "action";
+    public static final String ACTION_TRACK_ID_KEY = "track_id";
+    public static final String ACTION_SKIP_VAL = "skip";
+    public static final String ACTION_LIKE_VAL = "like";
+    public static final String ACTION_TOGGLE_PAUSE_VAL = "toggle_pause";
+
 
     /**
      * Reference to the context that notified.
@@ -76,7 +84,7 @@ public class NotificationMusic extends NotificationSimple {
      *                run on the background.
      * @param data
      * @param track   Current track info
-     * @note By calling this function multiple times, it'll
+     * @apiNote By calling this function multiple times, it'll
      * update the old notification.
      */
     public void notifyPlayer(Context context, Service service, FavouriteItem data, Track track) {
@@ -103,7 +111,7 @@ public class NotificationMusic extends NotificationSimple {
         // Manually settings the buttons and text
         // (ignoring the defaults on the XML)
         String artistName = extractArtistString(data, track);
-        notificationView.setTextViewText(R.id.notification_text_type, extractTypeString(data, track));
+        notificationView.setTextViewText(R.id.notification_text_type, extractTypeString(data));
         notificationView.setTextViewText(R.id.notification_text_artist, artistName);
         notificationView.setTextViewText(R.id.notification_text_album, extractAlbumName(data, track));
         notificationView.setTextViewText(R.id.notification_text_track, track.getTitle());
@@ -116,17 +124,25 @@ public class NotificationMusic extends NotificationSimple {
         //
         // First, building the play button and attaching it.
         Intent buttonPlayIntent = new Intent(context, NotificationPlayButtonHandler.class);
-        buttonPlayIntent.putExtra("action", "togglePause");
+        buttonPlayIntent.putExtra(NotificationMusic.ACTION_KEY, NotificationMusic.ACTION_TOGGLE_PAUSE_VAL);
 
         PendingIntent buttonPlayPendingIntent = PendingIntent.getBroadcast(context, 0, buttonPlayIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.notification_button_play, buttonPlayPendingIntent);
 
         // And now, building and attaching the Skip button.
         Intent buttonSkipIntent = new Intent(context, NotificationSkipButtonHandler.class);
-        buttonSkipIntent.putExtra("action", "skip");
+        buttonSkipIntent.putExtra(NotificationMusic.ACTION_KEY, NotificationMusic.ACTION_SKIP_VAL);
 
         PendingIntent buttonSkipPendingIntent = PendingIntent.getBroadcast(context, 0, buttonSkipIntent, 0);
         notificationView.setOnClickPendingIntent(R.id.notification_button_skip, buttonSkipPendingIntent);
+
+        // And now, building and attaching the Like button.
+        Intent buttonLikeIntent = new Intent(context, NotificationLikeButtonHandler.class);
+        buttonLikeIntent.putExtra(NotificationMusic.ACTION_KEY, NotificationMusic.ACTION_LIKE_VAL);
+        buttonLikeIntent.putExtra(NotificationMusic.ACTION_TRACK_ID_KEY, track.getId());
+
+        PendingIntent buttonLikePendingIntent = PendingIntent.getBroadcast(context, 0, buttonLikeIntent, 0);
+        notificationView.setOnClickPendingIntent(R.id.notification_button_like, buttonLikePendingIntent);
         //        Intent cancelNotificationIntent = new Intent(context, NotificationCancelHandler.class);
 //        cancelNotificationIntent.putExtra("action", "stop");
 //
@@ -146,12 +162,13 @@ public class NotificationMusic extends NotificationSimple {
 
         Notification notification = notificationBuilder.build();
         notification.bigContentView = notificationView;
-        //track.getAlbum().getCoverUrl()
 
-//        Picasso.with(context).load(R.drawable.ic_action_play).into(notificationView, R.id.notification_button_play, NOTIFICATION_ID, notification);
         Picasso.with(context).load(R.drawable.ic_action_next).into(notificationView, R.id.notification_button_skip, NOTIFICATION_ID, notification);
-        Picasso.with(context).load(extractPictureUrl(data, track)).into(notificationView, R.id.notification_item_image, NOTIFICATION_ID, notification);
-
+        //Picasso.with(context).load(R.drawable.ic_action_like_deselected).into(notificationView, R.id.notification_button_like, NOTIFICATION_ID, notification);
+        String itemUrl = extractPictureUrl(data, track);
+        if (itemUrl != null && Patterns.WEB_URL.matcher(itemUrl).matches()) {
+            Picasso.with(context).load(itemUrl).into(notificationView, R.id.notification_item_image, NOTIFICATION_ID, notification);
+        }
 
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 //		notificationManager.notify(NOTIFICATION_ID, notification);
@@ -161,7 +178,7 @@ public class NotificationMusic extends NotificationSimple {
         service.startForeground(NOTIFICATION_ID, notification);
     }
 
-    private String extractTypeString(FavouriteItem data, Track track) {
+    private String extractTypeString(FavouriteItem data) {
         String type = data.getType();
         if (data instanceof Radio) {
             type = data.getType() + " - " + data.getTitle();
@@ -173,15 +190,11 @@ public class NotificationMusic extends NotificationSimple {
         if (track.getArtist() != null) {
             return track.getArtist().getName();
         }
-        String artist;
-        if (data instanceof Radio) {
-            artist = "unknown";
-        } else if (data instanceof Artist) {
+        String artist = "unknown";
+        if (data instanceof Artist) {
             artist = ((Artist) data).getName();
         } else if (data instanceof Album) {
             artist = ((Album) data).getArtist().getName();
-        } else {
-            artist = "unknown";
         }
         return artist;
     }
@@ -190,32 +203,29 @@ public class NotificationMusic extends NotificationSimple {
         if (track.getAlbum() != null) {
             return track.getAlbum().getTitle();
         }
-        String album;
-        if (data instanceof Radio) {
-            album = "unknown";
-        } else if (data instanceof Artist) {
-            album = "unknown";
-        } else if (data instanceof Album) {
+        String album = "unknown";
+        if (data instanceof Album) {
             album = data.getTitle();
-        } else {
-            album = "unknown";
         }
         return album;
     }
 
     private String extractPictureUrl(FavouriteItem data, Track track) {
-        String url;
-        if (data instanceof Radio) {
-            url = ((Radio) data).getPictureSmall();
-        } else if (data instanceof Artist) {
-            url = ((Artist) data).getPictureSmall();
-        } else if (data instanceof Album) {
-            url = ((Album) data).getCoverSmall();
-        } else {
+        String url = data.getPictureSmall();
+        if (url == null && track.getAlbum() != null) {
             url = track.getAlbum().getCoverUrl();
         }
-//        else if (data instanceof com.tutorial.deeplayer.app.deeplayer.pojo.Track) {
-//
+//        if (data instanceof Radio) {
+//            url = data.getPictureSmall();
+//            if (url == null && track.getAlbum() != null) {
+//                url = track.getAlbum().getCoverUrl();
+//            }
+//        } else if (data instanceof Artist) {
+//            url = data.getPictureSmall();
+//        } else if (data instanceof Album) {
+//            url = data.getPictureSmall();
+//        } else {
+//            url = track.getAlbum().getCoverUrl();
 //        }
         return url;
     }
@@ -247,6 +257,21 @@ public class NotificationMusic extends NotificationSimple {
         }
     }
 
+    /**
+     * Called when user clicks the "like" button on the on-going system Notification.
+     */
+    public static class NotificationLikeButtonHandler extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (kMP.musicService != null) {
+                long trackId = intent.getLongExtra(NotificationMusic.ACTION_TRACK_ID_KEY, -1);
+                kMP.musicService.toggleTrackFavouriteStatus(trackId);
+                //kMP.musicService.playRadio();
+            }
+        }
+    }
+
 //    /**
 //     * Called when user cancels Notification e.g stops the playback
 //     */
@@ -256,6 +281,20 @@ public class NotificationMusic extends NotificationSimple {
 //            kMP.stopMusicService(context);
 //        }
 //    }
+
+    public void notifyIsFavourite(boolean isFavourite) {
+        if ((notificationView == null) || (notificationBuilder == null)) {
+            Log.d(TAG, "nothing to notify");
+            return;
+        }
+        int iconID = ((isFavourite) ?
+                R.drawable.ic_action_like :
+                R.drawable.ic_action_like_deselected);
+        Notification notification = notificationBuilder.build();
+        notification.bigContentView = notificationView;
+        Picasso.with(context).load(iconID).into(notificationView, R.id.notification_button_like, NOTIFICATION_ID, notification);
+
+    }
 
     /**
      * Updates the Notification icon if the music is paused.
@@ -289,7 +328,6 @@ public class NotificationMusic extends NotificationSimple {
      */
     public void cancel() {
         service.stopForeground(true);
-
         notificationManager.cancel(NOTIFICATION_ID);
     }
 

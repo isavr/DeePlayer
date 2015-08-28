@@ -19,6 +19,7 @@ import com.tutorial.deeplayer.app.deeplayer.fragments.*;
 import com.tutorial.deeplayer.app.deeplayer.kMP;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 import com.tutorial.deeplayer.app.deeplayer.services.MusicService;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.views.*;
@@ -32,7 +33,8 @@ import butterknife.ButterKnife;
 public class RecommendationsActivity extends BaseActivity implements RecommendedAlbumsView.OnAlbumItemInteractionListener,
         RecommendedArtistsView.OnArtistItemInteractionListener,
         RecommendedTracksView.OnTrackItemInteractionListener,
-        RecommendationsControlsView.OnTypeSelectedListener {
+        RecommendationsControlsView.OnTypeSelectedListener,
+        FlowView.OnFlowInteractionListener {
     public static final String TAG = RecommendationsActivity.class.getSimpleName();
 
     @Bind(R.id.fragment_container)
@@ -92,6 +94,10 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
                 kMP.musicService.initPlayer(MusicService.PlayerType.TRACK);
                 break;
             }
+            case Flow: {
+                kMP.musicService.initPlayer(MusicService.PlayerType.FLOW);
+                break;
+            }
             default: {
 
             }
@@ -109,10 +115,22 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
             case Tracks: {
                 return getTracksFragment();
             }
+            case Flow: {
+                return getFlowFragment();
+            }
             default: {
                 return null;
             }
         }
+    }
+
+    private FlowFragment getFlowFragment() {
+        FlowFragment flowFragment = (FlowFragment) getSupportFragmentManager().
+                findFragmentByTag(FlowFragment.TAG);
+        if (flowFragment == null) {
+            flowFragment = new FlowFragment();
+        }
+        return flowFragment;
     }
 
     private RecommendedTracksFragment getTracksFragment() {
@@ -190,7 +208,7 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
     public void onAlbumItemInteraction(@NonNull Album album) {
         if (kMP.musicService != null) {
             initMusicService(RecommendationsTypes.Albums);
-            kMP.musicService.setAlbum(album);
+            kMP.musicService.setData(album);
             kMP.musicService.playAlbum();
         }
     }
@@ -199,7 +217,7 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
     public void onArtistItemInteraction(@NonNull Artist artist) {
         if (kMP.musicService != null) {
             initMusicService(RecommendationsTypes.Artists);
-            kMP.musicService.setArtist(artist);
+            kMP.musicService.setData(artist);
             kMP.musicService.playArtist();
         }
     }
@@ -208,7 +226,7 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
     public void onTrackItemInteraction(@NonNull com.tutorial.deeplayer.app.deeplayer.pojo.Track track) {
         if (kMP.musicService != null) {
             initMusicService(RecommendationsTypes.Tracks);
-            kMP.musicService.setTrack(track);
+            kMP.musicService.setData(track);
             kMP.musicService.playTrack();
         }
     }
@@ -217,6 +235,21 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
     protected void onStop() {
         super.onStop();
         unbindService(kMP.musicConnection);
+    }
+
+    @Override
+    public void onFlowInteraction(long userId) {
+        Log.d(TAG, "try yo play the FLOW");
+        if (kMP.musicService != null) {
+            initMusicService(RecommendationsTypes.Flow);
+            Radio radio = new Radio();
+            radio.setId(userId);
+            radio.setTitle("User Flow");
+            radio.setType("radio");
+            radio.setDescription("User Flow radio");
+            kMP.musicService.setData(radio);
+            kMP.musicService.playFlow();
+        }
     }
 
     @Override
@@ -240,6 +273,9 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
                 // Node: Do the same
             }
             case Albums: {
+
+            }
+            case Flow: {
                 container.setVisibility(View.VISIBLE);
                 addFragment(type);
                 break;

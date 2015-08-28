@@ -66,7 +66,7 @@ public class TrackItemView extends RelativeLayout {
         setArtist(track);
         if (track.getAlbum() != null) {
             setAlbum(track.getAlbum());
-            setIcon(track.getAlbum().getCoverMedium());
+            setIcon(track.getAlbum().getPictureMedium());
         }
         setFavourite(track.isFavourite());
     }

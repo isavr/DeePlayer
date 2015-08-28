@@ -5,6 +5,9 @@ import com.tutorial.deeplayer.app.deeplayer.pojo.*;
 import com.tutorial.deeplayer.app.deeplayer.rest.interfaces.RadioAPI;
 import com.tutorial.deeplayer.app.deeplayer.rest.interfaces.UserAPI;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import rx.Observable;
@@ -161,12 +164,22 @@ public class RestService {
         return prepareTracksData(userAPI.getUserTracks());
     }
 
+    public Observable<Set<Long>> fetchUserTrackIds() {
+        return prepareTracksData(userAPI.getUserTracks()).map(item -> item.getUserData())
+                .reduce(new HashSet<>(), (dataSet, item) -> {
+                    for (Track track : item) {
+                        dataSet.add(track.getId());
+                    }
+                    return dataSet;
+                });
+    }
+
     public Observable<Boolean> fetchResultTrackAddToFavourite(long trackId) {
-        return userAPI.addArtistToFavourite(trackId);
+        return userAPI.addTrackToFavourite(trackId);
     }
 
     public Observable<Boolean> fetchResultTrackRemoveFromFavourite(long trackId) {
-        return userAPI.removeArtistFromFavourite(trackId);
+        return userAPI.removeTrackFromFavourite(trackId);
     }
 
     protected Observable<DataList<Track>> prepareTracksData(Observable<DataList<Track>> dataObservable) {

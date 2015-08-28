@@ -26,7 +26,8 @@ import rx.Observer;
 /**
  * Created by ilya.savritsky on 27.07.2015.
  */
-public class RadioView extends FrameLayout implements RadioItemView.OnRadioItemFavouriteStatusInteractionListener {
+public class RadioView extends FrameLayout
+        implements RadioItemView.OnRadioItemFavouriteStatusInteractionListener {
     public static final String TAG = RadioView.class.getSimpleName();
 
     @Bind(android.R.id.list)
