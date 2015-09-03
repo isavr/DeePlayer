@@ -1,6 +1,7 @@
 package com.tutorial.deeplayer.app.deeplayer.views;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -11,6 +12,8 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 
 import com.tutorial.deeplayer.app.deeplayer.adapters.TrackAdapter;
+import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
+import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Track;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedTrackViewModel;
@@ -26,7 +29,8 @@ import rx.Observer;
 /**
  * Created by ilya.savritsky on 17.08.2015.
  */
-public class RecommendedTracksView extends LinearLayout implements TrackItemView.OnTrackItemFavouriteStatusInteractionListener {
+public class RecommendedTracksView extends LinearLayout
+        implements TrackItemView.OnTrackItemFavouriteStatusInteractionListener {
     public static final String TAG = RecommendedTracksView.class.getSimpleName();
 
     private final RxBinderUtil rxBinderUtil = new RxBinderUtil(this);
@@ -60,8 +64,6 @@ public class RecommendedTracksView extends LinearLayout implements TrackItemView
 
     private void setupChildren() {
         ButterKnife.bind(this);
-        adapter = new TrackAdapter(getContext(), this);
-        mListView.setAdapter(adapter);
     }
 
     public void setViewModel(@Nullable RecommendedTrackViewModel viewModel) {
@@ -72,19 +74,25 @@ public class RecommendedTracksView extends LinearLayout implements TrackItemView
         }
     }
 
-    @OnItemClick(android.R.id.list)
-    public void listViewItemClicked(AdapterView<?> adapterView, View view, int position, long l) {
-        Track track = adapter.getItem(position);
+    private <U> void updateTrackList(U u) {
         if (listener != null) {
-            listener.onTrackItemInteraction(track);
+            listener.onStopProgress();
         }
     }
 
-    private void updateTrackList(List<Track> tracks) {
-        Log.d(TAG, "update Tracks -> " + tracks.size());
-        adapter.add(tracks);
-        if (listener != null) {
-            listener.onStopProgress();
+    @OnItemClick(android.R.id.list)
+    public void listViewItemClicked(AdapterView<?> adapterView, View view, int position, long l) {
+//        Track track = adapter.getItem(position);
+//        if (listener != null) {
+//            listener.onTrackItemInteraction(track);
+//        }
+        if (adapter != null) {
+            Cursor c = (Cursor) adapter.getItem(position);
+            if (c != null && listener != null) {
+                Log.d(TAG, "track clicked");
+                Track track = DataContract.TrackConverter.convertFromCursor(c);
+                listener.onTrackItemInteraction(track);
+            }
         }
     }
 
@@ -101,6 +109,8 @@ public class RecommendedTracksView extends LinearLayout implements TrackItemView
 
     public void clean() {
         adapter.remove();
+        adapter = null;
+        mListView.setAdapter(null);
     }
 
     @Override
@@ -149,10 +159,30 @@ public class RecommendedTracksView extends LinearLayout implements TrackItemView
                                              final boolean isSuccess) {
         if (isSuccess) {
             track.setFavourite(toFavourite);
-            adapter.updateItem(track);
+            Log.d(TAG, "Artist status updated! Id - " + track.getId() + " Title - " + track.getTitle() +
+                    " Status - " + track.isFavourite());
+            getContext().getApplicationContext().getContentResolver().update(
+                    SchematicDataProvider.Tracks.withId(track.getId()),
+                    DataContract.TrackConverter.convertFrom(track)[DataContract.getTrackIndex()], null, null);
             Log.d(TAG, "ALL IS OK");
         } else {
-            adapter.updateItem(track);
+            getContext().getApplicationContext().getContentResolver().notify();
+        }
+    }
+
+    public void onLoadFinish(Cursor data) {
+        if (adapter == null) {
+            adapter = new TrackAdapter(getContext(), data, false);
+            adapter.setListener(this);
+            mListView.setAdapter(adapter);
+        } else {
+            adapter.changeCursor(data);
+        }
+    }
+
+    public void onLoaderReset() {
+        if (adapter != null) {
+            adapter.changeCursor(null);
         }
     }
 

@@ -17,6 +17,7 @@ import rx.Observable;
  */
 public class RestService {
     private static final String TAG = RestService.class.getSimpleName();
+    public static int INDEX_STEP_VAL = 25;
     private static final String WEB_SERVICE_BASE_URL = "http://api.deezer.com/";
     private final UserAPI userAPI;
     private final RadioAPI radioAPI;
@@ -44,18 +45,22 @@ public class RestService {
         radioAPI = restAdapter.create(RadioAPI.class);
     }
 
-    public Observable<User> fetchUserInfoService() {
-        return fetchUserInfoService(-1);
+    public Observable<User> fetchUserInfo() {
+        return fetchUserInfo(-1);
     }
 
-    public Observable<User> fetchUserInfoService(int userId) {
+    public Observable<User> fetchUserInfo(int userId) {
         Observable<User> userObservable;
         if (userId == -1) {
             userObservable = userAPI.getUser();
         } else {
             userObservable = userAPI.getUser(userId);
         }
-        return userObservable.flatMap(user -> {
+        return prepareUserInfoData(userObservable);
+    }
+
+    protected Observable<User> prepareUserInfoData(Observable<User> userInfo) {
+        return userInfo.flatMap(user -> {
             if (user.getError() != null) {
                 return Observable.error(user.getError());
             }
@@ -68,7 +73,11 @@ public class RestService {
     }
 
     public Observable<DataList<Radio>> fetchUserRadioInfo() {
-        return prepareRadioInfoData(userAPI.getUserRadios());
+        return fetchUserRadioInfo(0);
+    }
+
+    public Observable<DataList<Radio>> fetchUserRadioInfo(int index) {
+        return prepareRadioInfoData(userAPI.getUserRadios(index));
     }
 
     public Observable<Boolean> fetchResultRadioAddToFavourite(long radioId) {
@@ -111,7 +120,11 @@ public class RestService {
     }
 
     public Observable<DataList<Album>> fetchUserAlbums() {
-        return prepareAlbumsData(userAPI.getUserAlbums());
+        return fetchUserAlbums(0);
+    }
+
+    public Observable<DataList<Album>> fetchUserAlbums(int index) {
+        return prepareAlbumsData(userAPI.getUserAlbums(index));
     }
 
     public Observable<Boolean> fetchResultAlbumAddToFavourite(long albumId) {
@@ -136,7 +149,11 @@ public class RestService {
     }
 
     public Observable<DataList<Artist>> fetchUserArtists() {
-        return prepareArtistsData(userAPI.getUserArtists());
+        return fetchUserArtists(0);
+    }
+
+    public Observable<DataList<Artist>> fetchUserArtists(int index) {
+        return prepareArtistsData(userAPI.getUserArtists(index));
     }
 
     public Observable<Boolean> fetchResultArtistAddToFavourite(long artistId) {
@@ -160,8 +177,12 @@ public class RestService {
         return prepareTracksData(userAPI.getTracksRecommendedForUser());
     }
 
-    public Observable<DataList<Track>> fetchUserTrack() {
-        return prepareTracksData(userAPI.getUserTracks());
+    public Observable<DataList<Track>> fetchUserTracks() {
+        return fetchUserTracks(0);
+    }
+
+    public Observable<DataList<Track>> fetchUserTracks(int index) {
+        return prepareTracksData(userAPI.getUserTracks(index));
     }
 
     public Observable<Set<Long>> fetchUserTrackIds() {

@@ -1,6 +1,7 @@
 package com.tutorial.deeplayer.app.deeplayer.views;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -11,6 +12,8 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 
 import com.tutorial.deeplayer.app.deeplayer.adapters.AlbumAdapter;
+import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
+import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedAlbumsViewModel;
@@ -26,7 +29,8 @@ import rx.Observer;
 /**
  * Created by ilya.savritsky on 28.07.2015.
  */
-public class RecommendedAlbumsView extends FrameLayout implements AlbumItemView.OnAlbumItemFavouriteStatusInteractionListener {
+public class RecommendedAlbumsView extends FrameLayout
+        implements AlbumItemView.OnAlbumItemFavouriteStatusInteractionListener {
     public static final String TAG = RecommendedAlbumsView.class.getSimpleName();
 
     private final RxBinderUtil rxBinderUtil = new RxBinderUtil(this);
@@ -60,8 +64,6 @@ public class RecommendedAlbumsView extends FrameLayout implements AlbumItemView.
 
     private void setupChildren() {
         ButterKnife.bind(this);
-        adapter = new AlbumAdapter(getContext(), this);
-        mListView.setAdapter(adapter);
     }
 
     public void setViewModel(@Nullable RecommendedAlbumsViewModel viewModel) {
@@ -72,19 +74,21 @@ public class RecommendedAlbumsView extends FrameLayout implements AlbumItemView.
         }
     }
 
-    @OnItemClick(android.R.id.list)
-    public void listViewItemClicked(AdapterView<?> adapterView, View view, int position, long l) {
-        Album album = adapter.getItem(position);
+    private <U> void updateAlbumList(U u) {
         if (listener != null) {
-            listener.onAlbumItemInteraction(album);
+            listener.onStopProgress();
         }
     }
 
-    private void updateAlbumList(List<Album> albums) {
-        Log.d(TAG, "update Albums -> " + albums.size());
-        adapter.add(albums);
-        if (listener != null) {
-            listener.onStopProgress();
+    @OnItemClick(android.R.id.list)
+    public void listViewItemClicked(AdapterView<?> adapterView, View view, int position, long l) {
+        if (adapter != null) {
+            Cursor c = (Cursor) adapter.getItem(position);
+            if (c != null && listener != null) {
+                Log.d(TAG, "album clicked");
+                Album album = DataContract.AlbumConverter.convertFromCursor(c);
+                listener.onAlbumItemInteraction(album);
+            }
         }
     }
 
@@ -145,15 +149,38 @@ public class RecommendedAlbumsView extends FrameLayout implements AlbumItemView.
                                              final boolean isSuccess) {
         if (isSuccess) {
             album.setFavourite(toFavourite);
-            adapter.updateItem(album);
+            Log.d(TAG, "Album status updated! Id - " + album.getId() + " Title - " + album.getTitle() +
+                    " Status - " + album.isFavourite());
+            getContext().getApplicationContext().getContentResolver()
+                    .update(SchematicDataProvider.Albums.withId(album.getId()),
+                            DataContract.AlbumConverter.convertFrom(album)[DataContract.getAlbumIndex()],
+                            null, null);
             Log.d(TAG, "ALL IS OK");
         } else {
-            adapter.updateItem(album);
+            getContext().getApplicationContext().getContentResolver().notify();
         }
     }
 
     public void clean() {
         adapter.remove();
+        adapter = null;
+        mListView.setAdapter(null);
+    }
+
+    public void onLoadFinish(Cursor data) {
+        if (adapter == null) {
+            adapter = new AlbumAdapter(getContext(), data, false);
+            adapter.setListener(this);
+            mListView.setAdapter(adapter);
+        } else {
+            adapter.changeCursor(data);
+        }
+    }
+
+    public void onLoaderReset() {
+        if (adapter != null) {
+            adapter.changeCursor(null);
+        }
     }
 
 

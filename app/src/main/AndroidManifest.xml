@@ -31,10 +31,10 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <provider
-            android:name=".data.DataProvider"
-            android:authorities="com.tutorial.deeplayer.app"
+            android:name="com.tutorial.deeplayer.app.deeplayer.data.generated.SchematicDataProvider"
+            android:authorities="com.tutorial.deeplayer.app.deeplayer.authority"
             android:enabled="true"
-            android:exported="false"></provider>
+            android:exported="false"/>
 
         <activity
             android:name=".activities.MixActivity"

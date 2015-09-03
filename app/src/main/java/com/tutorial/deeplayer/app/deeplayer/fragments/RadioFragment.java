@@ -1,22 +1,28 @@
 package com.tutorial.deeplayer.app.deeplayer.fragments;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
+import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RadioViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.RadioView;
 
 import javax.inject.Inject;
 
-public class RadioFragment extends Fragment {
+public class RadioFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = RadioFragment.class.getSimpleName();
+    private static final int LOADER_RADIOS = 10;
 
     private RadioView radioView;
     @Inject
@@ -42,6 +48,7 @@ public class RadioFragment extends Fragment {
         DialogFactory.showProgressDialog(this.getActivity(),
                 getActivity().getSupportFragmentManager());
         radioViewModel.subscribeToDataStore();
+        getLoaderManager().initLoader(LOADER_RADIOS, null, this);
     }
 
     @Override
@@ -84,5 +91,24 @@ public class RadioFragment extends Fragment {
         listener = null;
         radioView.clean();
         radioView.setListener(null);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+        return new CursorLoader(getActivity(), SchematicDataProvider.Radios.CONTENT_URI, null, null, null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (radioView != null) {
+            radioView.onLoadFinish(cursor);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        if (radioView != null) {
+            radioView.onLoaderReset();
+        }
     }
 }

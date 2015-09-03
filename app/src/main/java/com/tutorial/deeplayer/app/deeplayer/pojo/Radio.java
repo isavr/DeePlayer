@@ -7,6 +7,8 @@ public class Radio extends BaseItemWithPicture {
     private String title;
     private String description;
     private String share;
+    private String tracklist;
+    private long time_add;
 
     @Override
     public boolean equals(Object o) {
@@ -36,8 +38,6 @@ public class Radio extends BaseItemWithPicture {
         return result;
     }
 
-    private String tracklist;
-    private long time_add;
 
     @Override
     public String getTitle() {

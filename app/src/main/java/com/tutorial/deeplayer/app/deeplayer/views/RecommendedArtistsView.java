@@ -1,6 +1,7 @@
 package com.tutorial.deeplayer.app.deeplayer.views;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -8,15 +9,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.FilterQueryProvider;
 import android.widget.LinearLayout;
 
 import com.tutorial.deeplayer.app.deeplayer.adapters.ArtistAdapter;
+import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
+import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedArtistViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.ArtistItemView;
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -26,7 +28,8 @@ import rx.Observer;
 /**
  * Created by ilya.savritsky on 30.07.2015.
  */
-public class RecommendedArtistsView extends LinearLayout implements ArtistItemView.OnArtistItemFavouriteStatusInteractionListener {
+public class RecommendedArtistsView extends LinearLayout
+        implements ArtistItemView.OnArtistItemFavouriteStatusInteractionListener {
     public static final String TAG = RecommendedAlbumsView.class.getSimpleName();
 
     private final RxBinderUtil rxBinderUtil = new RxBinderUtil(this);
@@ -59,8 +62,6 @@ public class RecommendedArtistsView extends LinearLayout implements ArtistItemVi
 
     private void setupChildren() {
         ButterKnife.bind(this);
-        adapter = new ArtistAdapter(getContext(), this);
-        mListView.setAdapter(adapter);
     }
 
     public void setViewModel(@Nullable RecommendedArtistViewModel viewModel) {
@@ -71,19 +72,21 @@ public class RecommendedArtistsView extends LinearLayout implements ArtistItemVi
         }
     }
 
-    @OnItemClick(android.R.id.list)
-    public void listViewItemClicked(AdapterView<?> adapterView, View view, int position, long l) {
-        Artist album = adapter.getItem(position);
+    private <U> void updateArtistList(U u) {
         if (listener != null) {
-            listener.onArtistItemInteraction(album);
+            listener.onStopProgress();
         }
     }
 
-    private void updateArtistList(List<Artist> artists) {
-        Log.d(TAG, "update Artist -> " + artists.size());
-        adapter.add(artists);
-        if (listener != null) {
-            listener.onStopProgress();
+    @OnItemClick(android.R.id.list)
+    public void listViewItemClicked(AdapterView<?> adapterView, View view, int position, long l) {
+        if (adapter != null) {
+            Cursor c = (Cursor) adapter.getItem(position);
+            if (c != null && listener != null) {
+                Log.d(TAG, "artist clicked");
+                Artist artist = DataContract.ArtistConverter.convertFromCursor(c);
+                listener.onArtistItemInteraction(artist);
+            }
         }
     }
 
@@ -100,6 +103,8 @@ public class RecommendedArtistsView extends LinearLayout implements ArtistItemVi
 
     public void clean() {
         adapter.remove();
+        adapter = null;
+        mListView.setAdapter(null);
     }
 
     @Override
@@ -148,10 +153,29 @@ public class RecommendedArtistsView extends LinearLayout implements ArtistItemVi
                                               final boolean isSuccess) {
         if (isSuccess) {
             artist.setFavourite(toFavourite);
-            adapter.updateItem(artist);
+            Log.d(TAG, "Artist status updated! Id - " + artist.getId() + " Title - " + artist.getName() +
+                    " Status - " + artist.isFavourite());
+            getContext().getApplicationContext().getContentResolver().update(SchematicDataProvider.Artists.withId(artist.getId()),
+                    DataContract.ArtistConverter.convertFrom(artist), null, null);
             Log.d(TAG, "ALL IS OK");
         } else {
-            adapter.updateItem(artist);
+            getContext().getApplicationContext().getContentResolver().notify();
+        }
+    }
+
+    public void onLoadFinish(Cursor data) {
+        if (adapter == null) {
+            adapter = new ArtistAdapter(getContext(), data, false);
+            adapter.setListener(this);
+            mListView.setAdapter(adapter);
+        } else {
+            adapter.changeCursor(data);
+        }
+    }
+
+    public void onLoaderReset() {
+        if (adapter != null) {
+            adapter.changeCursor(null);
         }
     }
 

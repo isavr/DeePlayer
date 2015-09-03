@@ -9,14 +9,21 @@ import android.view.ViewGroup;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
+import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
+import com.tutorial.deeplayer.app.deeplayer.data.tables.AlbumColumns;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedAlbumsViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedAlbumsView;
 
 import javax.inject.Inject;
+import android.database.Cursor;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 
-public class AlbumFragment extends Fragment {
+public class AlbumFragment extends Fragment  implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = AlbumFragment.class.getSimpleName();
+    private static final int LOADER_ALBUMS = 30;
 
     private RecommendedAlbumsView recommendedAlbumsView;
     @Inject
@@ -44,6 +51,7 @@ public class AlbumFragment extends Fragment {
         DialogFactory.showProgressDialog(this.getActivity(),
                 getActivity().getSupportFragmentManager());
         albumsViewModel.subscribeToDataStore();
+        getLoaderManager().initLoader(LOADER_ALBUMS, null, this);
     }
 
     @Override
@@ -90,4 +98,23 @@ public class AlbumFragment extends Fragment {
         //instrumentation.getLeakTracing().traceLeakage(this);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(getActivity(), SchematicDataProvider.Albums.CONTENT_URI, null,
+                AlbumColumns.IS_RECOMMENDED + "=1", null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (recommendedAlbumsView != null) {
+            recommendedAlbumsView.onLoadFinish(cursor);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        if (recommendedAlbumsView != null) {
+            recommendedAlbumsView.onLoaderReset();
+        }
+    }
 }

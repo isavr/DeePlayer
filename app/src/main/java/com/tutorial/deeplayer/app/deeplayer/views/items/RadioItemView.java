@@ -67,7 +67,7 @@ public class RadioItemView extends RelativeLayout {
     }
 
     public void setIcon(String url) {
-        if (Patterns.WEB_URL.matcher(url).matches()) {
+        if (url != null && Patterns.WEB_URL.matcher(url).matches()) {
             Picasso.with(getContext()).load(url).fit().centerInside().into(iconView);
         }
     }

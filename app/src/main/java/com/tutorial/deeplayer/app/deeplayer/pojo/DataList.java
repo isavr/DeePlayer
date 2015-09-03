@@ -10,6 +10,8 @@ import java.util.List;
 public class DataList<T extends FavouriteItem> extends BaseTypedItem {
     @SerializedName("data")
     private List<T> data;
+    @SerializedName("total")
+    private int total;
 
     public List<T> getUserData() {
         if (data != null) {
@@ -26,5 +28,13 @@ public class DataList<T extends FavouriteItem> extends BaseTypedItem {
 
     public void setData(List<T> data) {
         this.data = data;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
     }
 }

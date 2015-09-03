@@ -71,10 +71,19 @@ public class MainActivityView extends FrameLayout {
         if (viewModel != null) {
 
             mainViewModel = viewModel;
+            rxBinderUtil.bindProperty(viewModel.getSubject(), this::dataUpdated, this::onError);
             //rxBinderUtil.bindProperty(viewModel.getRepository(), this::loginSuccessfull);
             //rxBinderUtil.bindProperty(viewModel.getSubject(), this::loginSuccessfull);
             //rxBinderUtil.bindProperty(ViewObservable.clicks(loginButton, false), this::attemptLogin);
         }
+    }
+
+    private <U> void dataUpdated(U u) {
+        Log.d(TAG, "data updated");
+    }
+
+    private void onError(Throwable throwable) {
+        Log.d(TAG, "Handle Error");
     }
 
     @OnItemClick(R.id.listView)
@@ -92,28 +101,28 @@ public class MainActivityView extends FrameLayout {
             }
             case 5: {
                 // Check User info
-                Observer<Album> observer = new Observer<Album>() {
-                    @Override
-                    public void onCompleted() {
-                        Log.d(TAG, "COMPLETED");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        e.printStackTrace();
-                    }
-
-                    @Override
-                    public void onNext(Album album) {
-                        Log.d(TAG, "received album -> " + album.getTitle());
-                    }
-                };
+//                Observer<Album> observer = new Observer<Album>() {
+//                    @Override
+//                    public void onCompleted() {
+//                        Log.d(TAG, "COMPLETED");
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    @Override
+//                    public void onNext(Album album) {
+//                        Log.d(TAG, "received album -> " + album.getTitle());
+//                    }
+//                };
 //                Observable<Album> recommended = new RestService().fetchAlbumsRecommendedForUser().subscribeOn(Schedulers.io())
 //                        .flatMap(item -> Observable.from(item.getData())).observeOn(AndroidSchedulers.mainThread());
 //
-                Observable<Album> userAlbums = new RestService().fetchUserAlbums().subscribeOn(Schedulers.io())
-                        .flatMap(item -> Observable.from(item.getUserData())).observeOn(AndroidSchedulers.mainThread());
-                userAlbums.subscribe(observer);
+//                Observable<Album> userAlbums = new RestService().fetchUserAlbums().subscribeOn(Schedulers.io())
+//                        .flatMap(item -> Observable.from(item.getUserData())).observeOn(AndroidSchedulers.mainThread());
+//                userAlbums.subscribe(observer);
                 //Observable.concat(recommended, userAlbums).distinct(album -> album.getId()).fi
                 //compositeSubscription.add(subscribeForUserUpdates());
                 //compositeSubscription.add(subscribeForRadioUpdates());

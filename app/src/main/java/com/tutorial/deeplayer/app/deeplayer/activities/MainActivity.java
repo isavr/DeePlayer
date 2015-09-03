@@ -20,6 +20,7 @@ public class MainActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         if (kMP.musicService != null) {
+            // TODO: // FIXME: 31.08.2015
             kMP.musicService.updateFavouriteTracksList();
         }
     }

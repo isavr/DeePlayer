@@ -1,6 +1,7 @@
 package com.tutorial.deeplayer.app.deeplayer.views;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
@@ -11,12 +12,12 @@ import android.widget.AdapterView;
 import android.widget.FrameLayout;
 
 import com.tutorial.deeplayer.app.deeplayer.adapters.RadioAdapter;
+import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
+import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RadioViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.RadioItemView;
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -60,8 +61,8 @@ public class RadioView extends FrameLayout
 
     private void setupChildren() {
         ButterKnife.bind(this);
-        radioAdapter = new RadioAdapter(getContext(), this);
-        mListView.setAdapter(radioAdapter);
+//        radioAdapter = new RadioAdapter(getContext(), this);
+//        mListView.setAdapter(radioAdapter);
     }
 
     public void setViewModel(@Nullable RadioViewModel viewModel) {
@@ -72,19 +73,28 @@ public class RadioView extends FrameLayout
         }
     }
 
+    private <U> void updateRadioList(U u) {
+        Log.d(TAG, "update Radio List");
+        if (listener != null) {
+            listener.onStopProgress();
+        }
+    }
+
     private void onError(Throwable throwable) {
         Log.d(TAG, "Handle Error");
     }
 
     public void addRadioToFavourite(@NonNull final Radio radio) {
         if (radioViewModel != null) {
-            rxBinderUtil.bindProperty(radioViewModel.addRadioToFavourite(radio), getFavouriteStatusChangeObserver(radio, true));
+            rxBinderUtil.bindProperty(radioViewModel.addRadioToFavourite(radio),
+                    getFavouriteStatusChangeObserver(radio, true));
         }
     }
 
     public void removeRadioFromFavourite(@NonNull final Radio radio) {
         if (radioViewModel != null) {
-            rxBinderUtil.bindProperty(radioViewModel.removeRadioFromFavourite(radio), getFavouriteStatusChangeObserver(radio, false));
+            rxBinderUtil.bindProperty(radioViewModel.removeRadioFromFavourite(radio),
+                    getFavouriteStatusChangeObserver(radio, false));
         }
     }
 
@@ -111,10 +121,15 @@ public class RadioView extends FrameLayout
                                              final boolean isSuccess) {
         if (isSuccess) {
             radio.setFavourite(toFavourite);
-            radioAdapter.updateItem(radio);
+            Log.d(TAG, "Radio status updated! Id - " + radio.getId() + " Title - "
+                    + radio.getTitle() + " Status - " + radio.isFavourite());
+            getContext().getApplicationContext().getContentResolver().update(SchematicDataProvider.Radios.withId(radio.getId()),
+                    DataContract.RadioConverter.convertFrom(radio), null, null);
+//            radioAdapter.updateItem(radio);
             Log.d(TAG, "ALL IS OK");
         } else {
-            radioAdapter.updateItem(radio);
+            getContext().getApplicationContext().getContentResolver().notify();
+//            radioAdapter.updateItem(radio);
         }
     }
 
@@ -122,19 +137,15 @@ public class RadioView extends FrameLayout
         this.listener = listener;
     }
 
-    private void updateRadioList(List<Radio> radios) {
-        Log.d(TAG, "update Radio -> " + radios.size());
-        if (listener != null) {
-            listener.onStopProgress();
-        }
-        radioAdapter.add(radios);
-    }
-
     @OnItemClick(android.R.id.list)
-    public void listViewItemClicked(AdapterView<?> adapterView, View view, int position, long l) {
-        Radio radio = radioAdapter.getItem(position);
-        if (listener != null) {
-            listener.onRadioItemInteraction(radio);
+    public void listViewItemClicked(AdapterView<?> adapterView, View view, int position, long id) {
+        if (radioAdapter != null) {
+            Cursor c = (Cursor) radioAdapter.getItem(position);
+            if (c != null && listener != null) {
+                Log.d(TAG, "radio clicked");
+                Radio radio = DataContract.RadioConverter.convertFromCursor(c);
+                listener.onRadioItemInteraction(radio);
+            }
         }
     }
 
@@ -150,6 +161,22 @@ public class RadioView extends FrameLayout
 
     public void clean() {
         radioAdapter.remove();
+    }
+
+    public void onLoadFinish(Cursor data) {
+        if (radioAdapter == null) {
+            radioAdapter = new RadioAdapter(getContext(), data);
+            radioAdapter.setListener(this);
+            mListView.setAdapter(radioAdapter);
+        } else {
+            radioAdapter.changeCursor(data);
+        }
+    }
+
+    public void onLoaderReset() {
+        if (radioAdapter != null) {
+            radioAdapter.changeCursor(null);
+        }
     }
 
     public interface OnRadioItemInteractionListener {

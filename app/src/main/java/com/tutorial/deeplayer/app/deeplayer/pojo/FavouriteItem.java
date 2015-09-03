@@ -5,6 +5,7 @@ package com.tutorial.deeplayer.app.deeplayer.pojo;
  */
 public class FavouriteItem extends BaseTypedItem implements ItemsPicturesActions {
     private boolean favourite;
+    private boolean isRecommended;
 
     public boolean isFavourite() {
         return favourite;
@@ -21,12 +22,13 @@ public class FavouriteItem extends BaseTypedItem implements ItemsPicturesActions
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof FavouriteItem)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
 
         FavouriteItem that = (FavouriteItem) o;
 
-        return favourite == that.favourite;
+        if (favourite != that.favourite) return false;
+        return isRecommended == that.isRecommended;
 
     }
 
@@ -34,6 +36,7 @@ public class FavouriteItem extends BaseTypedItem implements ItemsPicturesActions
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + (favourite ? 1 : 0);
+        result = 31 * result + (isRecommended ? 1 : 0);
         return result;
     }
 
@@ -75,5 +78,13 @@ public class FavouriteItem extends BaseTypedItem implements ItemsPicturesActions
     @Override
     public void setPictureBig(String pictureBig) {
 
+    }
+
+    public boolean isRecommended() {
+        return isRecommended;
+    }
+
+    public void setIsRecommended(boolean isRecommended) {
+        this.isRecommended = isRecommended;
     }
 }

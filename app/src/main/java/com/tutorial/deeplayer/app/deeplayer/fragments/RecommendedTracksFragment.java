@@ -9,23 +9,28 @@ import android.view.ViewGroup;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
+import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
+import com.tutorial.deeplayer.app.deeplayer.data.tables.TrackColumns;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedTrackViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedTracksView;
 
 import javax.inject.Inject;
+import android.database.Cursor;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 
 /**
  * Created by ilya.savritsky on 17.08.2015.
  */
-public class RecommendedTracksFragment extends Fragment {
+public class RecommendedTracksFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = RecommendedTracksFragment.class.getSimpleName();
+    private static final int LOADER_TRACKS = 40;
 
     private RecommendedTracksView recommendedTrackView;
     @Inject
     RecommendedTrackViewModel trackViewModel;
-//    @Inject
-//    Instrumentation instrumentation;
 
     private RecommendedTracksView.OnTrackItemInteractionListener listener;
 
@@ -47,6 +52,7 @@ public class RecommendedTracksFragment extends Fragment {
         DialogFactory.showProgressDialog(this.getActivity(),
                 getActivity().getSupportFragmentManager());
         trackViewModel.subscribeToDataStore();
+        getLoaderManager().initLoader(LOADER_TRACKS, null, this);
     }
 
     @Override
@@ -91,5 +97,25 @@ public class RecommendedTracksFragment extends Fragment {
         recommendedTrackView.clean();
         recommendedTrackView.setListener(null);
         //instrumentation.getLeakTracing().traceLeakage(this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new CursorLoader(getActivity(), SchematicDataProvider.Tracks.CONTENT_URI, null,
+                TrackColumns.IS_RECOMMENDED + "=1", null, null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (recommendedTrackView != null) {
+            recommendedTrackView.onLoadFinish(cursor);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        if (recommendedTrackView != null) {
+            recommendedTrackView.onLoaderReset();
+        }
     }
 }

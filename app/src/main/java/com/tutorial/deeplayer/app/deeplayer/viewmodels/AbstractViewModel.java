@@ -3,6 +3,8 @@ package com.tutorial.deeplayer.app.deeplayer.viewmodels;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService;
+
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -38,5 +40,9 @@ abstract public class AbstractViewModel {
             compositeSubscription.clear();
             compositeSubscription = null;
         }
+    }
+
+    protected RestService getRestService() {
+        return new RestService();
     }
 }

@@ -1,101 +1,78 @@
 package com.tutorial.deeplayer.app.deeplayer.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 
-import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
+import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.views.items.RadioItemView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by ilya.savritsky on 22.07.2015.
  */
-public class RadioAdapter extends BaseAdapter {
+public class RadioAdapter extends CursorAdapter {
 
     private LayoutInflater layoutInflator;
-    private List<Radio> items;
     private RadioItemView.OnRadioItemFavouriteStatusInteractionListener listener;
 
-    public RadioAdapter(Context context, RadioItemView.OnRadioItemFavouriteStatusInteractionListener listener) {
+    public RadioAdapter(Context context, Cursor c) {
+        super(context, c);
+    }
+
+    public RadioAdapter(Context context, Cursor c, boolean autoRequery) {
+        super(context, c, autoRequery);
+    }
+
+    public RadioAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
+        setup(context);
+    }
+
+    private void setup(Context context) {
         this.layoutInflator = LayoutInflater.from(context);
-        this.items = new ArrayList<>();
+    }
+
+    public void setListener(RadioItemView.OnRadioItemFavouriteStatusInteractionListener listener) {
         this.listener = listener;
     }
 
-    public void add(Radio item) {
-        this.items.add(item);
-        notifyDataSetChanged();
-    }
-
-    public void add(List<Radio> items) {
-        this.items.addAll(items);
-        notifyDataSetChanged();
-    }
-
-    public void clear() {
-        items.clear();
-        notifyDataSetChanged();
-    }
-
-    public void removeItem(Radio item) {
-        items.remove(item);
-        notifyDataSetChanged();
-    }
-
     public void remove() {
-        //items.clear();
         layoutInflator = null;
-        items = null;
         listener = null;
     }
 
-    public void updateItem(@NonNull Radio radio) {
-        int index = 0;
-        for (int i = 0; i < items.size(); ++i) {
-            Radio currRadio = items.get(i);
-            if (radio.getId().equals(currRadio.getId())) {
-                index = i;
-                break;
-            }
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        RadioItemView radioItemView = RadioItemView.inflate(LayoutInflater.from(context), parent);
+        radioItemView.setListener(listener);
+        radioItemView.bindToData(DataContract.RadioConverter.convertFromCursor(cursor));
+        return radioItemView;
+    }
+
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+        if (view instanceof RadioItemView) {
+            RadioItemView radioItemView = (RadioItemView)view;
+            radioItemView.setListener(listener);
+            radioItemView.bindToData(DataContract.RadioConverter.convertFromCursor(cursor));
         }
-        items.set(index, radio);
-        notifyDataSetChanged();
     }
 
-    @Override
-    public int getCount() {
-        return items.size();
-    }
-
-    @Override
-    public Radio getItem(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return getItem(position).getId();
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null || !(convertView instanceof RadioItemView)) {
-            convertView = RadioItemView.inflate(layoutInflator, parent);
-        }
-        Radio radio = getItem(position);
-        if (convertView != null) {
-            RadioItemView radioView = (RadioItemView) convertView;
-            radioView.setListener(listener);
-            radioView.bindToData(radio);
-            return radioView;
-        }
-
-        return convertView;
-    }
+//    private Radio getRadioInfoFromCursor(Cursor cursor) {
+//        int id = cursor.getInt(cursor.getColumnIndex(RadioColumns.ID));
+//        String title = cursor.getString(cursor.getColumnIndex(RadioColumns.TITLE));
+//        String imgUrl = cursor.getString(cursor.getColumnIndex(RadioColumns.PICTURE_MEDIUM));
+//        String type = cursor.getString(cursor.getColumnIndex(RadioColumns.TYPE));
+//        int favouriteStatus = cursor.getInt(cursor.getColumnIndex(RadioColumns.IS_FAVOURITE));
+//        Radio radio = new Radio();
+//        radio.setId(Long.valueOf(id));
+//        radio.setPictureMedium(imgUrl);
+//        radio.setTitle(title);
+//        radio.setType(type);
+//        radio.setFavourite(favouriteStatus == 1);
+//        return radio;
+//    }
 }

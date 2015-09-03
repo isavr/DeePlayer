@@ -1,102 +1,66 @@
 package com.tutorial.deeplayer.app.deeplayer.adapters;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
+import android.widget.FilterQueryProvider;
 
-import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
+import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.views.items.ArtistItemView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by ilya.savritsky on 31.07.2015.
  */
-public class ArtistAdapter extends BaseAdapter {
+public class ArtistAdapter extends CursorAdapter {
 
     private LayoutInflater layoutInflator;
-    private List<Artist> items;
     private ArtistItemView.OnArtistItemFavouriteStatusInteractionListener listener;
 
-    public ArtistAdapter(Context context, ArtistItemView.OnArtistItemFavouriteStatusInteractionListener listener) {
+    public ArtistAdapter(Context context, Cursor c) {
+        super(context, c);
+    }
+
+    public ArtistAdapter(Context context, Cursor c, boolean autoRequery) {
+        super(context, c, autoRequery);
+    }
+
+    public ArtistAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
+        setup(context);
+    }
+
+    private void setup(Context context) {
         this.layoutInflator = LayoutInflater.from(context);
-        this.items = new ArrayList<>();
+    }
+
+    public void setListener(ArtistItemView.OnArtistItemFavouriteStatusInteractionListener listener) {
         this.listener = listener;
     }
 
-    public void add(Artist item) {
-        this.items.add(item);
-        notifyDataSetChanged();
-    }
-
-    public void add(List<Artist> items) {
-        this.items.addAll(items);
-        notifyDataSetChanged();
-    }
-
-    public void clear() {
-        items.clear();
-        notifyDataSetChanged();
-    }
-
-    public void removeItem(Artist item) {
-        items.remove(item);
-        notifyDataSetChanged();
-    }
-
     public void remove() {
-        //items.clear();
         layoutInflator = null;
-        items = null;
         listener = null;
+        changeCursor(null);
+        notifyDataSetInvalidated();
     }
 
-    public void updateItem(@NonNull Artist artist) {
-        int index = 0;
-        for (int i = 0; i < items.size(); ++i) {
-            Artist currAtist = items.get(i);
-            if (artist.getId().equals(currAtist.getId())) {
-                index = i;
-                break;
-            }
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        ArtistItemView view = ArtistItemView.inflate(LayoutInflater.from(context), parent);
+        view.setListener(listener);
+        view.bindToData(DataContract.ArtistConverter.convertFromCursor(cursor));
+        return view;
+    }
+
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+        if (view instanceof ArtistItemView) {
+            ArtistItemView artistItemView = (ArtistItemView) view;
+            artistItemView.setListener(listener);
+            artistItemView.bindToData(DataContract.ArtistConverter.convertFromCursor(cursor));
         }
-        items.set(index, artist);
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public int getCount() {
-        return items.size();
-    }
-
-    @Override
-    public Artist getItem(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return getItem(position).getId();
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null || !(convertView instanceof ArtistItemView)) {
-            convertView = ArtistItemView.inflate(layoutInflator, parent);
-        }
-        Artist album = getItem(position);
-        if (convertView != null) {
-            ArtistItemView radioView = (ArtistItemView) convertView;
-
-            radioView.setListener(listener);
-            radioView.bindToData(album);
-            return radioView;
-        }
-
-        return convertView;
     }
 }

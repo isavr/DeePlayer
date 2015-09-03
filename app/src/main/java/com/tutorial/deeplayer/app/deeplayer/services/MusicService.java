@@ -3,6 +3,7 @@ package com.tutorial.deeplayer.app.deeplayer.services;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.*;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.RemoteControlClient;
 import android.os.Binder;
@@ -23,6 +24,8 @@ import com.deezer.sdk.player.exception.TooManyPlayersExceptions;
 import com.deezer.sdk.player.networkcheck.WifiOnlyNetworkStateChecker;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
+import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
+import com.tutorial.deeplayer.app.deeplayer.data.tables.TrackColumns;
 import com.tutorial.deeplayer.app.deeplayer.external.RemoteControlClientCompat;
 import com.tutorial.deeplayer.app.deeplayer.external.RemoteControlHelper;
 import com.tutorial.deeplayer.app.deeplayer.notifications.NotificationMusic;
@@ -825,24 +828,31 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     public void updateFavouriteTracksList() {
         // TODO: refactor this later
-        new RestService().fetchUserTrackIds().doOnNext(ids -> {
-            Log.d(TAG, "Items received - " + ids.size());
-            favouriteTracksIds.clear();
-            if (ids != null) {
-                favouriteTracksIds.addAll(ids);
-            }
-        }).subscribe();
+//        new RestService().fetchUserTrackIds().doOnNext(ids -> {
+//            Log.d(TAG, "Items received - " + ids.size());
+//            favouriteTracksIds.clear();
+//            if (ids != null) {
+//                favouriteTracksIds.addAll(ids);
+//            }
+//        }).subscribe();
+    }
+
+    public boolean checkTrackFavouriteStatus(final long trackId) {
+        Cursor c = getApplicationContext().getContentResolver().query(SchematicDataProvider.Tracks.withId(trackId),
+                null, TrackColumns.IS_FAVOURITE + "=1" , null, null);
+        return c != null && c.getCount() == 1;
     }
 
     public void toggleTrackFavouriteStatus(final long trackId) {
         // TODO: refactor this later
         Log.d(TAG, "try to like track with ID - " + trackId);
         if (trackId != -1) {
-            if (favouriteTracksIds.contains(trackId)) {
+
+            if (checkTrackFavouriteStatus(trackId)) {
                 new RestService().fetchResultTrackRemoveFromFavourite(trackId).observeOn(AndroidSchedulers.mainThread())
                         .doOnNext(item -> {
                                     Log.d(TAG, "unlike succeeded - " + item);
-                                    favouriteTracksIds.remove(trackId);
+                                    // TODO: fix remove from favourites
                                 }
                         )
                         .doOnError(error -> {
@@ -851,13 +861,13 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
                         })
                         .doOnCompleted(() -> {
                             Log.d(TAG, "UnLike Completed");
-                            notification.notifyIsFavourite(favouriteTracksIds.contains(trackId));
+                            notification.notifyIsFavourite(checkTrackFavouriteStatus(trackId));
                         }).subscribe();
             } else {
                 new RestService().fetchResultTrackAddToFavourite(trackId).observeOn(AndroidSchedulers.mainThread())
                         .doOnNext(item -> {
                                     Log.d(TAG, "like succeeded - " + item);
-                                    favouriteTracksIds.add(trackId);
+                                    // TODO: fix add to favourites
                                 }
                         )
                         .doOnError(error -> {
@@ -866,7 +876,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
                         })
                         .doOnCompleted(() -> {
                             Log.d(TAG, "Like Completed");
-                            notification.notifyIsFavourite(favouriteTracksIds.contains(trackId));
+                            notification.notifyIsFavourite(checkTrackFavouriteStatus(trackId));
                         }).subscribe();
             }
         }

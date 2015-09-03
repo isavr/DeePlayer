@@ -11,11 +11,9 @@ public class Track extends FavouriteItem {
     private boolean readable;
     private String title;
     @SerializedName("title_short")
-    private
-    String shortTitle;
+    private String shortTitle;
     @SerializedName("title_version")
-    private
-    String titleVersion;
+    private String titleVersion;
     private String isrc;
     @SerializedName("link")
     private String deezerURL;

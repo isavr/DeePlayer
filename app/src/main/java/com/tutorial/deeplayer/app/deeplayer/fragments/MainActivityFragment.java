@@ -1,12 +1,17 @@
 package com.tutorial.deeplayer.app.deeplayer.fragments;
 
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
+import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.MainViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.MainActivityView;
 
@@ -72,115 +77,4 @@ public class MainActivityFragment extends BaseFragment {
         //instrumentation.getLeakTracing().traceLeakage(this);
         DeePlayerApp.getRefWatcher().watch(this, "Main Fragment");
     }
-
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        //instrumentation.getLeakTracing().traceLeakage(this);
-//    }
-
-//    @OnItemClick(R.id.listView)
-//    public void listViewItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-//        switch (position) {
-//            case 4: {
-//                Intent intent = new Intent(getActivity(), MixActivity.class);
-//                startActivity(intent);
-//                break;
-//            }
-//            case 5: {
-//                // Check User info
-//                //compositeSubscription.add(subscribeForUserUpdates());
-//                //compositeSubscription.add(subscribeForRadioUpdates());
-//                break;
-//            }
-//            default: {
-//
-//            }
-//        }
-//    }
-//
-//
-//    private Subscription subscribeForUserUpdates() {
-//        Observer userDataObserver = new Observer<User>() {
-//            @Override
-//            public void onCompleted() {
-//                Log.d(TAG, "onCompleted");
-//                DialogFactory.closeAlertDialog(getChildFragmentManager());
-//            }
-//
-//            @Override
-//            public void onError(Throwable e) {
-//                Log.d(TAG, "onError");
-//                DialogFactory.showSimpleErrorMessage(getActivity(), getChildFragmentManager(), e.getMessage());
-//                e.printStackTrace();
-//            }
-//
-//            @Override
-//            public void onNext(User user) {
-//                Log.d(TAG, "onNext");
-//                //rxCupboard.put(user);
-//            }
-//        };
-//        Observable<User> userObservable = new RestService().fetchUserInfoService().subscribeOn(Schedulers.io());
-//
-//        return userObservable.subscribe(userDataObserver);
-//    }
-
-//   private Observable createObservable() {
-//        Observable<User> userObservable = new RestService().fetchUserInfoService().subscribeOn(Schedulers.io());
-//        Observable<Radio> radioObservable = new RestService().fetchRadioInfo().subscribeOn(Schedulers.io())
-//                .flatMap(item -> Observable.from(item.getData()));
-//        return Observable.zip(userObservable, radioObservable, (item1, item2) -> {return item1 + item2});
-//    }
-
-//    private Subscription subscribeForRadioUpdates() {
-//        DialogFactory.showProgressDialog(getActivity(), getChildFragmentManager());
-//        Observer<Radio> radioObserver = new Observer<Radio>() {
-//            @Override
-//            public void onCompleted() {
-//                Log.d(TAG, "onCompleted Radio");
-//                DialogFactory.closeAlertDialog(getChildFragmentManager());
-//            }
-//
-//            @Override
-//            public void onError(Throwable e) {
-//                DialogFactory.showSimpleErrorMessage(getActivity(), getChildFragmentManager(), e.getMessage());
-//                e.printStackTrace();
-//            }
-//
-//            @Override
-//            public void onNext(Radio radioData) {
-//                Log.d(TAG, "onNext Radio");
-//                //rxCupboard.put(radioData);
-//            }
-//        };
-//        //rxCupboard.delete(Radio.class);
-//        RestService service = new RestService();
-//        Observable<Radio> radioObservable = service.fetchRadioInfo().subscribeOn(Schedulers.io())
-//                .flatMap(item -> Observable.from(item.getData())).observeOn(AndroidSchedulers.mainThread());
-////        Observable<Radio> userRadios = service.fetchUserRadioInfo().subscribeOn(Schedulers.io())
-////                .flatMap(item -> Observable.from(item.getData())).observeOn(AndroidSchedulers.mainThread());
-////
-////        return Observable.zip(radioObservable, userRadios, (radio, radio2) -> {
-////            radio.setFavourite(false);
-////            if (radio.getId() == radio2.getId()) {
-////                radio.setFavourite(true);
-////            }
-////            return radio;
-////        }).subscribe(radioObserver);
-//        return radioObservable.subscribe(radioObserver);
-//    }
-
-//    @Override
-//    public void onStop() {
-//        super.onStop();
-//        //compositeSubscription.clear();
-//    }
-
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        ButterKnife.unbind(this);
-//    }
-
 }

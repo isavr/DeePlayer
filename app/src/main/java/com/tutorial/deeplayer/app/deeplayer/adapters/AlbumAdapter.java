@@ -1,12 +1,15 @@
 package com.tutorial.deeplayer.app.deeplayer.adapters;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CursorAdapter;
 
+import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.views.items.AlbumItemView;
 
@@ -16,87 +19,49 @@ import java.util.List;
 /**
  * Created by ilya.savritsky on 29.07.2015.
  */
-public class AlbumAdapter extends BaseAdapter {
-
-    private LayoutInflater layoutInflator;
-    private List<Album> items;
+public class AlbumAdapter extends CursorAdapter {
     private AlbumItemView.OnAlbumItemFavouriteStatusInteractionListener listener;
 
-    public AlbumAdapter(Context context, AlbumItemView.OnAlbumItemFavouriteStatusInteractionListener listener) {
-        this.layoutInflator = LayoutInflater.from(context);
-        this.items = new ArrayList<>();
+    public AlbumAdapter(Context context, Cursor c) {
+        super(context, c);
+    }
+
+    public AlbumAdapter(Context context, Cursor c, boolean autoRequery) {
+        super(context, c, autoRequery);
+    }
+
+    public AlbumAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
+        setup(context);
+    }
+
+    private void setup(Context context) {
+        //this.layoutInflator = LayoutInflater.from(context);
+    }
+
+
+    public void setListener(AlbumItemView.OnAlbumItemFavouriteStatusInteractionListener listener) {
         this.listener = listener;
     }
 
-    public void add(Album item) {
-        this.items.add(item);
-        notifyDataSetChanged();
-    }
-
-    public void add(List<Album> items) {
-        this.items.addAll(items);
-        notifyDataSetChanged();
-    }
-
-    public void clear() {
-        items.clear();
-        notifyDataSetChanged();
-    }
-
-    public void removeItem(Album item) {
-        items.remove(item);
-        notifyDataSetChanged();
-    }
-
     public void remove() {
-        //items.clear();
-        layoutInflator = null;
-        items = null;
         listener = null;
     }
 
-    public void updateItem(@NonNull Album radio) {
-        int index = 0;
-        for (int i = 0; i < items.size(); ++i) {
-            Album currAlbum = items.get(i);
-            if (radio.getId().equals(currAlbum.getId())) {
-                index = i;
-                break;
-            }
-        }
-        items.set(index, radio);
-        notifyDataSetChanged();
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        AlbumItemView view = AlbumItemView.inflate(LayoutInflater.from(context), parent);
+        view.setListener(listener);
+        view.bindToData(DataContract.AlbumConverter.convertFromCursor(cursor));
+        return view;
     }
 
     @Override
-    public int getCount() {
-        return items.size();
-    }
-
-    @Override
-    public Album getItem(int position) {
-        return items.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return getItem(position).getId();
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null || !(convertView instanceof AlbumItemView)) {
-            convertView = AlbumItemView.inflate(layoutInflator, parent);
-        }
-        Album album = getItem(position);
-        if (convertView != null) {
-            AlbumItemView albumItemView = (AlbumItemView) convertView;
-
+    public void bindView(View view, Context context, Cursor cursor) {
+        if (view instanceof AlbumItemView) {
+            AlbumItemView albumItemView = (AlbumItemView) view;
             albumItemView.setListener(listener);
-            albumItemView.bindToData(album);
-            return albumItemView;
+            albumItemView.bindToData(DataContract.AlbumConverter.convertFromCursor(cursor));
         }
-
-        return convertView;
     }
 }

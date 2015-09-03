@@ -94,9 +94,9 @@ public class LoginView extends LinearLayout {
     }
 
     private void attemptLogin(OnClickEvent onClickEvent) {
-        if (deezerConnect.isSessionValid()) {
-            loginSuccessfull(null);
-        } else {
+        if (deezerConnect != null && loginViewModel != null) {
+//            loginSuccessfull(null);
+//        } else {
             String[] permissions = new String[]{
                     Permissions.BASIC_ACCESS,
                     Permissions.MANAGE_LIBRARY,

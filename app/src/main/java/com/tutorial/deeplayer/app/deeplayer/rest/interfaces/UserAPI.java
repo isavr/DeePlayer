@@ -19,6 +19,9 @@ public interface UserAPI {
     @GET("/user/me/radios")
     Observable<DataList<Radio>> getUserRadios();
 
+    @GET("/user/me/radios")
+    Observable<DataList<Radio>> getUserRadios(@Query("index") int index);
+
     @POST("/user/me/radios")
     @FormUrlEncoded
     Observable<Boolean> addRadioToFavourite(@Field("radio_id") long radioId);
@@ -33,6 +36,9 @@ public interface UserAPI {
     @GET("/user/me/albums")
     Observable<DataList<Album>> getUserAlbums();
 
+    @GET("/user/me/albums")
+    Observable<DataList<Album>> getUserAlbums(@Query("index") int index);
+
     @POST("/user/me/albums")
     @FormUrlEncoded
     Observable<Boolean> addAlbumToFavourite(@Field("album_id") long albumId);
@@ -43,6 +49,9 @@ public interface UserAPI {
 
     @GET("/user/me/artists")
     Observable<DataList<Artist>> getUserArtists();
+
+    @GET("/user/me/artists")
+    Observable<DataList<Artist>> getUserArtists(@Query("index") int index);
 
     @GET("/user/me/recommendations/artists")
     Observable<DataList<Artist>> getArtistsRecommendedForUser();
@@ -60,6 +69,9 @@ public interface UserAPI {
 
     @GET("/user/me/recommendations/tracks")
     Observable<DataList<Track>> getTracksRecommendedForUser();
+
+    @GET("/user/me/tracks")
+    Observable<DataList<Track>> getUserTracks(@Query("index") int index);
 
     @POST("/user/me/tracks")
     @FormUrlEncoded
