@@ -209,7 +209,7 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
         if (kMP.musicService != null) {
             initMusicService(RecommendationsTypes.Albums);
             kMP.musicService.setData(album);
-            kMP.musicService.playAlbum();
+            kMP.musicService.play();
         }
     }
 
@@ -218,7 +218,7 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
         if (kMP.musicService != null) {
             initMusicService(RecommendationsTypes.Artists);
             kMP.musicService.setData(artist);
-            kMP.musicService.playArtist();
+            kMP.musicService.play();
         }
     }
 
@@ -227,7 +227,7 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
         if (kMP.musicService != null) {
             initMusicService(RecommendationsTypes.Tracks);
             kMP.musicService.setData(track);
-            kMP.musicService.playTrack();
+            kMP.musicService.play();
         }
     }
 
@@ -248,7 +248,7 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
             radio.setType("radio");
             radio.setDescription("User Flow radio");
             kMP.musicService.setData(radio);
-            kMP.musicService.playFlow();
+            kMP.musicService.play();
         }
     }
 

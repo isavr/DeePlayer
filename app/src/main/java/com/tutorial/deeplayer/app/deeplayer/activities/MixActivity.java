@@ -163,7 +163,7 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
         if (kMP.musicService != null) {
             kMP.musicService.initPlayer(MusicService.PlayerType.RADIO);
             kMP.musicService.setData(radio);
-            kMP.musicService.playRadio();
+            kMP.musicService.play();
         }
     }
 }

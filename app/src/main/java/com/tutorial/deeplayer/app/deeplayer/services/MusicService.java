@@ -2,7 +2,11 @@ package com.tutorial.deeplayer.app.deeplayer.services;
 
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.*;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.RemoteControlClient;
@@ -16,12 +20,8 @@ import android.widget.Toast;
 import com.deezer.sdk.model.Track;
 import com.deezer.sdk.network.connect.DeezerConnect;
 import com.deezer.sdk.network.connect.SessionStore;
-import com.deezer.sdk.network.request.event.DeezerError;
-import com.deezer.sdk.player.*;
 import com.deezer.sdk.player.event.PlayerState;
 import com.deezer.sdk.player.event.RadioPlayerListener;
-import com.deezer.sdk.player.exception.TooManyPlayersExceptions;
-import com.deezer.sdk.player.networkcheck.WifiOnlyNetworkStateChecker;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
@@ -29,8 +29,17 @@ import com.tutorial.deeplayer.app.deeplayer.data.tables.TrackColumns;
 import com.tutorial.deeplayer.app.deeplayer.external.RemoteControlClientCompat;
 import com.tutorial.deeplayer.app.deeplayer.external.RemoteControlHelper;
 import com.tutorial.deeplayer.app.deeplayer.notifications.NotificationMusic;
-import com.tutorial.deeplayer.app.deeplayer.pojo.*;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
+import com.tutorial.deeplayer.app.deeplayer.pojo.FavouriteItem;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService;
+import com.tutorial.deeplayer.app.deeplayer.services.player.AbstractPlayer;
+import com.tutorial.deeplayer.app.deeplayer.services.player.AlbumDeePlayer;
+import com.tutorial.deeplayer.app.deeplayer.services.player.ArtistDeePlayer;
+import com.tutorial.deeplayer.app.deeplayer.services.player.FlowDeePlayer;
+import com.tutorial.deeplayer.app.deeplayer.services.player.RadioDeePlayer;
+import com.tutorial.deeplayer.app.deeplayer.services.player.TrackDeePlayer;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -111,7 +120,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     private PlayerType playerType = PlayerType.UNKNOWN;
 
-    private AbstractPlayerWrapper mDeezerPlayer;
+    private AbstractPlayer mDeezerPlayer;
     private FavouriteItem data;
     private DeezerConnect deezerConnect;
 
@@ -189,7 +198,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
             PlayerType initType = (PlayerType) intent.getSerializableExtra("type");
             if (initType != null) {
                 initPlayer(initType);
-                playRadio();
+                play();
             }
         }
         return super.onStartCommand(intent, flags, startId);
@@ -205,73 +214,48 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
             mDeezerPlayer.stop();
             mDeezerPlayer.release();
         }
-        try {
-            switch (type) {
-                case RADIO: {
-                    initRadioPlayer();
-                    break;
-                }
-                case FLOW: {
-                    initRadioPlayer();
-                    break;
-                }
-                case ARTIST: {
-                    initArtistPlayer();
-                    break;
-                }
-                case ALBUM: {
-                    initAlbumPlayer();
-                    break;
-                }
-                case TRACK: {
-                    initTrackPlayer();
-                    break;
-                }
-                case PLAYLIST: {
-                    // do the same for now
-                }
-                case UNKNOWN: {
-                    // do the same as default
-                }
-                default: {
-                    if (data != null) {
-                        if (data instanceof Radio) {
-                            initRadioPlayer();
-                        } else if (data instanceof Artist) {
-                            initArtistPlayer();
-                        } else if (data instanceof Album) {
-                            initAlbumPlayer();
-                        } else if (data instanceof com.tutorial.deeplayer.app.deeplayer.pojo.Track) {
-                            initTrackPlayer();
-                        } // TODO: add playlist (?)
-                    }
+        switch (type) {
+            case RADIO: {
+                mDeezerPlayer = new RadioDeePlayer();
+                break;
+            }
+            case FLOW: {
+                mDeezerPlayer = new FlowDeePlayer();
+                break;
+            }
+            case ARTIST: {
+                mDeezerPlayer = new ArtistDeePlayer();
+                break;
+            }
+            case ALBUM: {
+                mDeezerPlayer = new AlbumDeePlayer();
+                break;
+            }
+            case TRACK: {
+                mDeezerPlayer = new TrackDeePlayer();
+                break;
+            }
+            case PLAYLIST: {
+                // do the same for now
+            }
+            case UNKNOWN: {
+                // do the same as default
+            }
+            default: {
+                if (data != null) {
+                    if (data instanceof Radio) {
+                        mDeezerPlayer = new RadioDeePlayer();
+                    } else if (data instanceof Artist) {
+                        mDeezerPlayer = new ArtistDeePlayer();
+                    } else if (data instanceof Album) {
+                        mDeezerPlayer = new AlbumDeePlayer();
+                    } else if (data instanceof com.tutorial.deeplayer.app.deeplayer.pojo.Track) {
+                        mDeezerPlayer = new TrackDeePlayer();
+                    } // TODO: add playlist (?)
                 }
             }
-        } catch (DeezerError deezerException) {
-            deezerException.printStackTrace();
-        } catch (TooManyPlayersExceptions playersException) {
-            playersException.printStackTrace();
         }
-    }
-
-    private void initRadioPlayer() throws DeezerError, TooManyPlayersExceptions {
-        mDeezerPlayer = new RadioPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker());
-        //((RadioPlayer)mDeezerPlayer).playRadio(RadioPlayer.RadioType.USER, userID);
-        mDeezerPlayer.addPlayerListener(this);
-    }
-
-    private void initArtistPlayer() throws DeezerError, TooManyPlayersExceptions {
-        mDeezerPlayer = new ArtistRadioPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker());
-        mDeezerPlayer.addPlayerListener(this);
-    }
-
-    private void initAlbumPlayer() throws DeezerError, TooManyPlayersExceptions {
-        mDeezerPlayer = new AlbumPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker());
-        mDeezerPlayer.addPlayerListener(this);
-    }
-
-    private void initTrackPlayer() throws DeezerError, TooManyPlayersExceptions {
-        mDeezerPlayer = new TrackPlayer(DeePlayerApp.get(), deezerConnect, new WifiOnlyNetworkStateChecker());
+        mDeezerPlayer.setup(deezerConnect);
         mDeezerPlayer.addPlayerListener(this);
     }
 
@@ -297,67 +281,10 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         this.data = data;
     }
 
-    public void playRadio() {
-        Log.d(TAG, "playRadio");
-        if (data != null && data instanceof Radio
-                && mDeezerPlayer != null && mDeezerPlayer instanceof RadioPlayer) {
-            Log.d(TAG, "Playing radio -> " + data.getTitle());
-            mDeezerPlayer.stop();
-            ((RadioPlayer) mDeezerPlayer).playRadio(RadioPlayer.RadioType.RADIO, data.getId());
-
-            broadcastState(MusicService.BROADCAST_EXTRA_PLAYING);
-            updateLockScreenWidget(data, RemoteControlClient.PLAYSTATE_PLAYING);
-        }
-    }
-
-    public void playFlow() {
-        Log.d(TAG, "playFlow");
-        //TODO: fix use user id
-        if (data != null && data instanceof Radio
-                && mDeezerPlayer != null && mDeezerPlayer instanceof RadioPlayer) {
-            Log.d(TAG, "Playing radio -> " + data.getTitle());
-            mDeezerPlayer.stop();
-            ((RadioPlayer) mDeezerPlayer).playRadio(RadioPlayer.RadioType.USER, data.getId());
-
-            broadcastState(MusicService.BROADCAST_EXTRA_PLAYING);
-            updateLockScreenWidget(data, RemoteControlClient.PLAYSTATE_PLAYING);
-        }
-    }
-
-    public void playArtist() {
-        Log.d(TAG, "playArtist");
-        if (data != null && data instanceof Artist
-                && mDeezerPlayer != null && mDeezerPlayer instanceof ArtistRadioPlayer) {
-            Log.d(TAG, "Playing artist radio -> " + ((Artist) data).getName());
-            mDeezerPlayer.stop();
-            ((ArtistRadioPlayer) mDeezerPlayer).playArtistRadio(data.getId());
-
-            broadcastState(MusicService.BROADCAST_EXTRA_PLAYING);
-            updateLockScreenWidget(data, RemoteControlClient.PLAYSTATE_PLAYING);
-        }
-    }
-
-    public void playAlbum() {
-        Log.d(TAG, "playAlbum");
-        if (data != null && data instanceof Album
-                && mDeezerPlayer != null && mDeezerPlayer instanceof AlbumPlayer) {
-            Log.d(TAG, "Playing Album radio -> " + data.getTitle());
-            mDeezerPlayer.stop();
-            ((AlbumPlayer) mDeezerPlayer).playAlbum(data.getId());
-
-            broadcastState(MusicService.BROADCAST_EXTRA_PLAYING);
-            updateLockScreenWidget(data, RemoteControlClient.PLAYSTATE_PLAYING);
-        }
-    }
-
-    public void playTrack() {
-        Log.d(TAG, "playTrack");
-        if (data != null && data instanceof com.tutorial.deeplayer.app.deeplayer.pojo.Track
-                && mDeezerPlayer != null && mDeezerPlayer instanceof TrackPlayer) {
-            Log.d(TAG, "Playing Track -> " + data.getTitle());
-            mDeezerPlayer.stop();
-            ((TrackPlayer) mDeezerPlayer).playTrack(data.getId());
-
+    public void play() {
+        if (mDeezerPlayer != null && data != null) {
+            Log.d(TAG, "start playing " + data.getType() + " -> " + data.getTitle());
+            mDeezerPlayer.playItem(data.getId());
             broadcastState(MusicService.BROADCAST_EXTRA_PLAYING);
             updateLockScreenWidget(data, RemoteControlClient.PLAYSTATE_PLAYING);
         }
@@ -839,7 +766,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     public boolean checkTrackFavouriteStatus(final long trackId) {
         Cursor c = getApplicationContext().getContentResolver().query(SchematicDataProvider.Tracks.withId(trackId),
-                null, TrackColumns.IS_FAVOURITE + "=1" , null, null);
+                null, TrackColumns.IS_FAVOURITE + "=1", null, null);
         return c != null && c.getCount() == 1;
     }
 
@@ -884,7 +811,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     public int getTrackDuration() {
         if (mDeezerPlayer != null) {
-            return (int) mDeezerPlayer.getTrackDuration();
+            return mDeezerPlayer.getTrackDuration();
         } else {
             return 0;
         }
