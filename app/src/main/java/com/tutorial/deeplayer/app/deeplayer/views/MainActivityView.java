@@ -10,6 +10,7 @@ import android.widget.*;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.activities.MixActivity;
 import com.tutorial.deeplayer.app.deeplayer.activities.RecommendationsActivity;
+import com.tutorial.deeplayer.app.deeplayer.activities.UserLibraryActivity;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
@@ -89,6 +90,11 @@ public class MainActivityView extends FrameLayout {
     @OnItemClick(R.id.listView)
     public void listViewItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
         switch (position) {
+            case 0: {
+                Intent intent = new Intent(getContext(), UserLibraryActivity.class);
+                getContext().startActivity(intent);
+                break;
+            }
             case 1: {
                 Intent intent = new Intent(getContext(), RecommendationsActivity.class);
                 getContext().startActivity(intent);

@@ -31,10 +31,10 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <provider
-            android:name="com.tutorial.deeplayer.app.deeplayer.data.generated.SchematicDataProvider"
+            android:name=".data.generated.SchematicDataProvider"
             android:authorities="com.tutorial.deeplayer.app.deeplayer.authority"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false" />
 
         <activity
             android:name=".activities.MixActivity"
@@ -50,6 +50,16 @@
             android:name=".activities.RecommendationsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_recommendations"
+            android:parentActivityName=".activities.MainActivity"
+            android:windowSoftInputMode="stateAlwaysHidden">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tutorial.deeplayer.app.deeplayer.activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activities.UserLibraryActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_user_library"
             android:parentActivityName=".activities.MainActivity"
             android:windowSoftInputMode="stateAlwaysHidden">
             <meta-data

@@ -16,6 +16,7 @@ import com.deezer.sdk.player.exception.NotAllowedToPlayThatSongException;
 import com.deezer.sdk.player.exception.StreamLimitationException;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
+import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

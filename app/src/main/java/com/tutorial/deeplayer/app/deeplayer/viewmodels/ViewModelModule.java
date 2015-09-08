@@ -37,4 +37,24 @@ public class ViewModelModule {
     public RecommendedTrackViewModel provideRecommendedATrackViewModel() {
         return new RecommendedTrackViewModel();
     }
+
+    @Provides
+    public FavouriteAlbumsViewModel provideFavouriteAlbumsViewModel() {
+        return new FavouriteAlbumsViewModel();
+    }
+
+    @Provides
+    public FavouriteArtistViewModel provideFavouriteArtistViewModel() {
+        return new FavouriteArtistViewModel();
+    }
+
+    @Provides
+    public FavouriteRadiosViewModel provideFavouriteRadiosViewModel() {
+        return new FavouriteRadiosViewModel();
+    }
+
+    @Provides
+    public FavouriteTracksViewModel provideFavouriteTracksViewModel() {
+        return new FavouriteTracksViewModel();
+    }
 }

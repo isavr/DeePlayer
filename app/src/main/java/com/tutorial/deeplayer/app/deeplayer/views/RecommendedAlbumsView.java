@@ -16,10 +16,8 @@ import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
-import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedAlbumsViewModel;
+import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteAlbumsViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.AlbumItemView;
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -40,7 +38,7 @@ public class RecommendedAlbumsView extends FrameLayout
     @Bind(android.R.id.list)
     AbsListView mListView;
 
-    RecommendedAlbumsViewModel albumsViewModel;
+    FavouriteAlbumsViewModel albumsViewModel;
 
     public RecommendedAlbumsView(Context context) {
         super(context, null);
@@ -66,7 +64,7 @@ public class RecommendedAlbumsView extends FrameLayout
         ButterKnife.bind(this);
     }
 
-    public void setViewModel(@Nullable RecommendedAlbumsViewModel viewModel) {
+    public void setViewModel(@Nullable FavouriteAlbumsViewModel viewModel) {
         rxBinderUtil.clear();
         if (viewModel != null) {
             albumsViewModel = viewModel;

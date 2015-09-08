@@ -15,7 +15,11 @@ import com.deezer.sdk.network.connect.DeezerConnect;
 import com.deezer.sdk.network.connect.SessionStore;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.fragments.*;
+import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.AlbumFragment;
+import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.ArtistFragment;
+import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.FlowFragment;
+import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.RecommendationsControlsFragment;
+import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.TracksFragment;
 import com.tutorial.deeplayer.app.deeplayer.kMP;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
@@ -133,13 +137,13 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
         return flowFragment;
     }
 
-    private RecommendedTracksFragment getTracksFragment() {
-        RecommendedTracksFragment recommendedTracksFragment = (RecommendedTracksFragment) getSupportFragmentManager().
-                findFragmentByTag(RecommendedTracksFragment.TAG);
-        if (recommendedTracksFragment == null) {
-            recommendedTracksFragment = new RecommendedTracksFragment();
+    private TracksFragment getTracksFragment() {
+        TracksFragment tracksFragment = (TracksFragment) getSupportFragmentManager().
+                findFragmentByTag(TracksFragment.TAG);
+        if (tracksFragment == null) {
+            tracksFragment = new TracksFragment();
         }
-        return recommendedTracksFragment;
+        return tracksFragment;
     }
 
     private ArtistFragment getArtistFragment() {

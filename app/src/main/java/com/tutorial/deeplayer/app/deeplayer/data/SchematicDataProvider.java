@@ -37,6 +37,7 @@ public class SchematicDataProvider {
         String ARTISTS = "artists";
         String ALBUMS = "albums";
         String ALBUMS_FROM_ARTIST = "albums_from_artist";
+        String ALBUMS_WITH_ARTISTS = "albums_with_artists";
         String TRACKS = "tracks";
     }
 
@@ -154,36 +155,36 @@ public class SchematicDataProvider {
             return buildUri(Path.ALBUMS, Path.ALBUMS_FROM_ARTIST, String.valueOf(artistId));
         }
 
-        @NotifyInsert(paths = Path.ALBUMS)
-        public static Uri[] onInsert(ContentValues values) {
-            final long artistId = values.getAsLong(AlbumColumns.ARTIST_ID);
-            return new Uri[] {
-                    Artists.withId(artistId), fromArtist(artistId),
-            };
-        }
-
-        @NotifyBulkInsert(paths = Path.ALBUMS)
-        public static Uri[] onBulkInsert(Context context, Uri uri, ContentValues[] values, long[] ids) {
-            return new Uri[]{
-                    uri,
-            };
-        }
-
-        @NotifyUpdate(paths = Path.ALBUMS + "/#")
-        public static Uri[] onUpdate(Context context,
-                                     Uri uri, String where, String[] whereArgs) {
-            final long noteId = Long.valueOf(uri.getPathSegments().get(1));
-            Cursor c = context.getContentResolver().query(uri, new String[]{
-                    AlbumColumns.ARTIST_ID,
-            }, null, null, null);
-            c.moveToFirst();
-            final long artistId = c.getLong(c.getColumnIndex(AlbumColumns.ARTIST_ID));
-            c.close();
-
-            return new Uri[]{
-                    withId(noteId), fromArtist(artistId), Artists.withId(artistId),
-            };
-        }
+//        @NotifyInsert(paths = Path.ALBUMS)
+//        public static Uri[] onInsert(ContentValues values) {
+//            final long artistId = values.getAsLong(AlbumColumns.ARTIST_ID);
+//            return new Uri[] {
+//                    Artists.withId(artistId), fromArtist(artistId),
+//            };
+//        }
+//
+//        @NotifyBulkInsert(paths = Path.ALBUMS)
+//        public static Uri[] onBulkInsert(Context context, Uri uri, ContentValues[] values, long[] ids) {
+//            return new Uri[]{
+//                    uri,
+//            };
+//        }
+//
+//        @NotifyUpdate(paths = Path.ALBUMS + "/#")
+//        public static Uri[] onUpdate(Context context,
+//                                     Uri uri, String where, String[] whereArgs) {
+//            final long noteId = Long.valueOf(uri.getPathSegments().get(1));
+//            Cursor c = context.getContentResolver().query(uri, new String[]{
+//                    AlbumColumns.ARTIST_ID,
+//            }, null, null, null);
+//            c.moveToFirst();
+//            final long artistId = c.getLong(c.getColumnIndex(AlbumColumns.ARTIST_ID));
+//            c.close();
+//
+//            return new Uri[]{
+//                    withId(noteId), fromArtist(artistId), Artists.withId(artistId),
+//            };
+//        }
     }
 
     @TableEndpoint(table = Database.Tables.TRACKS)

@@ -15,6 +15,11 @@ public class ServiceMoc extends RestService {
         super();
     }
 
+    @Override
+    protected String extractDeeToken() {
+        return null;
+    }
+
     private Radio getRadioMoc1() {
 //        Radio r1 = mock(Radio.class);
 //        when(r1.getId()).thenReturn(30901L);

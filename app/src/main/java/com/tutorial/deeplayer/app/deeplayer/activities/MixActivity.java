@@ -158,7 +158,6 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
     @Override
     public void onRadioItemInteraction(@NonNull Radio radio) {
         playerContainer.setVisibility(View.VISIBLE);
-//        try {
         Log.d(TAG, "play radio " + radio.getTitle());
         if (kMP.musicService != null) {
             kMP.musicService.initPlayer(MusicService.PlayerType.RADIO);

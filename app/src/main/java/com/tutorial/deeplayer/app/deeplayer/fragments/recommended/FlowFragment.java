@@ -1,4 +1,4 @@
-package com.tutorial.deeplayer.app.deeplayer.fragments;
+package com.tutorial.deeplayer.app.deeplayer.fragments.recommended;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -8,10 +8,7 @@ import android.view.ViewGroup;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.views.FlowView;
-
-import javax.inject.Inject;
 
 /**
  * A fragment with a Google +1 button.

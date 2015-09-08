@@ -1,14 +1,17 @@
 <resources xmlns:xliff="http://schemas.android.com/apk/res-auto">
     <string name="app_name">DeePlayer</string>
-    <string name="title_activity_main">MainActivity</string>
     <string name="hello_world">Hello world!</string>
+
+    <string name="title_activity_main">Main</string>
+    <string name="title_activity_mix">Mixes</string>
+    <string name="title_activity_recommendations">Recommendations</string>
+    <string name="title_activity_user_library">User Library</string>
 
     <string name="error_server_connection_lost">Problem connecting to the server</string>
     <string name="error_application">Application error! Contact administrator and describe the problem</string>
     <string name="error_server">Server error! Contact administrator and describe the problem</string>
     <string name="error_authentification_dialog_message_text">Incorrect Username/Password Combination</string>
-    <string name="title_activity_mix">MixActivity</string>
-    <string name="title_activity_recommendations">Recommendations</string>
+
     <string name="default_duration" translatable="false">0:00</string>
     <string name="empty" translatable="false"></string>
     <string name="login_with_deezer">Login with Deezer</string>
@@ -25,4 +28,10 @@
     <string name="notification_item_image_description">Associated image</string>
     <string name="flow_header_text">Want to hear something new? Flow can help.</string>
     <string name="start_flow_text">START FLOW</string>
+
+
+    <string name="title_section1">Tracks</string>
+    <string name="title_section2">Albums</string>
+    <string name="title_section3">Artists</string>
+    <string name="title_section4">Mixes</string>
 </resources>

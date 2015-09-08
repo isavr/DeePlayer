@@ -17,6 +17,7 @@ import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
+import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteArtistViewModel;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedArtistViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.ArtistItemView;
 
@@ -39,7 +40,7 @@ public class RecommendedArtistsView extends LinearLayout
     @Bind(android.R.id.list)
     AbsListView mListView;
 
-    RecommendedArtistViewModel artistViewModel;
+    FavouriteArtistViewModel artistViewModel;
 
     public RecommendedArtistsView(Context context) {
         super(context);
@@ -64,7 +65,7 @@ public class RecommendedArtistsView extends LinearLayout
         ButterKnife.bind(this);
     }
 
-    public void setViewModel(@Nullable RecommendedArtistViewModel viewModel) {
+    public void setViewModel(@Nullable FavouriteArtistViewModel viewModel) {
         rxBinderUtil.clear();
         if (viewModel != null) {
             artistViewModel = viewModel;

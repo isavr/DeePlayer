@@ -1,4 +1,4 @@
-package com.tutorial.deeplayer.app.deeplayer.fragments;
+package com.tutorial.deeplayer.app.deeplayer.fragments.library;
 
 import android.app.Activity;
 import android.database.Cursor;
@@ -16,7 +16,7 @@ import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.ArtistColumns;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
-import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedArtistViewModel;
+import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteArtistViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedArtistsView;
 
 import javax.inject.Inject;
@@ -24,15 +24,18 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ArtistFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    public static final String TAG = ArtistFragment.class.getSimpleName();
+/**
+ * Created by ilya.savritsky on 04.09.2015.
+ */
+public class FavouriteArtistsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    public static final String TAG = FavouriteArtistsFragment.class.getSimpleName();
     private static final int LOADER_ARTISTS = 20;
 
     @Bind(R.id.artist_view)
     RecommendedArtistsView recommendedArtistsView;
 
     @Inject
-    RecommendedArtistViewModel artistViewModel;
+    FavouriteArtistViewModel artistViewModel;
 //    @Inject
 //    Instrumentation instrumentation;
 
@@ -46,7 +49,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_artist, container, false);
+        View view = inflater.inflate(R.layout.fragment_favourite_artist, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -97,7 +100,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
             listener = (RecommendedArtistsView.OnArtistItemInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnAlbumItemInteractionListener");
+                    + " must implement OnArtistItemInteractionListener");
         }
     }
 
@@ -115,7 +118,7 @@ public class ArtistFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         return new CursorLoader(getActivity(), SchematicDataProvider.Artists.CONTENT_URI, null,
-                ArtistColumns.IS_RECOMMENDED + "=1", null, null);
+                ArtistColumns.IS_FAVOURITE + "=1", null, null);
     }
 
     @Override

@@ -8,6 +8,9 @@ import com.tutorial.deeplayer.app.deeplayer.rest.interfaces.UserAPI;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import rx.Observable;
@@ -15,6 +18,7 @@ import rx.Observable;
 /**
  * Created by ilya.savritsky on 17.07.2015.
  */
+@Singleton
 public class RestService {
     private static final String TAG = RestService.class.getSimpleName();
     public static int INDEX_STEP_VAL = 25;
@@ -23,6 +27,7 @@ public class RestService {
     private final RadioAPI radioAPI;
     private String token;
 
+    @Inject
     public RestService() {
         RequestInterceptor requestInterceptor = request -> {
             request.addQueryParam("output", "json");
@@ -36,13 +41,18 @@ public class RestService {
                 .setRequestInterceptor(requestInterceptor)
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
-        if (DeePlayerApp.get() != null) {
-            // we are not testing
-            token = DeePlayerApp.get().getApplicationContext().
-                    getSharedPreferences("deezer-session", 0).getString("access_token", null);
-        }
+        token = extractDeeToken();
         userAPI = restAdapter.create(UserAPI.class);
         radioAPI = restAdapter.create(RadioAPI.class);
+    }
+
+    protected String extractDeeToken() {
+        if (DeePlayerApp.get() != null) {
+            // we are not testing
+            return DeePlayerApp.get().getApplicationContext().
+                    getSharedPreferences("deezer-session", 0).getString("access_token", null);
+        }
+        return null;
     }
 
     public Observable<User> fetchUserInfo() {

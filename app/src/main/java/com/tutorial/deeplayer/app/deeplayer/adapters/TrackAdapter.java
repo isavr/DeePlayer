@@ -14,7 +14,7 @@ import com.tutorial.deeplayer.app.deeplayer.views.items.TrackItemView;
  * Created by ilya.savritsky on 17.08.2015.
  */
 public class TrackAdapter extends CursorAdapter {
-    private LayoutInflater layoutInflator;
+//    private LayoutInflater layoutInflator;
     private TrackItemView.OnTrackItemFavouriteStatusInteractionListener listener;
 
     public TrackAdapter(Context context, Cursor c) {
@@ -31,7 +31,7 @@ public class TrackAdapter extends CursorAdapter {
     }
 
     private void setup(Context context) {
-        this.layoutInflator = LayoutInflater.from(context);
+//        this.layoutInflator = LayoutInflater.from(context);
     }
 
     public void setListener(TrackItemView.OnTrackItemFavouriteStatusInteractionListener listener) {
@@ -40,7 +40,7 @@ public class TrackAdapter extends CursorAdapter {
 
     public void remove() {
         //items.clear();
-        layoutInflator = null;
+//        layoutInflator = null;
         listener = null;
         changeCursor(null);
         notifyDataSetInvalidated();

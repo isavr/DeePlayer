@@ -16,6 +16,7 @@ import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Track;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
+import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteTracksViewModel;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedTrackViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.TrackItemView;
 
@@ -40,7 +41,7 @@ public class RecommendedTracksView extends LinearLayout
     @Bind(android.R.id.list)
     AbsListView mListView;
 
-    RecommendedTrackViewModel trackViewModel;
+    FavouriteTracksViewModel trackViewModel;
 
     public RecommendedTracksView(Context context) {
         super(context);
@@ -66,7 +67,7 @@ public class RecommendedTracksView extends LinearLayout
         ButterKnife.bind(this);
     }
 
-    public void setViewModel(@Nullable RecommendedTrackViewModel viewModel) {
+    public void setViewModel(@Nullable FavouriteTracksViewModel viewModel) {
         rxBinderUtil.clear();
         if (viewModel != null) {
             trackViewModel = viewModel;
@@ -75,6 +76,7 @@ public class RecommendedTracksView extends LinearLayout
     }
 
     private <U> void updateTrackList(U u) {
+        Log.d(TAG, "Update track list");
         if (listener != null) {
             listener.onStopProgress();
         }
@@ -82,10 +84,6 @@ public class RecommendedTracksView extends LinearLayout
 
     @OnItemClick(android.R.id.list)
     public void listViewItemClicked(AdapterView<?> adapterView, View view, int position, long l) {
-//        Track track = adapter.getItem(position);
-//        if (listener != null) {
-//            listener.onTrackItemInteraction(track);
-//        }
         if (adapter != null) {
             Cursor c = (Cursor) adapter.getItem(position);
             if (c != null && listener != null) {
@@ -116,13 +114,13 @@ public class RecommendedTracksView extends LinearLayout
     @Override
     public void onTrackItemFavouriteStatusChanged(@NonNull Track track, boolean isFavourite) {
         if (isFavourite) {
-            addArtistToFavourite(track);
+            addTrackToFavourite(track);
         } else {
             removeTrackFromFavourite(track);
         }
     }
 
-    public void addArtistToFavourite(@NonNull final Track track) {
+    public void addTrackToFavourite(@NonNull final Track track) {
         if (trackViewModel != null) {
             rxBinderUtil.bindProperty(trackViewModel.addTrackToFavourite(track),
                     getFavouriteStatusChangeObserver(track, true));

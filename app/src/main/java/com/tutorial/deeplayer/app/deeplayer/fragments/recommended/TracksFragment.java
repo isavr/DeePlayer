@@ -1,4 +1,4 @@
-package com.tutorial.deeplayer.app.deeplayer.fragments;
+package com.tutorial.deeplayer.app.deeplayer.fragments.recommended;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,10 +10,10 @@ import android.view.ViewGroup;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
-import com.tutorial.deeplayer.app.deeplayer.data.tables.AlbumColumns;
+import com.tutorial.deeplayer.app.deeplayer.data.tables.TrackColumns;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
-import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedAlbumsViewModel;
-import com.tutorial.deeplayer.app.deeplayer.views.RecommendedAlbumsView;
+import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedTrackViewModel;
+import com.tutorial.deeplayer.app.deeplayer.views.RecommendedTracksView;
 
 import javax.inject.Inject;
 import android.database.Cursor;
@@ -21,17 +21,18 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 
-public class AlbumFragment extends Fragment  implements LoaderManager.LoaderCallbacks<Cursor> {
-    public static final String TAG = AlbumFragment.class.getSimpleName();
-    private static final int LOADER_ALBUMS = 30;
+/**
+ * Created by ilya.savritsky on 17.08.2015.
+ */
+public class TracksFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    public static final String TAG = TracksFragment.class.getSimpleName();
+    private static final int LOADER_TRACKS = 40;
 
-    private RecommendedAlbumsView recommendedAlbumsView;
+    private RecommendedTracksView recommendedTrackView;
     @Inject
-    RecommendedAlbumsViewModel albumsViewModel;
-//    @Inject
-//    Instrumentation instrumentation;
+    RecommendedTrackViewModel trackViewModel;
 
-    private RecommendedAlbumsView.OnAlbumItemInteractionListener listener;
+    private RecommendedTracksView.OnTrackItemInteractionListener listener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,51 +42,51 @@ public class AlbumFragment extends Fragment  implements LoaderManager.LoaderCall
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_album, container, false);
+        return inflater.inflate(R.layout.fragment_tracks, container, false);
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recommendedAlbumsView = (RecommendedAlbumsView) view.findViewById(R.id.album_view);
+        recommendedTrackView = (RecommendedTracksView) view.findViewById(R.id.tracks_view);
         DialogFactory.showProgressDialog(this.getActivity(),
                 getActivity().getSupportFragmentManager());
-        albumsViewModel.subscribeToDataStore();
-        getLoaderManager().initLoader(LOADER_ALBUMS, null, this);
+        trackViewModel.subscribeToDataStore();
+        getLoaderManager().initLoader(LOADER_TRACKS, null, this);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        recommendedAlbumsView.setViewModel(albumsViewModel);
-        recommendedAlbumsView.setListener(listener);
+        recommendedTrackView.setViewModel(trackViewModel);
+        recommendedTrackView.setListener(listener);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        recommendedAlbumsView.setViewModel(null);
-        recommendedAlbumsView.setListener(null);
+        recommendedTrackView.setViewModel(null);
+        recommendedTrackView.setListener(null);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        albumsViewModel.unsubscribeFromDataStore();
-        albumsViewModel.dispose();
-        albumsViewModel = null;
+        trackViewModel.unsubscribeFromDataStore();
+        trackViewModel.dispose();
+        trackViewModel = null;
         //instrumentation.getLeakTracing().traceLeakage(this);
-        DeePlayerApp.getRefWatcher().watch(this, "Recommended Albums Fragment");
+        DeePlayerApp.getRefWatcher().watch(this, "Recommended Tracks Fragment");
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            listener = (RecommendedAlbumsView.OnAlbumItemInteractionListener) activity;
+            listener = (RecommendedTracksView.OnTrackItemInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement OnAlbumItemInteractionListener");
+                    + " must implement OnTrackItemInteractionListener");
         }
     }
 
@@ -93,28 +94,28 @@ public class AlbumFragment extends Fragment  implements LoaderManager.LoaderCall
     public void onDetach() {
         super.onDetach();
         listener = null;
-        recommendedAlbumsView.clean();
-        recommendedAlbumsView.setListener(null);
+        recommendedTrackView.clean();
+        recommendedTrackView.setListener(null);
         //instrumentation.getLeakTracing().traceLeakage(this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(getActivity(), SchematicDataProvider.Albums.CONTENT_URI, null,
-                AlbumColumns.IS_RECOMMENDED + "=1", null, null);
+        return new CursorLoader(getActivity(), SchematicDataProvider.Tracks.CONTENT_URI, null,
+                TrackColumns.IS_RECOMMENDED + "=1", null, null);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (recommendedAlbumsView != null) {
-            recommendedAlbumsView.onLoadFinish(cursor);
+        if (recommendedTrackView != null) {
+            recommendedTrackView.onLoadFinish(cursor);
         }
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        if (recommendedAlbumsView != null) {
-            recommendedAlbumsView.onLoaderReset();
+        if (recommendedTrackView != null) {
+            recommendedTrackView.onLoaderReset();
         }
     }
 }

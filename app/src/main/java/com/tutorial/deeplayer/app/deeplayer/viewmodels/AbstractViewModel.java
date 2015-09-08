@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService;
+import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService_Factory;
 
 import rx.subscriptions.CompositeSubscription;
 
@@ -43,6 +44,6 @@ abstract public class AbstractViewModel {
     }
 
     protected RestService getRestService() {
-        return new RestService();
+        return RestService_Factory.create().get();
     }
 }

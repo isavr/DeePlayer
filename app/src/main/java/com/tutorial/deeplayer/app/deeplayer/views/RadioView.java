@@ -16,6 +16,7 @@ import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
+import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteRadiosViewModel;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RadioViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.RadioItemView;
 
@@ -37,7 +38,7 @@ public class RadioView extends FrameLayout
     private RadioAdapter radioAdapter;
 
     private final RxBinderUtil rxBinderUtil = new RxBinderUtil(this);
-    private RadioViewModel radioViewModel;
+    private FavouriteRadiosViewModel radioViewModel;
     private OnRadioItemInteractionListener listener;
 
     public RadioView(Context context) {
@@ -65,7 +66,7 @@ public class RadioView extends FrameLayout
 //        mListView.setAdapter(radioAdapter);
     }
 
-    public void setViewModel(@Nullable RadioViewModel viewModel) {
+    public void setViewModel(@Nullable FavouriteRadiosViewModel viewModel) {
         rxBinderUtil.clear();
         if (viewModel != null) {
             radioViewModel = viewModel;
