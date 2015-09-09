@@ -98,6 +98,7 @@ public class FavouriteTracksFragment extends Fragment implements LoaderManager.L
         listener = null;
         recommendedTrackView.clean();
         recommendedTrackView.setListener(null);
+        getLoaderManager().destroyLoader(LOADER_TRACKS);
         //instrumentation.getLeakTracing().traceLeakage(this);
     }
 

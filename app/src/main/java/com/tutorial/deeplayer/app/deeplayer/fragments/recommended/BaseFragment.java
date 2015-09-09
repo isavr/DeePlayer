@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
+import com.tutorial.deeplayer.app.deeplayer.utils.Utils;
 
 import rx.Observable;
 import rx.android.lifecycle.LifecycleEvent;
@@ -54,6 +55,7 @@ public class BaseFragment extends Fragment {
         lifecycleSubject.onNext(LifecycleEvent.DESTROY);
         super.onDestroy();
         DeePlayerApp.getRefWatcher().watch(this);
+        Utils.unbindDrawables(this.getView());
         //DeePlayerApp.getRefWatcher().watch(lifecycleSubject);
     }
 }

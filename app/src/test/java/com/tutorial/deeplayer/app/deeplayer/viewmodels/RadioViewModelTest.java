@@ -32,7 +32,7 @@ public class RadioViewModelTest extends RadioViewModel {
         return new ServiceMoc();
     }
 
-    @Override
+    //@Override
     protected Observable<DataList<Radio>> warpToIoThread(Observable<DataList<Radio>> dataObservable) {
         // Do nothing while testing
         return dataObservable;

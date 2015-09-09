@@ -28,4 +28,5 @@ public interface AlbumColumns extends BaseItemWithPictureColumns {
     @DataType(DataType.Type.INTEGER)
     @References(table = Database.Tables.ARTISTS, column = ArtistColumns.ID) String ARTIST_ID = "artist_id";
     @DataType(DataType.Type.TEXT) String TRACKLIST = "tracklist";
+    String ARTIST_NAME = "artist_name";
 }

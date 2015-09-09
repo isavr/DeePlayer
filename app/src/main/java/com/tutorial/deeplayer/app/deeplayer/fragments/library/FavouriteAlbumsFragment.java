@@ -101,8 +101,8 @@ public class FavouriteAlbumsFragment extends Fragment implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(getActivity(), SchematicDataProvider.Albums.CONTENT_URI, null,
-                AlbumColumns.IS_FAVOURITE + "=1", null, null);
+        return new CursorLoader(getActivity(), SchematicDataProvider.Albums.queryWithArtists(true), null,
+                AlbumColumns.IS_FAVOURITE + "=1", null, " artistSelection.name ASC");
     }
 
     @Override

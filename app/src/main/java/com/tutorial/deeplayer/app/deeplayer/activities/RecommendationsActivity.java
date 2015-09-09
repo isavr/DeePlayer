@@ -277,7 +277,7 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
                 // Node: Do the same
             }
             case Albums: {
-
+                // Node: Do the same
             }
             case Flow: {
                 container.setVisibility(View.VISIBLE);

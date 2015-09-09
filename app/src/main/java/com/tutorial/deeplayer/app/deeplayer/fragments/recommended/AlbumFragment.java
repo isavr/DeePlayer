@@ -100,8 +100,10 @@ public class AlbumFragment extends Fragment  implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(getActivity(), SchematicDataProvider.Albums.CONTENT_URI, null,
-                AlbumColumns.IS_RECOMMENDED + "=1", null, null);
+//        return new CursorLoader(getActivity(), SchematicDataProvider.Albums.CONTENT_URI, null,
+//                AlbumColumns.IS_RECOMMENDED + "=1", null, null);
+        return new CursorLoader(getActivity(), SchematicDataProvider.Albums.recommendedQueryWithArtists(true), null,
+                AlbumColumns.IS_RECOMMENDED + "=1", null, " artistSelection.name ASC");
     }
 
     @Override

@@ -413,11 +413,12 @@ public class DataContract {
             album.setTracksCount(trackCount);
             Cursor artistCursor = DeePlayerApp.get().getApplicationContext().getContentResolver()
                     .query(SchematicDataProvider.Artists.withId(artistId), null, null, null, null);
-            if (artistCursor != null) {
+            if (artistCursor != null && artistCursor.getCount() != 0) {
                 if (artistCursor.moveToFirst()) {
                     Artist artist = ArtistConverter.convertFromCursor(artistCursor);
                     album.setArtist(artist);
                 }
+                artistCursor.close();
             }
             // TODO: add fields
             return album;
@@ -513,7 +514,7 @@ public class DataContract {
             // TODO: fix album + artist conversion
             Cursor albumCursor = DeePlayerApp.get().getApplicationContext().getContentResolver()
                     .query(SchematicDataProvider.Albums.withId(albumId), null, null, null, null);
-            if (albumCursor != null) {
+            if (albumCursor != null && albumCursor.getCount() != 0) {
                 if (albumCursor.moveToFirst()) {
                     Album album = AlbumConverter.convertFromCursor(albumCursor);
                     track.setAlbum(album);
@@ -529,6 +530,7 @@ public class DataContract {
                     }
                     track.setArtist(album.getArtist());
                 }
+                albumCursor.close();
             }
             return track;
         }

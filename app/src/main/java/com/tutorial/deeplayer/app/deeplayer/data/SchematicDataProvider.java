@@ -1,8 +1,5 @@
 package com.tutorial.deeplayer.app.deeplayer.data;
 
-import android.content.ContentValues;
-import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 
 import com.tutorial.deeplayer.app.deeplayer.data.tables.AlbumColumns;
@@ -15,10 +12,11 @@ import com.tutorial.deeplayer.app.deeplayer.data.tables.UserColumns;
 import net.simonvt.schematic.annotation.ContentProvider;
 import net.simonvt.schematic.annotation.ContentUri;
 import net.simonvt.schematic.annotation.InexactContentUri;
-import net.simonvt.schematic.annotation.NotifyBulkInsert;
-import net.simonvt.schematic.annotation.NotifyInsert;
-import net.simonvt.schematic.annotation.NotifyUpdate;
+import net.simonvt.schematic.annotation.MapColumns;
 import net.simonvt.schematic.annotation.TableEndpoint;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by ilya.savritsky on 28.08.2015.
@@ -38,6 +36,7 @@ public class SchematicDataProvider {
         String ALBUMS = "albums";
         String ALBUMS_FROM_ARTIST = "albums_from_artist";
         String ALBUMS_WITH_ARTISTS = "albums_with_artists";
+        String REC_ALBUMS_WITH_ARTISTS = "rec_albums_with_artists";
         String TRACKS = "tracks";
     }
 
@@ -129,11 +128,34 @@ public class SchematicDataProvider {
 
     @TableEndpoint(table = Database.Tables.ALBUMS)
     public static class Albums {
+
+        @MapColumns
+        public static Map<String, String> mapColumns() {
+            Map<String, String> map = new HashMap<>();
+
+            map.put(AlbumColumns.ARTIST_NAME, ARTIST_NAME_SELECT);
+
+            return map;
+        }
+
         @ContentUri(
                 path = Path.ALBUMS,
                 type = "vnd.android.cursor.dir/albums",
-                defaultSort = AlbumColumns.ID + " ASC")
+                defaultSort = AlbumColumns.ARTIST_ID + ", " + AlbumColumns.ID + " ASC")
         public static final Uri CONTENT_URI = buildUri(Path.ALBUMS);
+
+        static final String ARTIST_NAME_SELECT = "(SELECT " + Database.Tables.ARTISTS
+                + "." + ArtistColumns.NAME + " FROM "
+                + Database.Tables.ALBUMS + " INNER JOIN " + Database.Tables.ARTISTS
+                + " ON "
+                + Database.Tables.ARTISTS
+                + "."
+                + ArtistColumns.ID
+                + "="
+                + Database.Tables.ALBUMS
+                + "."
+                + AlbumColumns.ARTIST_ID
+                + ")";
 
         @InexactContentUri(
                 name = "ALBUM_ID",
@@ -155,6 +177,36 @@ public class SchematicDataProvider {
             return buildUri(Path.ALBUMS, Path.ALBUMS_FROM_ARTIST, String.valueOf(artistId));
         }
 
+        @InexactContentUri(
+                name = "ALBUMS_WITH_ARTISTS",
+                table = "albums",
+                join = " INNER JOIN (SELECT artists._id, artists.name From artists) as artistSelection ON artistSelection._id=albums.artist_id ",//" INNER JOIN artists ON artists._id=albums.artist_id ",
+                path = Path.ALBUMS_WITH_ARTISTS + "/#",
+                type = "vnd.android.cursor.item/albums/albums_with_artists",
+                whereColumn = Database.Tables.ALBUMS + "." + AlbumColumns.IS_FAVOURITE,
+                pathSegment = 1,
+        allowInsert = false,
+        allowDelete = false,
+        allowUpdate = false)
+        public static Uri queryWithArtists(boolean isFavourite) {
+            return buildUri(Path.ALBUMS_WITH_ARTISTS, String.valueOf(isFavourite ? 1 : 0) );
+        }
+
+        @InexactContentUri(
+                name = "REC_ALBUMS_WITH_ARTISTS",
+                table = "albums",
+                join = " INNER JOIN (SELECT artists._id, artists.name From artists) as artistSelection ON artistSelection._id=albums.artist_id ",//" INNER JOIN artists ON artists._id=albums.artist_id ",
+                path = Path.REC_ALBUMS_WITH_ARTISTS + "/#",
+                type = "vnd.android.cursor.item/albums/rec_albums_with_artists",
+                whereColumn = Database.Tables.ALBUMS + "." + AlbumColumns.IS_RECOMMENDED,
+                pathSegment = 1,
+                allowInsert = false,
+                allowDelete = false,
+                allowUpdate = false)
+        public static Uri recommendedQueryWithArtists(boolean isRecommended) {
+            return buildUri(Path.REC_ALBUMS_WITH_ARTISTS, String.valueOf(isRecommended ? 1 : 0) );
+        }
+//
 //        @NotifyInsert(paths = Path.ALBUMS)
 //        public static Uri[] onInsert(ContentValues values) {
 //            final long artistId = values.getAsLong(AlbumColumns.ARTIST_ID);
@@ -192,7 +244,7 @@ public class SchematicDataProvider {
         @ContentUri(
                 path = Path.TRACKS,
                 type = "vnd.android.cursor.dir/tracks",
-                defaultSort = TrackColumns.ID + " ASC")
+                defaultSort = TrackColumns.ARTIST_ID + ", " + TrackColumns.ALBUM_ID + ", " + TrackColumns.ID + " ASC")
         public static final Uri CONTENT_URI = buildUri(Path.TRACKS);
 
         @InexactContentUri(

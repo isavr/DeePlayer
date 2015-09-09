@@ -49,6 +49,10 @@ public class FavouriteAlbumsViewModel extends AbstractViewModel {
             public void onCompleted() {
                 Log.d(TAG, "onCompleted Albums");
                 subject.onCompleted();
+                final Context context = DeePlayerApp.get().getApplicationContext();
+                context.getContentResolver().notifyChange(SchematicDataProvider.Albums.recommendedQueryWithArtists(true), null);
+                context.getContentResolver().notifyChange(SchematicDataProvider.Albums.queryWithArtists(true), null);
+
             }
 
             @Override
