@@ -144,6 +144,11 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
     }
 
     @Override
+    public void onError(Throwable err) {
+        DialogFactory.closeAlertDialog(getSupportFragmentManager());
+    }
+
+    @Override
     protected void onStop() {
         unbindService(kMP.musicConnection);
         musicController.hide();

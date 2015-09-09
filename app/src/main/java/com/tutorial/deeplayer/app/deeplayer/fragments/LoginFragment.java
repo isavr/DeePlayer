@@ -48,6 +48,11 @@ public class LoginFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (loginViewModel != null) {
+            loginViewModel.unsubscribeFromDataStore();
+            loginViewModel = new LoginViewModel();
+            loginViewModel.subscribeToDataStore();
+        }
         loginView.setViewModel(loginViewModel);
     }
 

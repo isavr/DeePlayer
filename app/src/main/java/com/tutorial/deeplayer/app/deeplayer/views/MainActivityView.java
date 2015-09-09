@@ -105,35 +105,6 @@ public class MainActivityView extends FrameLayout {
                 getContext().startActivity(intent);
                 break;
             }
-            case 5: {
-                // Check User info
-//                Observer<Album> observer = new Observer<Album>() {
-//                    @Override
-//                    public void onCompleted() {
-//                        Log.d(TAG, "COMPLETED");
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    @Override
-//                    public void onNext(Album album) {
-//                        Log.d(TAG, "received album -> " + album.getTitle());
-//                    }
-//                };
-//                Observable<Album> recommended = new RestService().fetchAlbumsRecommendedForUser().subscribeOn(Schedulers.io())
-//                        .flatMap(item -> Observable.from(item.getData())).observeOn(AndroidSchedulers.mainThread());
-//
-//                Observable<Album> userAlbums = new RestService().fetchUserAlbums().subscribeOn(Schedulers.io())
-//                        .flatMap(item -> Observable.from(item.getUserData())).observeOn(AndroidSchedulers.mainThread());
-//                userAlbums.subscribe(observer);
-                //Observable.concat(recommended, userAlbums).distinct(album -> album.getId()).fi
-                //compositeSubscription.add(subscribeForUserUpdates());
-                //compositeSubscription.add(subscribeForRadioUpdates());
-                break;
-            }
             default: {
 
             }

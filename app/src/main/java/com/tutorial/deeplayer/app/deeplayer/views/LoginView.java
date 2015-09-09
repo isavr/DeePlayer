@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.Button;
@@ -83,6 +84,11 @@ public class LoginView extends LinearLayout {
 
     private void onError(Throwable throwable) {
         Log.d(TAG, "Handle Error");
+        Snackbar.make(getRootView(), throwable.getMessage(), Snackbar.LENGTH_SHORT)
+                .setAction("Hide", v -> {
+                }).show();
+//        DialogFactory.showSimpleErrorMessage(getContext().getApplicationContext(),
+//                ((FragmentActivity)getContext()).getSupportFragmentManager(), throwable.getMessage());
     }
 
 
@@ -95,8 +101,6 @@ public class LoginView extends LinearLayout {
 
     private void attemptLogin(OnClickEvent onClickEvent) {
         if (deezerConnect != null && loginViewModel != null) {
-//            loginSuccessfull(null);
-//        } else {
             String[] permissions = new String[]{
                     Permissions.BASIC_ACCESS,
                     Permissions.MANAGE_LIBRARY,

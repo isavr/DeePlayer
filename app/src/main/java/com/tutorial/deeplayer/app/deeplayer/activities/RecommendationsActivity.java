@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.Menu;
@@ -205,7 +206,8 @@ public class RecommendationsActivity extends BaseActivity implements Recommended
 
     @Override
     public void onError(Throwable err) {
-        DialogFactory.showSimpleErrorMessage(this, getSupportFragmentManager(), err.getMessage());
+        DialogFactory.closeAlertDialog(getSupportFragmentManager());
+        //DialogFactory.showSimpleErrorMessage(this, getSupportFragmentManager(), err.getMessage());
     }
 
     @Override

@@ -116,7 +116,8 @@ public class UserLibraryActivity extends BaseActivity implements ActionBar.TabLi
 
     @Override
     public void onError(Throwable err) {
-        DialogFactory.showSimpleErrorMessage(this, getSupportFragmentManager(), err.getMessage());
+        DialogFactory.closeAlertDialog(getSupportFragmentManager());
+        //DialogFactory.showSimpleErrorMessage(this, getSupportFragmentManager(), err.getMessage());
     }
 
     /**
