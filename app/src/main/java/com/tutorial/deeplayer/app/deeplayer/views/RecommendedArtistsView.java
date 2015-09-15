@@ -2,6 +2,7 @@ package com.tutorial.deeplayer.app.deeplayer.views;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -10,7 +11,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.FilterQueryProvider;
 import android.widget.LinearLayout;
 
 import com.tutorial.deeplayer.app.deeplayer.adapters.ArtistAdapter;
@@ -19,7 +19,6 @@ import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteArtistViewModel;
-import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedArtistViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.ArtistItemView;
 
 import butterknife.Bind;
@@ -64,6 +63,9 @@ public class RecommendedArtistsView extends LinearLayout
 
     private void setupChildren() {
         ButterKnife.bind(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mListView.setNestedScrollingEnabled(true);
+        }
     }
 
     public void setViewModel(@Nullable FavouriteArtistViewModel viewModel) {
@@ -93,7 +95,10 @@ public class RecommendedArtistsView extends LinearLayout
     }
 
     private void onError(Throwable throwable) {
-        Log.d(TAG, "Handle Error");
+        Log.d(TAG, "Handle Error! ");
+        if (listener == null) {
+            Log.d(TAG, "NULL listener!");
+        }
         if (listener != null && throwable != null) {
             listener.onError(throwable);
             Snackbar.make(getRootView(), throwable.getMessage(), Snackbar.LENGTH_SHORT)

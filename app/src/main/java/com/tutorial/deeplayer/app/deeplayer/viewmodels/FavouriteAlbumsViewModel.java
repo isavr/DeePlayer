@@ -76,7 +76,7 @@ public class FavouriteAlbumsViewModel extends AbstractViewModel {
                     final int columnIndex = artistIds.getColumnIndex(ArtistColumns.ID);
                     for (int i = 0; i < artistCount; ++i) {
                         final int artistId = artistIds.getInt(columnIndex);
-                        existingArtists.add(Long.valueOf(artistId));
+                        existingArtists.add((long) artistId);
                         artistIds.moveToNext();
                     }
                 }

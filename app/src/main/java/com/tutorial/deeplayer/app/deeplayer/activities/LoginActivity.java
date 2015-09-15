@@ -1,7 +1,6 @@
 package com.tutorial.deeplayer.app.deeplayer.activities;
 
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.view.View;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
@@ -12,7 +11,7 @@ import butterknife.ButterKnife;
 /**
  * A login screen that offers login via email/password.
  */
-public class LoginActivity extends FragmentActivity {
+public class LoginActivity extends BaseActivity {
     public static final String TAG = LoginActivity.class.getSimpleName();
 
     public LoginActivity() {

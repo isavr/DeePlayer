@@ -27,9 +27,12 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
 
     @Bind(R.id.fragment_container)
     View container;
+    @Bind(R.id.app_bar)
+    android.support.v7.widget.Toolbar toolbar;
 
-    @Bind(R.id.player)
-    View playerContainer;
+
+//    @Bind(R.id.player)
+//    View playerContainer;
 
 //    private PlayerFragment playerFragment;
 
@@ -41,7 +44,7 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
         ButterKnife.bind(this);
         addFragment();
 //        addPlayerFragment();
-        playerContainer.setVisibility(View.GONE);
+//        playerContainer.setVisibility(View.GONE);
         setMusicController();
 
         if (playbackPaused) {
@@ -61,6 +64,10 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
     @Override
     protected void onResume() {
         super.onResume();
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         if (paused) {
             // Ensure that the controller
             // is shown when the user returns to the app
@@ -115,7 +122,7 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_mix, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -125,8 +132,9 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
+//        noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 
@@ -162,7 +170,7 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
 
     @Override
     public void onRadioItemInteraction(@NonNull Radio radio) {
-        playerContainer.setVisibility(View.VISIBLE);
+//        playerContainer.setVisibility(View.VISIBLE);
         Log.d(TAG, "play radio " + radio.getTitle());
         if (kMP.musicService != null) {
             kMP.musicService.initPlayer(MusicService.PlayerType.RADIO);

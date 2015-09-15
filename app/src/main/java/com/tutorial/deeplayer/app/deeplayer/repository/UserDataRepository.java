@@ -45,6 +45,13 @@ public class UserDataRepository implements RadioRepository, TrackRepository, Art
     }
 
     @Override
+    public Observable<List<ContentValues>> getAllRadiosDBComposingWithNet() {
+        final RadioDataStore radioStore = new RadioDataStore();
+        final LocalRadioDataStore localRadioStore = new LocalRadioDataStore();
+        return radioStore.getAllRadiosObservable(localRadioStore.getRadiosItems());
+    }
+
+    @Override
     public Observable<List<ContentValues>> getFavouriteRadiosFromNet() {
         final RadioDataStore radioStore = new RadioDataStore();
         return radioStore.getUserFavouriteRadios();

@@ -50,7 +50,9 @@ public class TrackAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         TrackItemView view = TrackItemView.inflate(LayoutInflater.from(context), parent);
         view.setListener(listener);
-        view.bindToData(DataContract.TrackConverter.convertFromCursor(cursor));
+//        if (cursor != null && !cursor.isBeforeFirst() && !cursor.isAfterLast()) {
+//            view.bindToData(DataContract.TrackConverter.convertFromCursor(cursor));
+//        }
         return view;
     }
 
@@ -59,7 +61,9 @@ public class TrackAdapter extends CursorAdapter {
         if (view instanceof TrackItemView) {
             TrackItemView trackView = (TrackItemView) view;
             trackView.setListener(listener);
-            trackView.bindToData(DataContract.TrackConverter.convertFromCursor(cursor));
+            if (cursor != null && cursor.getCount() != 0 && !cursor.isBeforeFirst() && !cursor.isAfterLast()) {
+                trackView.bindToData(DataContract.TrackConverter.convertFromCursor(cursor));
+            }
         }
     }
 }

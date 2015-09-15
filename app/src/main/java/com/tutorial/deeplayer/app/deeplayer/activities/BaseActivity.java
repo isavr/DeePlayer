@@ -99,32 +99,24 @@ public class BaseActivity extends AppCompatActivity {
 
     private void setupTheme(String themeKey) {
         switch (themeKey) {
-            case "default": {
-                setTheme(R.style.Theme_Default);
+            case "grey": {
+                setTheme(R.style.CustomTheme_Grey);
                 break;
             }
-            case "light": {
-                setTheme(R.style.Theme_Light);
+            case "indigo": {
+                setTheme(R.style.CustomTheme_Indigo);
                 break;
             }
-            case "dark": {
-                setTheme(R.style.Theme_Dark);
+            case "blue": {
+                setTheme(R.style.CustomTheme_Blue);
                 break;
             }
-            // Testing each possible theme name.
-            // I repeat - all valid theme names are specified
-            // at `res/strings.xml`, right at the Settings sub menu.
-//            if (theme.equals("default")) setTheme(R.style.Base_Theme_AppCompat);
-//            else if (theme.equals("light")) setTheme(R.style.Base_Theme_AppCompat_Light);
-//            else if (theme.equals("dark")) setTheme(R.style.Base_ThemeOverlay_AppCompat_Dark);
-//            else if (theme.equals("solarized_dark")) setTheme(R.style.Theme_Solarized_Dark);
-//            else if (theme.equals("wallpaper")) setTheme(R.style.Theme_Wallpaper);
-//            else if (theme.equals("dialog_light")) setTheme(R.style.Theme_DialogLight);
-//            else if (theme.equals("dialog_dark")) setTheme(R.style.Theme_DialogDark);
-//            else if (theme.equals("light_simple")) setTheme(R.style.Theme_LightSimple);
-//            else if (theme.equals("dark_simple")) setTheme(R.style.Theme_DarkSimple);
+            case "green": {
+                setTheme(R.style.CustomTheme_Green);
+                break;
+            }
             default: {
-                setTheme(R.style.Base_Theme_AppCompat);
+                setTheme(R.style.CustomTheme_Grey);
             }
         }
     }
@@ -185,5 +177,13 @@ public class BaseActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    protected int getPersistedItem(final String keyName, final int defaultValue) {
+        return PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getInt(keyName, defaultValue);
+    }
+
+    protected void setPersistedItem(final String keyName, final int position) {
+        PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit().putInt(keyName, position).commit();
     }
 }

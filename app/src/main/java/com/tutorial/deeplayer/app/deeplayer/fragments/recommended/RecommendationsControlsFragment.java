@@ -14,6 +14,7 @@ import com.tutorial.deeplayer.app.deeplayer.views.RecommendationsControlsView;
 /**
  * Created by ilya.savritsky on 30.07.2015.
  */
+@Deprecated
 public class RecommendationsControlsFragment extends Fragment {
     public static final String TAG = RecommendationsControlsFragment.class.getSimpleName();
 

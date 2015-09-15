@@ -1,6 +1,9 @@
 package com.tutorial.deeplayer.app.deeplayer.notifications;
 
-import android.app.*;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -15,7 +18,10 @@ import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.activities.MixActivity;
 import com.tutorial.deeplayer.app.deeplayer.activities.RecommendationsActivity;
 import com.tutorial.deeplayer.app.deeplayer.kMP;
-import com.tutorial.deeplayer.app.deeplayer.pojo.*;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
+import com.tutorial.deeplayer.app.deeplayer.pojo.FavouriteItem;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 
 /**
  * Specific way to stick an on-going message on the system
@@ -293,7 +299,9 @@ public class NotificationMusic extends NotificationSimple {
         Notification notification = notificationBuilder.build();
         notification.bigContentView = notificationView;
         Picasso.with(context).load(iconID).into(notificationView, R.id.notification_button_like, NOTIFICATION_ID, notification);
-
+        // Sets the notification to run on the foreground.
+        // (why not the former commented line?)
+        service.startForeground(NOTIFICATION_ID, notification);
     }
 
     /**
@@ -314,10 +322,7 @@ public class NotificationMusic extends NotificationSimple {
         Picasso.with(context).load(iconID).into(notificationView, R.id.notification_button_play, NOTIFICATION_ID, notification);
 
 //        notificationView.setImageViewResource(R.id.notification_button_play, iconID);
-
-
 //		notificationManager.notify(NOTIFICATION_ID, notificationBuilder.build());
-
         // Sets the notification to run on the foreground.
         // (why not the former commented line?)
         service.startForeground(NOTIFICATION_ID, notification);

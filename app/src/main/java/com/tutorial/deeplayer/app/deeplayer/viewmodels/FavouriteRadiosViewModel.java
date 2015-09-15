@@ -9,7 +9,6 @@ import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.interactions.GetUserFavouriteRadios;
 import com.tutorial.deeplayer.app.deeplayer.interactions.UseCase;
-import com.tutorial.deeplayer.app.deeplayer.pojo.DataList;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 
 import java.util.List;
@@ -33,12 +32,7 @@ public class FavouriteRadiosViewModel extends AbstractViewModel {
         UseCase getRadiosUseCase = new GetUserFavouriteRadios();
         compositeSubscription.add(getRadiosUseCase.build(Schedulers.computation(),
                 AndroidSchedulers.mainThread(), getRadioObserver()));
-        //compositeSubscription.add(getRadiosWithStatuses());
     }
-
-//    protected Observable<DataList<Radio>> warpToIoThread(Observable<DataList<Radio>> dataObservable) {
-//        return dataObservable.subscribeOn(Schedulers.io());
-//    }
 
     protected Observer<List<ContentValues>> getRadioObserver() {
         return new Observer<List<ContentValues>>() {

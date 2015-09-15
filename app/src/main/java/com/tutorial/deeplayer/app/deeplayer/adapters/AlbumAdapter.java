@@ -2,24 +2,20 @@ package com.tutorial.deeplayer.app.deeplayer.adapters;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.CursorAdapter;
 
 import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
-import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.views.items.AlbumItemView;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by ilya.savritsky on 29.07.2015.
  */
 public class AlbumAdapter extends CursorAdapter {
+    private static final String TAG = AlbumAdapter.class.getSimpleName();
     private AlbumItemView.OnAlbumItemFavouriteStatusInteractionListener listener;
 
     public AlbumAdapter(Context context, Cursor c) {
@@ -52,7 +48,7 @@ public class AlbumAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         AlbumItemView view = AlbumItemView.inflate(LayoutInflater.from(context), parent);
         view.setListener(listener);
-        view.bindToData(DataContract.AlbumConverter.convertFromCursor(cursor));
+        //view.bindToData(DataContract.AlbumConverter.convertFromCursor(cursor));
         return view;
     }
 
@@ -62,6 +58,8 @@ public class AlbumAdapter extends CursorAdapter {
             AlbumItemView albumItemView = (AlbumItemView) view;
             albumItemView.setListener(listener);
             albumItemView.bindToData(DataContract.AlbumConverter.convertFromCursor(cursor));
+        } else {
+            Log.d(TAG, "STRANGE ERROR!");
         }
     }
 }

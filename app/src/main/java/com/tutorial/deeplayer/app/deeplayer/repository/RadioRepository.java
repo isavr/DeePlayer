@@ -15,4 +15,6 @@ public interface RadioRepository {
     Observable<List<Radio>> getRadiosFromDB();
     Observable<List<ContentValues>> getRadiosFromNet();
     Observable<List<ContentValues>> getFavouriteRadiosFromNet();
+
+    Observable<List<ContentValues>> getAllRadiosDBComposingWithNet();
 }

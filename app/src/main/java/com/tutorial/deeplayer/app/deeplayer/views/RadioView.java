@@ -2,6 +2,7 @@ package com.tutorial.deeplayer.app.deeplayer.views;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -18,7 +19,6 @@ import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteRadiosViewModel;
-import com.tutorial.deeplayer.app.deeplayer.viewmodels.RadioViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.RadioItemView;
 
 import butterknife.Bind;
@@ -63,14 +63,17 @@ public class RadioView extends FrameLayout
 
     private void setupChildren() {
         ButterKnife.bind(this);
-//        radioAdapter = new RadioAdapter(getContext(), this);
-//        mListView.setAdapter(radioAdapter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setNestedScrollingEnabled(true);
+            mListView.setNestedScrollingEnabled(true);
+        }
     }
 
     public void setViewModel(@Nullable FavouriteRadiosViewModel viewModel) {
         rxBinderUtil.clear();
         if (viewModel != null) {
             radioViewModel = viewModel;
+            Log.d(TAG, "set view model");
             rxBinderUtil.bindProperty(viewModel.getSubject(), this::updateRadioList, this::onError);
         }
     }
@@ -168,7 +171,9 @@ public class RadioView extends FrameLayout
     }
 
     public void clean() {
-        radioAdapter.remove();
+        if (radioAdapter != null) {
+            radioAdapter.remove();
+        }
     }
 
     public void onLoadFinish(Cursor data) {

@@ -2,6 +2,7 @@ package com.tutorial.deeplayer.app.deeplayer.views;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -63,6 +64,9 @@ public class RecommendedAlbumsView extends FrameLayout
 
     private void setupChildren() {
         ButterKnife.bind(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mListView.setNestedScrollingEnabled(true);
+        }
     }
 
     public void setViewModel(@Nullable FavouriteAlbumsViewModel viewModel) {
@@ -92,7 +96,10 @@ public class RecommendedAlbumsView extends FrameLayout
     }
 
     private void onError(Throwable throwable) {
-        Log.d(TAG, "Handle Error");
+        Log.d(TAG, "Handle Error! ");
+        if (listener == null) {
+            Log.d(TAG, "NULL listener!");
+        }
         if (listener != null && throwable != null) {
             listener.onError(throwable);
             Snackbar.make(getRootView(), throwable.getMessage(), Snackbar.LENGTH_SHORT)

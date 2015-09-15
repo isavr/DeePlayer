@@ -53,7 +53,11 @@ public class RadioDataStore extends BaseLocalDataStore {
     }
 
     public Observable<List<ContentValues>> getRadiosWithStatusesObservable() {
-        return Observable.concat(getUserFavouritesObservable(), getRadiosDataObservable()).distinct(BaseTypedItem::getId)
+        return getAllRadiosObservable(getUserFavouritesObservable());
+    }
+
+    public Observable<List<ContentValues>> getAllRadiosObservable(Observable<Radio> favouriteRadiosObservable) {
+        return Observable.concat(favouriteRadiosObservable, getRadiosDataObservable()).distinct(BaseTypedItem::getId)
                 .map(radio -> DataContract.RadioConverter.convertFrom(radio)).toList();
     }
 

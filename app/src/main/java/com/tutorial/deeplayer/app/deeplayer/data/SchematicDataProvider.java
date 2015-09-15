@@ -110,7 +110,7 @@ public class SchematicDataProvider {
         @ContentUri(
                 path = Path.ARTISTS,
                 type = "vnd.android.cursor.dir/artists",
-                defaultSort = ArtistColumns.ID + " ASC")
+                defaultSort = ArtistColumns.NAME + " ASC")
         public static final Uri CONTENT_URI = buildUri(Path.ARTISTS);
 
         @InexactContentUri(

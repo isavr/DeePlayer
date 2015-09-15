@@ -2,7 +2,6 @@ package com.tutorial.deeplayer.app.deeplayer.viewmodels;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -10,8 +9,6 @@ import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.User;
-
-import java.util.List;
 
 import rx.Observable;
 import rx.Observer;
@@ -31,7 +28,7 @@ public class MainViewModel extends AbstractViewModel {
 
     @Override
     void subscribeToDataStoreInternal(@NonNull CompositeSubscription compositeSubscription) {
-        compositeSubscription.add(getUserData());
+        //compositeSubscription.add(getUserData());
     }
 
     private Observable<ContentValues> getUserDataObservable() {

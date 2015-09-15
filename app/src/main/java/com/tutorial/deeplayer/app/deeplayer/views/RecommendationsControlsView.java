@@ -19,6 +19,7 @@ import butterknife.OnItemSelected;
 /**
  * Created by ilya.savritsky on 30.07.2015.
  */
+@Deprecated
 public class RecommendationsControlsView extends LinearLayout {
     private static final String SPINNER_KEY = "recommendations_control_val";
     private static final int SPINNER_DEF_VALUE = 0;

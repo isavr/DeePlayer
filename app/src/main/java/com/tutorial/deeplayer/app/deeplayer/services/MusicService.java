@@ -4,10 +4,10 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.RemoteControlClient;
 import android.os.Binder;
@@ -24,16 +24,20 @@ import com.deezer.sdk.player.event.PlayerState;
 import com.deezer.sdk.player.event.RadioPlayerListener;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
+import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
+import com.tutorial.deeplayer.app.deeplayer.data.generated.values.TracksValuesBuilder;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.TrackColumns;
 import com.tutorial.deeplayer.app.deeplayer.external.RemoteControlClientCompat;
 import com.tutorial.deeplayer.app.deeplayer.external.RemoteControlHelper;
+import com.tutorial.deeplayer.app.deeplayer.interactions.GetUserFavouriteTracks;
+import com.tutorial.deeplayer.app.deeplayer.interactions.UseCase;
 import com.tutorial.deeplayer.app.deeplayer.notifications.NotificationMusic;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 import com.tutorial.deeplayer.app.deeplayer.pojo.FavouriteItem;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
-import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService;
+import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService_Factory;
 import com.tutorial.deeplayer.app.deeplayer.services.player.AbstractPlayer;
 import com.tutorial.deeplayer.app.deeplayer.services.player.AlbumDeePlayer;
 import com.tutorial.deeplayer.app.deeplayer.services.player.ArtistDeePlayer;
@@ -42,9 +46,12 @@ import com.tutorial.deeplayer.app.deeplayer.services.player.RadioDeePlayer;
 import com.tutorial.deeplayer.app.deeplayer.services.player.TrackDeePlayer;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by ilya.savritsky on 11.08.2015.
@@ -285,6 +292,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         if (mDeezerPlayer != null && data != null) {
             Log.d(TAG, "start playing " + data.getType() + " -> " + data.getTitle());
             mDeezerPlayer.playItem(data.getId());
+//            notification.notifyIsFavourite(favouriteTracksIds.contains(data.getId()));
             broadcastState(MusicService.BROADCAST_EXTRA_PLAYING);
             updateLockScreenWidget(data, RemoteControlClient.PLAYSTATE_PLAYING);
         }
@@ -762,12 +770,41 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 //                favouriteTracksIds.addAll(ids);
 //            }
 //        }).subscribe();
+        UseCase useCase = new GetUserFavouriteTracks();
+        useCase.build(Schedulers.computation(),
+                AndroidSchedulers.mainThread(), new Observer<List<ContentValues[]>>() {
+                    @Override
+                    public void onCompleted() {
+                        Log.d(TAG, "onCompleted Tracks");
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(List<ContentValues[]> tracks) {
+                        favouriteTracksIds.clear();
+                        final Context context = DeePlayerApp.get().getApplicationContext();
+                        for (ContentValues[] data : tracks) {
+//                            ContentValues artist = data[DataContract.getArtistIndex()];
+//                            ContentValues album = data[DataContract.getAlbumIndex()];
+                            ContentValues track = data[DataContract.getTrackIndex()];
+                            Long trackId = (Long) track.get(TrackColumns.ID);
+                            favouriteTracksIds.add(trackId);
+                        }
+                    }
+                });
     }
 
     public boolean checkTrackFavouriteStatus(final long trackId) {
-        Cursor c = getApplicationContext().getContentResolver().query(SchematicDataProvider.Tracks.withId(trackId),
-                null, TrackColumns.IS_FAVOURITE + "=1", null, null);
-        return c != null && c.getCount() == 1;
+        boolean fl = (favouriteTracksIds != null && favouriteTracksIds.contains(Long.valueOf(trackId)));
+        Log.d(TAG, "status -> " + fl);
+        return fl;
+//        Cursor c = getApplicationContext().getContentResolver().query(SchematicDataProvider.Tracks.withId(trackId),
+//                null, TrackColumns.IS_FAVOURITE + "=1", null, null);
+//        return c != null && c.getCount() == 1;
     }
 
     public void toggleTrackFavouriteStatus(final long trackId) {
@@ -776,36 +813,82 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         if (trackId != -1) {
 
             if (checkTrackFavouriteStatus(trackId)) {
-                new RestService().fetchResultTrackRemoveFromFavourite(trackId).observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext(item -> {
-                                    Log.d(TAG, "unlike succeeded - " + item);
-                                    // TODO: fix remove from favourites
-                                }
-                        )
-                        .doOnError(error -> {
-                            Log.d(TAG, "error occured");
-                            error.printStackTrace();
-                        })
-                        .doOnCompleted(() -> {
-                            Log.d(TAG, "UnLike Completed");
-                            notification.notifyIsFavourite(checkTrackFavouriteStatus(trackId));
-                        }).subscribe();
+                RestService_Factory.create().get().fetchResultTrackRemoveFromFavourite(trackId).observeOn(AndroidSchedulers.mainThread())
+//                        .doOnNext(item -> {
+//                                    Log.d(TAG, "unlike succeeded - " + item);
+//                                    // TODO: fix remove from favourites
+//                                }
+//                        )
+//                        .doOnError(error -> {
+//                            Log.d(TAG, "error occured");
+//                            error.printStackTrace();
+//                        })
+//                        .doOnCompleted(() -> {
+//                            Log.d(TAG, "UnLike Completed");
+//                            notification.notifyIsFavourite(checkTrackFavouriteStatus(trackId));
+//                        }).subscribe();
+                        .subscribe(getFavouriteStatusChangeObserver(trackId, true));
             } else {
-                new RestService().fetchResultTrackAddToFavourite(trackId).observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext(item -> {
-                                    Log.d(TAG, "like succeeded - " + item);
-                                    // TODO: fix add to favourites
-                                }
-                        )
-                        .doOnError(error -> {
-                            Log.d(TAG, "error occured");
-                            error.printStackTrace();
-                        })
-                        .doOnCompleted(() -> {
-                            Log.d(TAG, "Like Completed");
-                            notification.notifyIsFavourite(checkTrackFavouriteStatus(trackId));
-                        }).subscribe();
+                RestService_Factory.create().get().fetchResultTrackAddToFavourite(trackId).observeOn(AndroidSchedulers.mainThread())
+//                        .doOnNext(item -> {
+//                                    Log.d(TAG, "like succeeded - " + item);
+//                                    // TODO: fix add to favourites
+//                                }
+//                        )
+//                        .doOnError(error -> {
+//                            Log.d(TAG, "error occured");
+//                            error.printStackTrace();
+//                        })
+//                        .doOnCompleted(() -> {
+//                            Log.d(TAG, "Like Completed");
+//                            notification.notifyIsFavourite(checkTrackFavouriteStatus(trackId));
+//                        }).subscribe();
+                        .subscribe(getFavouriteStatusChangeObserver(trackId, false));
             }
+        }
+    }
+
+    private Observer<Boolean> getFavouriteStatusChangeObserver(final long trackId, final boolean toFavourite) {
+        return new Observer<Boolean>() {
+            @Override
+            public void onCompleted() {
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+                trackFavouriteStatusChanged(trackId, toFavourite, false);
+            }
+
+            @Override
+            public void onNext(Boolean aBoolean) {
+                trackFavouriteStatusChanged(trackId, toFavourite, aBoolean);
+            }
+        };
+    }
+
+    private void trackFavouriteStatusChanged(final long trackId, final boolean toFavourite,
+                                             final boolean isSuccess) {
+        final Context context = DeePlayerApp.get().getApplicationContext();
+        if (isSuccess) {
+            ContentValues trackValues = new TracksValuesBuilder().id(trackId)
+                    .isFavourite(toFavourite ? 1 : 0).values();
+            context.getApplicationContext().getContentResolver().insert(SchematicDataProvider.Tracks.CONTENT_URI, trackValues);
+//            track.setFavourite(toFavourite);
+//            Log.d(TAG, "Artist status updated! Id - " + track.getId() + " Title - " + track.getTitle() +
+//                    " Status - " + track.isFavourite());
+//            context.getApplicationContext().getContentResolver().update(
+//                    SchematicDataProvider.Tracks.withId(trackId),
+//                    DataContract.TrackConverter.convertFrom(track)[DataContract.getTrackIndex()], null, null);
+            if (toFavourite) {
+                favouriteTracksIds.add(trackId);
+            } else {
+                favouriteTracksIds.remove(trackId);
+            }
+            notification.notifyIsFavourite(toFavourite);
+            Log.d(TAG, "ALL IS OK");
+        } else {
+            context.getApplicationContext().getContentResolver().notify();
         }
     }
 

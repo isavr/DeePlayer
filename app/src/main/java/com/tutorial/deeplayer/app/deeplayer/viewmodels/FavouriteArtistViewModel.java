@@ -6,22 +6,16 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
-import com.tutorial.deeplayer.app.deeplayer.interactions.GetUserFavouriteAlbums;
+import com.tutorial.deeplayer.app.deeplayer.data.tables.ArtistColumns;
 import com.tutorial.deeplayer.app.deeplayer.interactions.GetUserFavouriteArtists;
 import com.tutorial.deeplayer.app.deeplayer.interactions.UseCase;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
-import com.tutorial.deeplayer.app.deeplayer.pojo.BaseTypedItem;
-import com.tutorial.deeplayer.app.deeplayer.pojo.DataList;
-import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
 import rx.Observer;
-import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subjects.BehaviorSubject;
@@ -62,7 +56,7 @@ public class FavouriteArtistViewModel  extends AbstractViewModel {
                 ContentValues[] values = new ContentValues[valuesList.size()];
                 values = valuesList.toArray(values);
                 int deleted = context.getContentResolver().delete(SchematicDataProvider.Artists.CONTENT_URI,
-                        null, null);
+                        ArtistColumns.IS_RECOMMENDED + "=1 OR " + ArtistColumns.IS_FAVOURITE + "=1", null);
                 Log.d(TAG, "Rows deleted -> " + deleted);
                 int insertedRows = context.getContentResolver().bulkInsert(SchematicDataProvider.Artists.CONTENT_URI,
                         values);

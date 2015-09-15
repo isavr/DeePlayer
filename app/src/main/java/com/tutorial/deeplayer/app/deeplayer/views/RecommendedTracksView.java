@@ -2,6 +2,7 @@ package com.tutorial.deeplayer.app.deeplayer.views;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -18,10 +19,7 @@ import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Track;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteTracksViewModel;
-import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedTrackViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.TrackItemView;
-
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -63,9 +61,11 @@ public class RecommendedTracksView extends LinearLayout
         setupChildren();
     }
 
-
     private void setupChildren() {
         ButterKnife.bind(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mListView.setNestedScrollingEnabled(true);
+        }
     }
 
     public void setViewModel(@Nullable FavouriteTracksViewModel viewModel) {
@@ -96,7 +96,10 @@ public class RecommendedTracksView extends LinearLayout
     }
 
     private void onError(Throwable throwable) {
-        Log.d(TAG, "Handle Error");
+        Log.d(TAG, "Handle Error! ");
+        if (listener == null) {
+            Log.d(TAG, "NULL listener!");
+        }
         if (listener != null && throwable != null) {
             listener.onError(throwable);
             Snackbar.make(getRootView(), throwable.getMessage(), Snackbar.LENGTH_SHORT)

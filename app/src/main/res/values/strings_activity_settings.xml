@@ -10,14 +10,16 @@
 
     <string name="menu_settings_themes_title">Theme</string>
     <string-array name="themes">
-        <item>Default</item>
-        <item>Light</item>
-        <item>Dark</item>
+        <item>Grey</item>
+        <item>Indigo</item>
+        <item>Blue</item>
+        <item>Green</item>
     </string-array>
     <string-array name="themes_values">
-        <item>default</item>
-        <item>light</item>
-        <item>dark</item>
+        <item>grey</item>
+        <item>indigo</item>
+        <item>blue</item>
+        <item>green</item>
     </string-array>
 
     <!-- Example settings for Data & Sync -->

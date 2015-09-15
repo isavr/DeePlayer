@@ -1,9 +1,7 @@
 package com.tutorial.deeplayer.app.deeplayer.repository.datasources;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
@@ -15,8 +13,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 import rx.Observable;
-import rx.Subscriber;
-import rx.functions.Action1;
 
 /**
  * Created by ilya.savritsky on 07.09.2015.
@@ -53,7 +49,12 @@ public class LocalRadioDataStore extends BaseLocalDataStore {
 //    };
 
     public Observable<List<Radio>> getRadios() {
-        return makeObservable(getRadiosFromDb());
+        Observable<List<Radio>> result = makeObservable(getRadiosFromDb());
+        return result;
+    }
+
+    public Observable<Radio> getRadiosItems() {
+        return getRadios().flatMap(item -> Observable.from(item));
     }
 
 }

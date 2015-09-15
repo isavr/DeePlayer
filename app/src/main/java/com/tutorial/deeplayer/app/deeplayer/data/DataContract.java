@@ -2,6 +2,7 @@ package com.tutorial.deeplayer.app.deeplayer.data;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.generated.values.AlbumsValuesBuilder;
@@ -30,6 +31,8 @@ import java.util.Map;
  * Created by ilya.savritsky on 21.07.2015.
  */
 public class DataContract {
+    private final static String TAG = DataContract.class.getSimpleName();
+
     private enum KeyIndex {
         AlbumIndex,
         ArtistIndex,
@@ -98,7 +101,7 @@ public class DataContract {
             r.setTitle(title);
             r.setDescription(description);
             r.setFavourite(favouriteVal == 1);
-            r.setId(Long.valueOf(id));
+            r.setId((long) id);
             r.setType(type);
             r.setTime_add(timeAdded);
             r.setIsRecommended(recommendedVal == 1);
@@ -161,7 +164,7 @@ public class DataContract {
             int isRecommendedVal = cursor.getInt(mappedColumns.get(ArtistColumns.IS_RECOMMENDED));
 
             Artist artist = new Artist();
-            artist.setId(Long.valueOf(id));
+            artist.setId((long) id);
             artist.setName(name);
             artist.setShare(share);
             artist.setPictureMedium(picture_medium);
@@ -240,7 +243,7 @@ public class DataContract {
             String trackList = cursor.getString(mappedColumns.get(UserColumns.TRACKLIST));
 
             User user = new User();
-            user.setId(Long.valueOf(id));
+            user.setId((long) id);
             user.setPictureMedium(picture_medium);
             user.setPicture(picture);
             user.setPictureSmall(picture_small);
@@ -306,7 +309,7 @@ public class DataContract {
             int recommendedVal = cursor.getInt(mappedColumns.get(GenreColumns.IS_RECOMMENDED));
 
             Genre r = new Genre();
-            r.setId(Long.valueOf(id));
+            r.setId((long) id);
             r.setName(name);
             r.setPictureMedium(picture_medium);
             r.setPicture(picture);
@@ -335,7 +338,8 @@ public class DataContract {
             if (mappedColumns == null) {
                 mappedColumns = new HashMap<>();
             }
-            if (mappedColumns.size() == 0) {
+            mappedColumns.clear();
+//            if (mappedColumns.size() == 0) {
                 mappedColumns.put(AlbumColumns.ID, cursor.getColumnIndex(AlbumColumns.ID));
                 mappedColumns.put(AlbumColumns.TYPE, cursor.getColumnIndex(AlbumColumns.TYPE));
                 mappedColumns.put(AlbumColumns.SHARE, cursor.getColumnIndex(AlbumColumns.SHARE));
@@ -359,12 +363,23 @@ public class DataContract {
                 mappedColumns.put(AlbumColumns.TRACKS_COUNT, cursor.getColumnIndex(AlbumColumns.TRACKS_COUNT));
                 mappedColumns.put(AlbumColumns.RELEASE_DATE, cursor.getColumnIndex(AlbumColumns.RELEASE_DATE));
                 mappedColumns.put(AlbumColumns.RECORD_TYPE, cursor.getColumnIndex(AlbumColumns.RECORD_TYPE));
-            }
+//            }
         }
 
         public static Album convertFromCursor(Cursor cursor) {
             init(cursor);
-            int id = cursor.getInt(mappedColumns.get(AlbumColumns.ID));
+            int id_column = mappedColumns.get(AlbumColumns.ID);
+//            if (id_column == 0) {
+//                Log.d(TAG, "Possible error");
+//            }
+//            try {
+//                cursor.getInt(id_column);
+//            }
+//            catch (IllegalStateException ex) {
+//                ex.printStackTrace();
+//                Log.d(TAG, "Album id -> " + id_column);
+//            }
+            int id = cursor.getInt(id_column);
             String share = cursor.getString(mappedColumns.get(AlbumColumns.SHARE));
             String type = cursor.getString(mappedColumns.get(AlbumColumns.TYPE));
             String label = cursor.getString(mappedColumns.get(AlbumColumns.LABEL));
@@ -389,7 +404,7 @@ public class DataContract {
             String recordType = cursor.getString(mappedColumns.get(AlbumColumns.RECORD_TYPE));
 
             Album album = new Album();
-            album.setId(Long.valueOf(id));
+            album.setId((long) id);
             album.setTitle(title);
             album.setShare(share);
             album.setPictureMedium(picture_medium);
@@ -419,6 +434,8 @@ public class DataContract {
                     album.setArtist(artist);
                 }
                 artistCursor.close();
+            } else {
+                Log.d(TAG, "output -> " + album);
             }
             // TODO: add fields
             return album;
@@ -495,7 +512,7 @@ public class DataContract {
             String releaseDate = cursor.getString(cursor.getColumnIndex(TrackColumns.RELEASE_DATE));
 
             Track track = new Track();
-            track.setId(Long.valueOf(id));
+            track.setId((long) id);
             track.setType(type);
             track.setShare(share);
             track.setTitle(title);
@@ -516,19 +533,21 @@ public class DataContract {
                     .query(SchematicDataProvider.Albums.withId(albumId), null, null, null, null);
             if (albumCursor != null && albumCursor.getCount() != 0) {
                 if (albumCursor.moveToFirst()) {
-                    Album album = AlbumConverter.convertFromCursor(albumCursor);
-                    track.setAlbum(album);
-                    if (album.getArtist() == null || album.getArtist().getId() != artistId) {
-                        Cursor artistCursor = DeePlayerApp.get().getApplicationContext().getContentResolver()
-                                .query(SchematicDataProvider.Artists.withId(artistId), null, null, null, null);
-                        if (artistCursor != null) {
-                            if (artistCursor.moveToFirst()) {
-                                Artist artist = ArtistConverter.convertFromCursor(artistCursor);
-                                album.setArtist(artist);
+                    if (!(albumCursor.isAfterLast() || albumCursor.isBeforeFirst())) {
+                        Album album = AlbumConverter.convertFromCursor(albumCursor);
+                        track.setAlbum(album);
+                        if (album.getArtist() == null || album.getArtist().getId() != artistId) {
+                            Cursor artistCursor = DeePlayerApp.get().getApplicationContext().getContentResolver()
+                                    .query(SchematicDataProvider.Artists.withId(artistId), null, null, null, null);
+                            if (artistCursor != null) {
+                                if (artistCursor.moveToFirst()) {
+                                    Artist artist = ArtistConverter.convertFromCursor(artistCursor);
+                                    album.setArtist(artist);
+                                }
                             }
                         }
+                        track.setArtist(album.getArtist());
                     }
-                    track.setArtist(album.getArtist());
                 }
                 albumCursor.close();
             }

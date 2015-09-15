@@ -15,6 +15,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".activities.LoginActivity"
             android:label="@string/app_name"
@@ -25,9 +26,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/title_activity_main"
+            android:theme="@style/CustomBaseTheme"
             android:windowSoftInputMode="stateAlwaysHidden" />
 
         <provider
@@ -41,6 +44,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_mix"
             android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/CustomBaseTheme"
             android:windowSoftInputMode="stateAlwaysHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -51,6 +55,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_recommendations"
             android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/CustomBaseTheme"
             android:windowSoftInputMode="stateAlwaysHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -61,6 +66,7 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_user_library"
             android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/CustomBaseTheme"
             android:windowSoftInputMode="stateAlwaysHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

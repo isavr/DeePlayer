@@ -8,7 +8,12 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.*;
+import android.preference.ListPreference;
+import android.preference.Preference;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
+import android.preference.RingtonePreference;
 import android.text.TextUtils;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
@@ -53,6 +58,12 @@ public class SettingsActivity extends PreferenceActivity {
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void onBuildHeaders(List<Header> target) {
         loadHeadersFromResource(R.xml.pref_headers, target);
+    }
+
+    @Override
+    protected boolean isValidFragment(String fragmentName) {
+//        return super.isValidFragment(fragmentName);
+        return true;
     }
 
     /**
