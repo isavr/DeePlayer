@@ -82,6 +82,8 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
      */
     public static final String BROADCAST_EXTRA_RADIO_ID = "radio_id";
 
+//    public static final String BROADCAST_EXTRA_FAVOURITE_STATE = "is_favourite";
+
     // All possible messages this Service will broadcast
     // Ignore the actual values
 
@@ -413,7 +415,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         if (notification == null) {
             notification = new NotificationMusic();
         }
-
+        data.setFavourite(checkTrackFavouriteStatus(track.getId()));
         notification.notifyPlayer(this, this, data, track);
         notification.notifyIsFavourite(favouriteTracksIds.contains(track.getId()));
     }
@@ -696,6 +698,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
         broadcastIntent.putExtra(MusicService.BROADCAST_EXTRA_STATE, state);
         broadcastIntent.putExtra(MusicService.BROADCAST_EXTRA_RADIO_ID, data.getId());
+//        broadcastIntent.putExtra(MusicService.BROADCAST_EXTRA_FAVOURITE_STATE, favouriteTracksIds.contains(data.getId()));
 
         LocalBroadcastManager
                 .getInstance(getApplicationContext())
@@ -770,6 +773,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 //                favouriteTracksIds.addAll(ids);
 //            }
 //        }).subscribe();
+        Log.d(TAG, "UPDATING track list");
         UseCase useCase = new GetUserFavouriteTracks();
         useCase.build(Schedulers.computation(),
                 AndroidSchedulers.mainThread(), new Observer<List<ContentValues[]>>() {
@@ -811,8 +815,9 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         // TODO: refactor this later
         Log.d(TAG, "try to like track with ID - " + trackId);
         if (trackId != -1) {
-
-            if (checkTrackFavouriteStatus(trackId)) {
+            boolean isFavourite = checkTrackFavouriteStatus(trackId);
+            Log.d(TAG, "Current state - " + isFavourite);
+            if (isFavourite) {
                 RestService_Factory.create().get().fetchResultTrackRemoveFromFavourite(trackId).observeOn(AndroidSchedulers.mainThread())
 //                        .doOnNext(item -> {
 //                                    Log.d(TAG, "unlike succeeded - " + item);
@@ -827,7 +832,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 //                            Log.d(TAG, "UnLike Completed");
 //                            notification.notifyIsFavourite(checkTrackFavouriteStatus(trackId));
 //                        }).subscribe();
-                        .subscribe(getFavouriteStatusChangeObserver(trackId, true));
+                        .subscribe(getFavouriteStatusChangeObserver(trackId, false));
             } else {
                 RestService_Factory.create().get().fetchResultTrackAddToFavourite(trackId).observeOn(AndroidSchedulers.mainThread())
 //                        .doOnNext(item -> {
@@ -843,7 +848,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 //                            Log.d(TAG, "Like Completed");
 //                            notification.notifyIsFavourite(checkTrackFavouriteStatus(trackId));
 //                        }).subscribe();
-                        .subscribe(getFavouriteStatusChangeObserver(trackId, false));
+                        .subscribe(getFavouriteStatusChangeObserver(trackId, true));
             }
         }
     }
@@ -862,6 +867,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
             @Override
             public void onNext(Boolean aBoolean) {
+                Log.d(TAG, "Next result -> " + aBoolean);
                 trackFavouriteStatusChanged(trackId, toFavourite, aBoolean);
             }
         };
@@ -886,7 +892,7 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
                 favouriteTracksIds.remove(trackId);
             }
             notification.notifyIsFavourite(toFavourite);
-            Log.d(TAG, "ALL IS OK");
+            Log.d(TAG, "ALL IS OK. New status - " + toFavourite + " Rechecking - " + checkTrackFavouriteStatus(trackId));
         } else {
             context.getApplicationContext().getContentResolver().notify();
         }

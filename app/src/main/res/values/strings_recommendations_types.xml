@@ -11,5 +11,6 @@
     <string name="title_section_artists">Artists</string>
     <string name="title_section_albums">Albums</string>
     <string name="title_section_tracks">Tracks</string>
+    <string name="title_section_playlists">Playlists</string>
     <string name="title_section_flow">Flow</string>
 </resources>

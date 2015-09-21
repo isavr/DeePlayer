@@ -75,4 +75,28 @@ public class ArtistDataStore extends BaseLocalDataStore {
                 .map(item -> DataContract.ArtistConverter.convertFrom(item))
                 .toList();
     }
+
+    private Observable<Artist> getChartedArtistsDataObservable() {
+        return RestService_Factory.create().get().fetchChartInfo().flatMap(item -> {
+            if (item.getArtists() != null) {
+                return Observable.from(item.getArtists().getData());
+            }
+            return Observable.empty();
+        });
+    }
+
+    public Observable<List<ContentValues>> getChartedArtists() {
+        Observable<Artist> userAlbums = getUserArtistsDataObservable();
+        Observable<Artist> charted = getChartedArtistsDataObservable();
+        return Observable.concat(charted, userAlbums).groupBy(BaseTypedItem::getId).flatMap(Observable::toList)
+                .filter(item -> item.size() > 1).map(itemList -> {
+                    final int index = 0;//itemList.size() - 1;
+                    Artist artist = itemList.get(index);
+                    artist.setFavourite(true);
+//                    album.setIsRecommended(true);
+                    return artist;
+                }).concatWith(charted).distinct(BaseTypedItem::getId)
+                .map(item -> DataContract.ArtistConverter.convertFrom(item))
+                .toList();
+    }
 }

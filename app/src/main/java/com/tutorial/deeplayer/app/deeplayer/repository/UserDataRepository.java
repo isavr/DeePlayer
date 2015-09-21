@@ -12,6 +12,7 @@ import com.tutorial.deeplayer.app.deeplayer.repository.datasources.LocalAlbumDat
 import com.tutorial.deeplayer.app.deeplayer.repository.datasources.LocalArtistDataStore;
 import com.tutorial.deeplayer.app.deeplayer.repository.datasources.LocalRadioDataStore;
 import com.tutorial.deeplayer.app.deeplayer.repository.datasources.LocalTrackDataStore;
+import com.tutorial.deeplayer.app.deeplayer.repository.datasources.PlaylistDataStore;
 import com.tutorial.deeplayer.app.deeplayer.repository.datasources.RadioDataStore;
 import com.tutorial.deeplayer.app.deeplayer.repository.datasources.TrackDataStore;
 
@@ -26,7 +27,8 @@ import rx.Observable;
  * Created by ilya.savritsky on 07.09.2015.
  */
 @Singleton
-public class UserDataRepository implements RadioRepository, TrackRepository, ArtistRepository, AlbumRepository {
+public class UserDataRepository implements RadioRepository, TrackRepository,
+        ArtistRepository, AlbumRepository, PlaylistRepository {
 
     @Inject
     public UserDataRepository() {
@@ -103,6 +105,30 @@ public class UserDataRepository implements RadioRepository, TrackRepository, Art
     public Observable<List<ContentValues[]>> getAlbumsFromNet() {
         final AlbumDataStore trackDataStore = new AlbumDataStore();
         return trackDataStore.getRecommendedAlbums();
+    }
+
+    @Override
+    public Observable<List<ContentValues[]>> getChartedAlbumsFromNet() {
+        final AlbumDataStore trackDataStore = new AlbumDataStore();
+        return trackDataStore.getChartedAlbums();
+    }
+
+    @Override
+    public Observable<List<ContentValues>> getChartedArtistsFromNet() {
+        final ArtistDataStore dataStore = new ArtistDataStore();
+        return dataStore.getChartedArtists();
+    }
+
+    @Override
+    public Observable<List<ContentValues[]>> getChartedTracksFromNet() {
+        final TrackDataStore dataStore = new TrackDataStore();
+        return dataStore.getChartedTracks();
+    }
+
+    @Override
+    public Observable<List<ContentValues[]>> getChartedPlaylistsFromNet() {
+        final PlaylistDataStore dataStore = new PlaylistDataStore();
+        return dataStore.getChartedPlaylists();
     }
 
     @Override

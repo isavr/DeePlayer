@@ -29,6 +29,8 @@ public interface TrackColumns {
     @DataType(DataType.Type.INTEGER) String DISK_NUMBER = "disk_number";
     @DataType(DataType.Type.INTEGER) String HAS_EXPLICIT_LYRICS = "explicit_lyrics";
     @DataType(DataType.Type.INTEGER)
+    String POSITION = "position"; // in chart
+    @DataType(DataType.Type.INTEGER)
     @References(table = Database.Tables.ARTISTS, column = ArtistColumns.ID) String ARTIST_ID = "artist_id";
     @DataType(DataType.Type.INTEGER)
     @References(table = Database.Tables.ALBUMS, column = AlbumColumns.ID) String ALBUM_ID = "album_id";

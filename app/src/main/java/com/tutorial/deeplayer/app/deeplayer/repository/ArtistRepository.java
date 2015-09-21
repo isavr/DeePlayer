@@ -15,4 +15,6 @@ public interface ArtistRepository {
     Observable<List<Artist>> getArtistsFromDB();
     Observable<List<ContentValues>> getArtistsFromNet();
     Observable<List<ContentValues>> getFavouriteArtistsFromNet();
+
+    Observable<List<ContentValues>> getChartedArtistsFromNet();
 }

@@ -1,5 +1,6 @@
 package com.tutorial.deeplayer.app.deeplayer.fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,8 @@ public class MainActivityFragment extends BaseFragment {
 
 
     private MainActivityView mainActivityView;
+    private MainActivityView.OnMainItemInteractionListener listener;
+
     @Inject
     MainViewModel viewModel;
 //    @Inject
@@ -56,12 +59,34 @@ public class MainActivityFragment extends BaseFragment {
     public void onResume() {
         super.onResume();
         mainActivityView.setViewModel(viewModel);
+        mainActivityView.setListener(listener);
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            listener = (MainActivityView.OnMainItemInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnMainItemInteractionListener");
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
         mainActivityView.setViewModel(null);
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        listener = null;
+        if (mainActivityView != null) {
+            mainActivityView.clean();
+            mainActivityView.setListener(null);
+        }
     }
 
     @Override

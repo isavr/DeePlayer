@@ -113,7 +113,9 @@ public class RecommendedTracksView extends LinearLayout
     }
 
     public void clean() {
-        adapter.remove();
+        if (adapter != null) {
+            adapter.remove();
+        }
         adapter = null;
         mListView.setAdapter(null);
     }

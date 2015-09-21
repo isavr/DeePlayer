@@ -1,8 +1,29 @@
 <resources>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
+    <style name="MyCustomTabLayout" parent="Widget.Design.TabLayout"></style>
+
+    <style name="MyCustomTabLayout.Amber" parent="MyCustomTabLayout">
+        <item name="tabSelectedTextColor">@color/tab_selected_amber</item>
+        <item name="tabTextColor">@color/tab_unselected_amber</item>
+    </style>
+
+    <style name="MyCustomTabLayout.Pink" parent="MyCustomTabLayout">
+        <item name="tabSelectedTextColor">@color/tab_selected_pink</item>
+        <item name="tabTextColor">@color/tab_unselected_pink</item>
+    </style>
+
+    <style name="MyCustomTabLayout.Orange" parent="MyCustomTabLayout">
+        <item name="tabSelectedTextColor">@color/tab_selected_orange</item>
+        <item name="tabTextColor">@color/tab_unselected_orange</item>
+    </style>
+
+    <style name="MyCustomTabLayout.Green" parent="MyCustomTabLayout">
+        <item name="tabSelectedTextColor">@color/tab_selected_green</item>
+        <item name="tabTextColor">@color/tab_unselected_green</item>
+    </style>
+
+    <style name="MyCustomCheckedTextView" parent="TextAppearance.AppCompat.Headline">
+        <item name="android:drawableRight">@null</item>
     </style>
 
 </resources>

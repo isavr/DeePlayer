@@ -17,4 +17,6 @@ public interface AlbumRepository {
     Observable<List<ContentValues[]>> getAlbumsFromNet();
 
     Observable<List<ContentValues[]>> getFavouriteAlbumsFromNet();
+
+    Observable<List<ContentValues[]>> getChartedAlbumsFromNet();
 }

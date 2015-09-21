@@ -1,5 +1,7 @@
 package com.tutorial.deeplayer.app.deeplayer.activities;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -130,11 +132,7 @@ public class UserLibraryActivity extends BaseActivity implements TabLayout.OnTab
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_library);
         ButterKnife.bind(this);
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mViewPager.setNestedScrollingEnabled(true);
         }
@@ -151,8 +149,22 @@ public class UserLibraryActivity extends BaseActivity implements TabLayout.OnTab
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, MusicService.class);
+        bindService(intent, kMP.musicConnection, Context.BIND_AUTO_CREATE);
+        startService(intent);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(kMP.musicConnection);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
         tabLayout.removeAllTabs();
         tabLayout.setOnTabSelectedListener(null);
     }

@@ -52,6 +52,7 @@ public class FavouriteAlbumsViewModel extends AbstractViewModel {
                 final Context context = DeePlayerApp.get().getApplicationContext();
                 context.getContentResolver().notifyChange(SchematicDataProvider.Albums.recommendedQueryWithArtists(true), null);
                 context.getContentResolver().notifyChange(SchematicDataProvider.Albums.queryWithArtists(true), null);
+                context.getContentResolver().notifyChange(SchematicDataProvider.Albums.CONTENT_URI, null);
 
             }
 

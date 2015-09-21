@@ -5,7 +5,9 @@
     <string name="title_activity_main">Main</string>
     <string name="title_activity_mix">Mixes</string>
     <string name="title_activity_recommendations">Recommendations</string>
+    <string name="title_activity_new_releases">New Releases</string>
     <string name="title_activity_user_library">User Library</string>
+    <string name="title_activity_chart">Charts</string>
 
     <string name="error_server_connection_lost">Problem connecting to the server</string>
     <string name="error_application">Application error! Contact administrator and describe the problem</string>
@@ -34,4 +36,8 @@
     <string name="title_section2">Albums</string>
     <string name="title_section3">Artists</string>
     <string name="title_section4">Mixes</string>
+    <string name="menu_category_navigation">Navigation</string>
+
+    <string name="open_drawer">Open the Navigation Menu</string>
+    <string name="close_drawer">Close the Navigation Menu</string>
 </resources>

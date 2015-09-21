@@ -1,8 +1,11 @@
 package com.tutorial.deeplayer.app.deeplayer.fragments.recommended;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +19,8 @@ import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedAlbumsViewMode
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedAlbumsView;
 
 import javax.inject.Inject;
-import android.database.Cursor;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 
-public class AlbumFragment extends Fragment  implements LoaderManager.LoaderCallbacks<Cursor> {
+public class AlbumFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = AlbumFragment.class.getSimpleName();
     private static final int LOADER_ALBUMS = 30;
 

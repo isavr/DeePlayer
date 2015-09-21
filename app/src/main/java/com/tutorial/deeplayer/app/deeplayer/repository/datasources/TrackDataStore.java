@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
-import rx.Subscription;
 
 /**
  * Created by ilya.savritsky on 07.09.2015.
@@ -75,5 +74,29 @@ public class TrackDataStore extends BaseLocalDataStore {
     public Observable<List<ContentValues[]>> getUserFavouriteTracks() {
         return getUserTracksDataObservable()
                 .map(item -> DataContract.TrackConverter.convertFrom(item)).toList();
+    }
+
+    private Observable<Track> getChartedTracksDataObservable() {
+        return RestService_Factory.create().get().fetchChartInfo().flatMap(item -> {
+            if (item.getTracks() != null) {
+                return Observable.from(item.getTracks().getData());
+            }
+            return Observable.empty();
+        });
+    }
+
+    public Observable<List<ContentValues[]>> getChartedTracks() {
+        Observable<Track> userAlbums = getUserTracksDataObservable();
+        Observable<Track> charted = getChartedTracksDataObservable();
+        return Observable.concat(charted, userAlbums).groupBy(BaseTypedItem::getId).flatMap(Observable::toList)
+                .filter(item -> item.size() > 1).map(itemList -> {
+                    final int index = 0;//itemList.size() - 1;
+                    Track track = itemList.get(index);
+                    track.setFavourite(true);
+//                    album.setIsRecommended(true);
+                    return track;
+                }).concatWith(charted).distinct(BaseTypedItem::getId)
+                .map(item -> DataContract.TrackConverter.convertFrom(item))
+                .toList();
     }
 }

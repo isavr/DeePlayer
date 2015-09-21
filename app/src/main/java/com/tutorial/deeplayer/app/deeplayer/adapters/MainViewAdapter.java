@@ -6,7 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.CheckedTextView;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
 
@@ -20,11 +20,14 @@ public class MainViewAdapter extends RecyclerView.Adapter<MainViewAdapter.MenuDa
     private String[] menuItems;
     private Context context;
     private ViewHolderClicks listener;
+    private static final int DEFAULT_SELECTED_ITEM = -1; // no selection
+    private int selectedItemIndex;
 
     public MainViewAdapter(Context context, String[] items, ViewHolderClicks listener) {
         super();
         this.menuItems = items;
         this.context = context;
+        this.selectedItemIndex = -1;
         this.listener = listener;
     }
 
@@ -40,6 +43,17 @@ public class MainViewAdapter extends RecyclerView.Adapter<MainViewAdapter.MenuDa
     @Override
     public void onBindViewHolder(MenuDataHolder menuDataHolder, int i) {
         final String text = menuItems[i];
+        menuDataHolder.position = i;
+//        if (i == selectedItemIndex) {
+//            menuDataHolder.textView.setSelected(true);
+//            menuDataHolder.cardView.setCardElevation(5);
+//            menuDataHolder.cardView.setCardBackgroundColor(R.color.primary_green);
+//        } else {
+//            menuDataHolder.textView.setSelected(false);
+//            menuDataHolder.cardView.setCardElevation(0);
+//            menuDataHolder.cardView.setCardBackgroundColor(R.color.primary_green_dark);
+//        }
+        menuDataHolder.textView.setChecked(i == selectedItemIndex);
         menuDataHolder.textView.setText(text);
     }
 
@@ -56,9 +70,11 @@ public class MainViewAdapter extends RecyclerView.Adapter<MainViewAdapter.MenuDa
         CardView cardView;
 
         @Bind(R.id.text_view)
-        TextView textView;
+        CheckedTextView textView;
 
         ViewHolderClicks listener;
+
+        int position;
 
         public MenuDataHolder(View itemView, final ViewHolderClicks listener) {
             super(itemView);
@@ -69,10 +85,21 @@ public class MainViewAdapter extends RecyclerView.Adapter<MainViewAdapter.MenuDa
 
         @Override
         public void onClick(View v) {
+            String key = textView.getText().toString();
             if (listener != null) {
-                listener.onItemClick(textView.getText().toString());
+                listener.onItemClick(key);
             }
         }
+    }
+
+    public void selectItemAtPos(int position) {
+//        int previousIndex = selectedItemIndex;
+        this.selectedItemIndex = position;
+        notifyDataSetChanged();
+//        if (previousIndex != -1) {
+//            notifyItemChanged(previousIndex);
+//        }
+//        notifyItemChanged(position);
     }
 
     public interface ViewHolderClicks {

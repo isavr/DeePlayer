@@ -12,11 +12,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.deezer.sdk.network.connect.DeezerConnect;
-import com.deezer.sdk.network.connect.SessionStore;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.adapters.RecommendationsSectionsPagerAdapter;
-import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.kMP;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
@@ -53,25 +50,17 @@ public class RecommendationsActivity extends BaseActivity implements TabLayout.O
 
     @Bind(R.id.pager)
     ViewPager mViewPager;
-    private DeezerConnect deezerConnect;
+//    private DeezerConnect deezerConnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recommendations);
         ButterKnife.bind(this);
-//        addControlsFragment();
-//        addPlayerFragment();
-//        playerContainer.setVisibility(View.GONE);
-
-        deezerConnect = new DeezerConnect(DeePlayerApp.get(), getString(R.string.app_id));
-        SessionStore sessionStore = new SessionStore();
-        sessionStore.restore(deezerConnect, getApplicationContext());
+        init();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private void init() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             mViewPager.setNestedScrollingEnabled(true);
         }
@@ -85,13 +74,10 @@ public class RecommendationsActivity extends BaseActivity implements TabLayout.O
         mViewPager.setCurrentItem(tabPosition);
         tabLayout.setupWithViewPager(mViewPager);
         tabLayout.setOnTabSelectedListener(this);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        tabLayout.removeAllTabs();
-        tabLayout.setOnTabSelectedListener(null);
+        // deezer
+//        deezerConnect = new DeezerConnect(DeePlayerApp.get(), getString(R.string.app_id));
+//        SessionStore sessionStore = new SessionStore();
+//        sessionStore.restore(deezerConnect, getApplicationContext());
     }
 
     @Override
@@ -185,6 +171,13 @@ public class RecommendationsActivity extends BaseActivity implements TabLayout.O
     protected void onStop() {
         super.onStop();
         unbindService(kMP.musicConnection);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        tabLayout.removeAllTabs();
+        tabLayout.setOnTabSelectedListener(null);
     }
 
     @Override

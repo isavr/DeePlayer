@@ -3,7 +3,6 @@ package com.tutorial.deeplayer.app.deeplayer.fragments.library;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -15,9 +14,9 @@ import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.TrackColumns;
+import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteTracksViewModel;
-import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedTrackViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedTracksView;
 
 import javax.inject.Inject;
@@ -25,7 +24,7 @@ import javax.inject.Inject;
 /**
  * Created by ilya.savritsky on 07.09.2015.
  */
-public class FavouriteTracksFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class FavouriteTracksFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = FavouriteTracksFragment.class.getSimpleName();
     private static final int LOADER_TRACKS = 40;
 

@@ -3,7 +3,6 @@ package com.tutorial.deeplayer.app.deeplayer.fragments;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -14,13 +13,14 @@ import android.view.ViewGroup;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
+import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.RadioViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.RadioView;
 
 import javax.inject.Inject;
 
-public class RadioFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class RadioFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = RadioFragment.class.getSimpleName();
     private static final int LOADER_RADIOS = 10;
 

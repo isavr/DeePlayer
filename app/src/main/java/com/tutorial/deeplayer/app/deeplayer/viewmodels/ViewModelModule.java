@@ -57,4 +57,24 @@ public class ViewModelModule {
     public FavouriteTracksViewModel provideFavouriteTracksViewModel() {
         return new FavouriteTracksViewModel();
     }
+
+    @Provides
+    public ChartedAlbumsViewModel provideChartedAlbumsViewModel() {
+        return new ChartedAlbumsViewModel();
+    }
+
+    @Provides
+    public ChartedArtistsViewModel provideChartedArtistsViewModel() {
+        return new ChartedArtistsViewModel();
+    }
+
+    @Provides
+    public ChartedTracksViewModel provideChartedTracksViewModel() {
+        return new ChartedTracksViewModel();
+    }
+
+    @Provides
+    public ChartedPlaylistsViewModel provideChartedPlaylistsViewModel() {
+        return new ChartedPlaylistsViewModel();
+    }
 }

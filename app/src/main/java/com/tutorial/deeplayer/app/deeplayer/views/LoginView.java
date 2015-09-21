@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.Button;
@@ -36,6 +37,8 @@ public class LoginView extends LinearLayout {
     private final RxBinderUtil rxBinderUtil = new RxBinderUtil(this);
     @Inject
     LoginViewModel loginViewModel;
+
+    private OnLoginInteractionListener listener;
 
     @Bind(R.id.login_button)
     Button loginButton;
@@ -87,6 +90,9 @@ public class LoginView extends LinearLayout {
         Snackbar.make(getRootView(), throwable.getMessage(), Snackbar.LENGTH_SHORT)
                 .setAction("Hide", v -> {
                 }).show();
+        if (listener != null) {
+            listener.onError(throwable);
+        }
 //        DialogFactory.showSimpleErrorMessage(getContext().getApplicationContext(),
 //                ((FragmentActivity)getContext()).getSupportFragmentManager(), throwable.getMessage());
     }
@@ -96,7 +102,9 @@ public class LoginView extends LinearLayout {
         SessionStore store = new SessionStore();
         store.save(deezerConnect, getContext());
         Intent intent = new Intent(getContext(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         getContext().startActivity(intent);
+        ((FragmentActivity) getContext()).finish();
     }
 
     private void attemptLogin(OnClickEvent onClickEvent) {
@@ -114,5 +122,13 @@ public class LoginView extends LinearLayout {
             // Launches the authentication process
             deezerConnect.authorize((Activity) getContext(), permissions, loginViewModel.getListener());
         }
+    }
+
+    public void setListener(OnLoginInteractionListener listener) {
+        this.listener = listener;
+    }
+
+    public interface OnLoginInteractionListener {
+        void onError(Throwable err);
     }
 }

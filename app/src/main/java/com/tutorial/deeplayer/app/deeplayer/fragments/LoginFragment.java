@@ -1,13 +1,13 @@
 package com.tutorial.deeplayer.app.deeplayer.fragments;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
+import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.LoginViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.LoginView;
 
@@ -16,9 +16,10 @@ import javax.inject.Inject;
 /**
  * Created by ilya.savritsky on 24.07.2015.
  */
-public class LoginFragment extends Fragment {
+public class LoginFragment extends BaseFragment implements LoginView.OnLoginInteractionListener {
     public static final String TAG = LoginFragment.class.getSimpleName();
 
+    private LoginView.OnLoginInteractionListener listener;
     private LoginView loginView;
     @Inject
     LoginViewModel loginViewModel;
@@ -41,13 +42,19 @@ public class LoginFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        listener = this;
         loginView = (LoginView) view.findViewById(R.id.login_view);
         loginViewModel.subscribeToDataStore();
+        loginView.setListener(listener);
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        updateViewModel();
+    }
+
+    public void updateViewModel() {
         if (loginViewModel != null) {
             loginViewModel.unsubscribeFromDataStore();
             loginViewModel = new LoginViewModel();
@@ -73,7 +80,13 @@ public class LoginFragment extends Fragment {
         super.onDestroy();
         loginViewModel.dispose();
         loginViewModel = null;
+        listener = null;
         //instrumentation.getLeakTracing().traceLeakage(this);
         DeePlayerApp.getRefWatcher().watch(this, "Login Fragment");
+    }
+
+    @Override
+    public void onError(Throwable err) {
+        updateViewModel();
     }
 }

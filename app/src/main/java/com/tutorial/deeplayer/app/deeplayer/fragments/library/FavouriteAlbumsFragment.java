@@ -3,7 +3,6 @@ package com.tutorial.deeplayer.app.deeplayer.fragments.library;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -15,9 +14,9 @@ import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.AlbumColumns;
+import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteAlbumsViewModel;
-import com.tutorial.deeplayer.app.deeplayer.viewmodels.RecommendedAlbumsViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedAlbumsView;
 
 import javax.inject.Inject;
@@ -25,7 +24,7 @@ import javax.inject.Inject;
 /**
  * Created by ilya.savritsky on 04.09.2015.
  */
-public class FavouriteAlbumsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class FavouriteAlbumsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = FavouriteAlbumsFragment.class.getSimpleName();
     private static final int LOADER_ALBUMS = 30;
 
@@ -43,7 +42,7 @@ public class FavouriteAlbumsFragment extends Fragment implements LoaderManager.L
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_favourite_album, container, false);
+        return inflater.inflate(R.layout.fragment_album, container, false);
     }
 
     @Override

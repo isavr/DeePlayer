@@ -6,10 +6,10 @@ import android.database.sqlite.SQLiteDatabase;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.AlbumColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.ArtistColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.GenreColumns;
+import com.tutorial.deeplayer.app.deeplayer.data.tables.PlaylistColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.RadioColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.TrackColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.UserColumns;
-import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 
 import net.simonvt.schematic.annotation.OnConfigure;
 import net.simonvt.schematic.annotation.OnCreate;
@@ -45,6 +45,9 @@ public final class Database {
 
         @Table(ArtistColumns.class)
         public static final String ARTISTS = "artists";
+
+        @Table(PlaylistColumns.class)
+        public static final String PLAYLISTS = "playlists";
     }
 
     @OnCreate

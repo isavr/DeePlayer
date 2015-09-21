@@ -62,4 +62,7 @@
       http://developer.android.com/training/multiscreen/screensizes.html#TaskUseAliasFilters
       -->
     <item name="fragment_favourite_tracks" type="layout">@layout/fragment_recommended_tracks_grid</item>
+
+
+    <item name="fragment_playlist" type="layout">@layout/fragment_playlist_grid</item>
 </resources>

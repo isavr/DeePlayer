@@ -8,18 +8,21 @@ import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.generated.values.AlbumsValuesBuilder;
 import com.tutorial.deeplayer.app.deeplayer.data.generated.values.ArtistsValuesBuilder;
 import com.tutorial.deeplayer.app.deeplayer.data.generated.values.GenresValuesBuilder;
+import com.tutorial.deeplayer.app.deeplayer.data.generated.values.PlaylistsValuesBuilder;
 import com.tutorial.deeplayer.app.deeplayer.data.generated.values.RadiosValuesBuilder;
 import com.tutorial.deeplayer.app.deeplayer.data.generated.values.TracksValuesBuilder;
 import com.tutorial.deeplayer.app.deeplayer.data.generated.values.UserValuesBuilder;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.AlbumColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.ArtistColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.GenreColumns;
+import com.tutorial.deeplayer.app.deeplayer.data.tables.PlaylistColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.RadioColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.TrackColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.UserColumns;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Genre;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Playlist;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Track;
 import com.tutorial.deeplayer.app.deeplayer.pojo.User;
@@ -41,6 +44,14 @@ public class DataContract {
 
     public static int getAlbumIndex() {
         return KeyIndex.AlbumIndex.ordinal();
+    }
+
+    public static int getPlaylistIndex() {
+        return KeyIndex.AlbumIndex.ordinal();
+    }
+
+    public static int getUserIndex() {
+        return KeyIndex.ArtistIndex.ordinal();
     }
 
     public static int getArtistIndex() {
@@ -142,6 +153,7 @@ public class DataContract {
                 mappedColumns.put(ArtistColumns.ALBUM_COUNT, cursor.getColumnIndex(ArtistColumns.ALBUM_COUNT));
                 mappedColumns.put(ArtistColumns.HAS_RADIO, cursor.getColumnIndex(ArtistColumns.HAS_RADIO));
                 mappedColumns.put(ArtistColumns.IS_RECOMMENDED, cursor.getColumnIndex(ArtistColumns.IS_RECOMMENDED));
+                mappedColumns.put(ArtistColumns.POSITION, cursor.getColumnIndex(ArtistColumns.POSITION));
             }
         }
 
@@ -162,9 +174,11 @@ public class DataContract {
             int albumCount = cursor.getInt(mappedColumns.get(ArtistColumns.ALBUM_COUNT));
             int hasRadioVal = cursor.getInt(mappedColumns.get(ArtistColumns.HAS_RADIO));
             int isRecommendedVal = cursor.getInt(mappedColumns.get(ArtistColumns.IS_RECOMMENDED));
+            int position = cursor.getInt(mappedColumns.get(ArtistColumns.POSITION));
 
             Artist artist = new Artist();
             artist.setId((long) id);
+            artist.setPosition(position);
             artist.setName(name);
             artist.setShare(share);
             artist.setPictureMedium(picture_medium);
@@ -188,11 +202,13 @@ public class DataContract {
                     .picture(artist.getPicture()).pictureSmall(artist.getPictureSmall())
                     .pictureMedium(artist.getPictureMedium()).pictureBig(artist.getPictureBig())
                     .fansCount(artist.getFansCount()).albumCount(artist.getAlbumCount())
+                    .position(artist.getPosition())
                     .hasRadio(artist.isHasRadio() ? 1 : 0).tracklist(artist.getTracklist()).link(artist.getLink())
                     .isRecommended(artist.isRecommended() ? 1 : 0).type(artist.getType()).values();
             return values;
         }
     }
+
 
     public static final class UserConverter {
         private static Map<String, Integer> mappedColumns;
@@ -215,6 +231,7 @@ public class DataContract {
                 mappedColumns.put(UserColumns.LINK, cursor.getColumnIndex(ArtistColumns.LINK));
                 mappedColumns.put(UserColumns.BIRTHDAY, cursor.getColumnIndex(UserColumns.BIRTHDAY));
                 mappedColumns.put(UserColumns.IS_FAVOURITE, cursor.getColumnIndex(UserColumns.IS_FAVOURITE));
+                mappedColumns.put(UserColumns.IS_RECOMMENDED, cursor.getColumnIndex(UserColumns.IS_RECOMMENDED));
                 mappedColumns.put(UserColumns.GENDER, cursor.getColumnIndex(UserColumns.GENDER));
                 mappedColumns.put(UserColumns.COUNTRY, cursor.getColumnIndex(UserColumns.COUNTRY));
                 mappedColumns.put(UserColumns.STATUS, cursor.getColumnIndex(UserColumns.STATUS));
@@ -235,6 +252,7 @@ public class DataContract {
             String lastName = cursor.getString(mappedColumns.get(UserColumns.LAST_NAME));
             String birthday = cursor.getString(mappedColumns.get(UserColumns.BIRTHDAY));
             int favouriteVal = cursor.getInt(mappedColumns.get(UserColumns.IS_FAVOURITE));
+            int recommendedVal = cursor.getInt(mappedColumns.get(UserColumns.IS_RECOMMENDED));
             String gender = cursor.getString(mappedColumns.get(UserColumns.GENDER));
             String country = cursor.getString(mappedColumns.get(UserColumns.COUNTRY));
             int status = cursor.getInt(mappedColumns.get(UserColumns.STATUS));
@@ -253,6 +271,7 @@ public class DataContract {
             user.setFirstName(firstName);
             user.setLastName(lastName);
             user.setFavourite(favouriteVal == 1);
+            user.setIsRecommended(recommendedVal == 1);
             user.setGender(gender);
             user.setBirthday(birthday);
             user.setLink(link);
@@ -272,6 +291,113 @@ public class DataContract {
                     .country(user.getCountry()).inscriptionDate(user.getInscriptionDate()).lang(user.getLang())
                     .type(user.getType()).values();
             return values;
+        }
+
+    }
+
+    public static final class PlaylistConverter {
+        private static Map<String, Integer> mappedColumns;
+
+        private static void init(Cursor cursor) {
+            if (mappedColumns == null) {
+                mappedColumns = new HashMap<>();
+            }
+            if (mappedColumns.size() == 0) {
+                mappedColumns.put(PlaylistColumns.ID, cursor.getColumnIndex(PlaylistColumns.ID));
+                mappedColumns.put(PlaylistColumns.TYPE, cursor.getColumnIndex(PlaylistColumns.TYPE));
+                mappedColumns.put(PlaylistColumns.PICTURE, cursor.getColumnIndex(PlaylistColumns.PICTURE));
+                mappedColumns.put(PlaylistColumns.PICTURE_SMALL, cursor.getColumnIndex(PlaylistColumns.PICTURE_SMALL));
+                mappedColumns.put(PlaylistColumns.PICTURE_MEDIUM, cursor.getColumnIndex(PlaylistColumns.PICTURE_MEDIUM));
+                mappedColumns.put(PlaylistColumns.PICTURE_BIG, cursor.getColumnIndex(PlaylistColumns.PICTURE_BIG));
+                mappedColumns.put(PlaylistColumns.TRACKLIST, cursor.getColumnIndex(PlaylistColumns.TRACKLIST));
+                mappedColumns.put(PlaylistColumns.TITLE, cursor.getColumnIndex(PlaylistColumns.TITLE));
+                mappedColumns.put(PlaylistColumns.LINK, cursor.getColumnIndex(PlaylistColumns.LINK));
+                mappedColumns.put(PlaylistColumns.IS_FAVOURITE, cursor.getColumnIndex(PlaylistColumns.IS_FAVOURITE));
+                mappedColumns.put(PlaylistColumns.IS_RECOMMENDED, cursor.getColumnIndex(PlaylistColumns.IS_RECOMMENDED));
+                mappedColumns.put(PlaylistColumns.DURATION, cursor.getColumnIndex(PlaylistColumns.DURATION));
+                mappedColumns.put(PlaylistColumns.IS_PUBLIC, cursor.getColumnIndex(PlaylistColumns.IS_PUBLIC));
+                mappedColumns.put(PlaylistColumns.LOVED_TRACK, cursor.getColumnIndex(PlaylistColumns.LOVED_TRACK));
+                mappedColumns.put(PlaylistColumns.IS_COLLABORATIVE, cursor.getColumnIndex(PlaylistColumns.IS_COLLABORATIVE));
+                mappedColumns.put(PlaylistColumns.TRACKS_NUMBER, cursor.getColumnIndex(PlaylistColumns.TRACKS_NUMBER));
+                mappedColumns.put(PlaylistColumns.USER_ID, cursor.getColumnIndex(PlaylistColumns.USER_ID));
+                mappedColumns.put(PlaylistColumns.POSITION, cursor.getColumnIndex(PlaylistColumns.POSITION));
+            }
+        }
+
+        public static Playlist convertFromCursor(Cursor cursor) {
+            init(cursor);
+            int id = cursor.getInt(mappedColumns.get(PlaylistColumns.ID));
+            String type = cursor.getString(mappedColumns.get(PlaylistColumns.TYPE));
+            String picture = cursor.getString(mappedColumns.get(PlaylistColumns.PICTURE));
+            String picture_small = cursor.getString(mappedColumns.get(PlaylistColumns.PICTURE_SMALL));
+            String picture_medium = cursor.getString(mappedColumns.get(PlaylistColumns.PICTURE_MEDIUM));
+            String picture_big = cursor.getString(mappedColumns.get(PlaylistColumns.PICTURE_BIG));
+            String tracklist = cursor.getString(mappedColumns.get(PlaylistColumns.TRACKLIST));
+            String title = cursor.getString(mappedColumns.get(PlaylistColumns.TITLE));
+            String link = cursor.getString(mappedColumns.get(PlaylistColumns.LINK));
+            int favouriteVal = cursor.getInt(mappedColumns.get(PlaylistColumns.IS_FAVOURITE));
+            int recommendedVal = cursor.getInt(mappedColumns.get(PlaylistColumns.IS_RECOMMENDED));
+            int duration = cursor.getInt(mappedColumns.get(PlaylistColumns.DURATION));
+            int publicVal = cursor.getInt(mappedColumns.get(PlaylistColumns.IS_PUBLIC));
+            int lovedTrackVal = cursor.getInt(mappedColumns.get(PlaylistColumns.LOVED_TRACK));
+            int collaborativeVal = cursor.getInt(mappedColumns.get(PlaylistColumns.IS_COLLABORATIVE));
+            int trackNumber = cursor.getInt(mappedColumns.get(PlaylistColumns.TRACKS_NUMBER));
+            int userId = cursor.getInt(mappedColumns.get(PlaylistColumns.USER_ID));
+            int position = cursor.getInt(mappedColumns.get(PlaylistColumns.POSITION));
+
+            Playlist playlist = new Playlist();
+            playlist.setId((long) id);
+            playlist.setIsRecommended(recommendedVal == 1);
+            playlist.setType(type);
+            playlist.setPicture(picture);
+            playlist.setPictureSmall(picture_small);
+            playlist.setPictureMedium(picture_medium);
+            playlist.setPictureBig(picture_big);
+            playlist.setTracklist(tracklist);
+            playlist.setTitle(title);
+            playlist.setLink(link);
+            playlist.setFavourite(favouriteVal == 1);
+            playlist.setPosition(position);
+            playlist.setDuration(duration);
+            playlist.setIsPublic(publicVal == 1);
+            playlist.setIsLovedTrack(lovedTrackVal == 1);
+            playlist.setIsCollaborative(collaborativeVal == 1);
+            playlist.setTracksNumber(trackNumber);
+            Cursor userCursor = DeePlayerApp.get().getApplicationContext().getContentResolver()
+                    .query(SchematicDataProvider.User.withId(userId), null, null, null, null);
+            if (userCursor != null && userCursor.getCount() != 0) {
+                if (userCursor.moveToFirst()) {
+                    User user = UserConverter.convertFromCursor(userCursor);
+                    playlist.setCreator(user);
+                }
+                userCursor.close();
+            } else {
+                Log.d(TAG, "output -> " + playlist);
+            }
+            return playlist;
+        }
+
+        public static ContentValues[] convertFrom(Playlist playlist) {
+            User user = playlist.getCreator();
+            // TODO: add all fields
+            ContentValues playlistValues = new PlaylistsValuesBuilder().id(playlist.getId())
+                    .title(playlist.getTitle()).tracksNumber(playlist.getTracksNumber())
+                    .picture(playlist.getPicture()).pictureSmall(playlist.getPictureSmall())
+                    .pictureMedium(playlist.getPictureMedium()).pictureBig(playlist.getPictureBig())
+                    .tracklist(playlist.getTracklist()).link(playlist.getLink()).userId(user.getId())
+                    .position(playlist.getPosition()).type(playlist.getType()).duration(playlist.getDuration())
+                    .values();
+//            ContentValues userValues = new UserValuesBuilder().id(user.getId()).picture(user.getPicture())
+//                    .pictureSmall(user.getPictureSmall()).pictureMedium(user.getPictureMedium())
+//                    .pictureBig(user.getPictureBig()).tracklist(user.getTracklist()).name(user.getName())
+//                    .firstName(user.getFirstName()).lastName(user.getLastName()).isFavourite(user.isFavourite() ? 1 : 0)
+//                    .gender(user.getGender()).birthday(user.getBirthday()).link(user.getLink()).status(user.getStatus())
+//                    .country(user.getCountry()).inscriptionDate(user.getInscriptionDate()).lang(user.getLang())
+//                    .type(user.getType()).values();
+            ContentValues[] result = new ContentValues[2];
+            result[getPlaylistIndex()] = playlistValues;
+            result[getUserIndex()] = UserConverter.convertFrom(user);
+            return result;
         }
 
     }
@@ -363,6 +489,7 @@ public class DataContract {
                 mappedColumns.put(AlbumColumns.TRACKS_COUNT, cursor.getColumnIndex(AlbumColumns.TRACKS_COUNT));
                 mappedColumns.put(AlbumColumns.RELEASE_DATE, cursor.getColumnIndex(AlbumColumns.RELEASE_DATE));
                 mappedColumns.put(AlbumColumns.RECORD_TYPE, cursor.getColumnIndex(AlbumColumns.RECORD_TYPE));
+            mappedColumns.put(AlbumColumns.POSITION, cursor.getColumnIndex(AlbumColumns.POSITION));
 //            }
         }
 
@@ -400,12 +527,14 @@ public class DataContract {
             int artistId = cursor.getInt(mappedColumns.get(AlbumColumns.ARTIST_ID));
             int genreId = cursor.getInt(mappedColumns.get(AlbumColumns.GENRE_ID));
             int trackCount = cursor.getInt(mappedColumns.get(AlbumColumns.TRACKS_COUNT));
+            int position = cursor.getInt(mappedColumns.get(AlbumColumns.POSITION));
             String releaseDate = cursor.getString(mappedColumns.get(AlbumColumns.RELEASE_DATE));
             String recordType = cursor.getString(mappedColumns.get(AlbumColumns.RECORD_TYPE));
 
             Album album = new Album();
             album.setId((long) id);
             album.setTitle(title);
+            album.setPosition(position);
             album.setShare(share);
             album.setPictureMedium(picture_medium);
             album.setPicture(picture);
@@ -450,6 +579,7 @@ public class DataContract {
                     .fansCount(album.getFansCount()).duration(album.getDuration())
                     .genreId(album.getGenreID()).fansCount(album.getFansCount()).tracksCount(album.getTracksCount())
                     .tracklist(album.getTracklist()).link(album.getLink()).artistId(album.getArtist().getId())
+                    .position(album.getPosition())
                     .isRecommended(album.isRecommended() ? 1 : 0).type(album.getType()).values();
             ContentValues artist = ArtistConverter.convertFrom(album.getArtist());
             ContentValues[] result = new ContentValues[2];
@@ -487,6 +617,7 @@ public class DataContract {
                 mappedColumns.put(TrackColumns.ARTIST_ID, cursor.getColumnIndex(TrackColumns.ARTIST_ID));
                 mappedColumns.put(TrackColumns.ALBUM_ID, cursor.getColumnIndex(TrackColumns.ALBUM_ID));
                 mappedColumns.put(TrackColumns.RELEASE_DATE, cursor.getColumnIndex(TrackColumns.RELEASE_DATE));
+                mappedColumns.put(TrackColumns.POSITION, cursor.getColumnIndex(TrackColumns.POSITION));
             }
         }
 
@@ -509,10 +640,12 @@ public class DataContract {
             int diskNumber = cursor.getInt(cursor.getColumnIndex(TrackColumns.DISK_NUMBER));
             int artistId = cursor.getInt(cursor.getColumnIndex(TrackColumns.ARTIST_ID));
             int albumId = cursor.getInt(cursor.getColumnIndex(TrackColumns.ALBUM_ID));
+            int position = cursor.getInt(cursor.getColumnIndex(TrackColumns.POSITION));
             String releaseDate = cursor.getString(cursor.getColumnIndex(TrackColumns.RELEASE_DATE));
 
             Track track = new Track();
             track.setId((long) id);
+            track.setPosition(position);
             track.setType(type);
             track.setShare(share);
             track.setTitle(title);
@@ -562,6 +695,7 @@ public class DataContract {
                     .hasExplicitLyrics(track.isHasExplicitLyrics() ? 1 : 0).link(track.getDeezerURL())
                     .releaseDate(track.getReleaseDate()).preview(track.getPreview()).share(track.getShare())
                     .diskNumber(track.getDiskNumber()).trackPosition(track.getTrackPosition())
+                    .position(track.getPosition())
                     .type(track.getType()).isReadable(track.isReadable() ? 1 : 0)
                     .isRecommended(track.isRecommended() ? 1 : 0);
             ContentValues[] result = new ContentValues[3];

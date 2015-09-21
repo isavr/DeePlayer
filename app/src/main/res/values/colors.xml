@@ -4,12 +4,20 @@
     <color name="primary_blue_dark">#03A9F4</color>
     <color name="primary_blue_3">#0288D1</color>
     <color name="accent_green">#B2FF59</color>
+    <color name="tab_unselected_green">#64DD17</color>
+    // A700
+    <color name="tab_selected_green">#76FF03</color>
+    // A400
 
     <color name="primary_green">#81C784</color>
     <color name="primary_green_dark">#4CAF50</color>
     <color name="primary_green_3">#388E3C</color>
     <color name="accent_amber">#FFD740</color>
     // A200
+    <color name="tab_unselected_amber">#FFAB00</color>
+    // A700
+    <color name="tab_selected_amber">#FFC400</color>
+    // A400
 
     <color name="primary_indigo">#FF7986CB</color>
     // 300
@@ -19,6 +27,10 @@
     // 700
     <color name="accent_pink">#FFFF4081</color>
     // A200
+    <color name="tab_unselected_pink">#C51162</color>
+    // A700
+    <color name="tab_selected_pink">#F50057</color>
+    // A400
 
     <color name="primary_grey">#FFE0E0E0</color>
     // 300
@@ -28,4 +40,8 @@
     // 700
     <color name="accent_orange">#FFFF6E40</color>
     // A200
+    <color name="tab_unselected_orange">#FF6D00</color>
+    // A700
+    <color name="tab_selected_orange">#FF9100</color>
+    // A400
 </resources>

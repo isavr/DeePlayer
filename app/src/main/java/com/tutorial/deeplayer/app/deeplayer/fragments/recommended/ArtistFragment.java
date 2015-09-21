@@ -3,7 +3,6 @@ package com.tutorial.deeplayer.app.deeplayer.fragments.recommended;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -24,7 +23,7 @@ import javax.inject.Inject;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class ArtistFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ArtistFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = ArtistFragment.class.getSimpleName();
     private static final int LOADER_ARTISTS = 20;
 

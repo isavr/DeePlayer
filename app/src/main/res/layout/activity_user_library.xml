@@ -17,9 +17,9 @@
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
-            app:layout_collapseMode="pin"
-            app:contentInsetStart="72dp"
             android:elevation="4dp"
+            app:contentInsetStart="72dp"
+            app:layout_collapseMode="pin"
             app:navigationIcon="@drawable/ic_menu"
             app:title="@string/title_activity_user_library" />
 
@@ -27,7 +27,10 @@
             android:id="@+id/tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_collapseMode="pin" />
+            app:layout_collapseMode="pin"
+            app:tabBackground="?colorPrimaryDark"
+            app:tabSelectedTextColor="?tabSelectedTextColor"
+            app:tabTextColor="?tabTextColor" />
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"

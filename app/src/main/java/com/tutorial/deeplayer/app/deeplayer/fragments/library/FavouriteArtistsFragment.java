@@ -3,7 +3,6 @@ package com.tutorial.deeplayer.app.deeplayer.fragments.library;
 import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -15,6 +14,7 @@ import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.ArtistColumns;
+import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteArtistViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedArtistsView;
@@ -27,7 +27,7 @@ import butterknife.ButterKnife;
 /**
  * Created by ilya.savritsky on 04.09.2015.
  */
-public class FavouriteArtistsFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class FavouriteArtistsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = FavouriteArtistsFragment.class.getSimpleName();
     private static final int LOADER_ARTISTS = 20;
 

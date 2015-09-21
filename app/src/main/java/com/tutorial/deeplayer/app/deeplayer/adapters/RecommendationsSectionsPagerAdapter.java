@@ -17,14 +17,14 @@ import java.util.Locale;
  * Created by ilya.savritsky on 11.09.2015.
  */
 public class RecommendationsSectionsPagerAdapter extends FragmentStatePagerAdapter {
-    private enum LibraryTabs {
+    private enum RecommendationsTabs {
         Artists,
         Albums,
         Tracks,
         Flow,
         DEFAULT;
 
-        public static LibraryTabs create(int p) {
+        public static RecommendationsTabs create(int p) {
             switch (p) {
                 case 0: {
                     return Artists;
@@ -62,7 +62,7 @@ public class RecommendationsSectionsPagerAdapter extends FragmentStatePagerAdapt
     public Fragment getItem(int position) {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
-        LibraryTabs val = LibraryTabs.create(position);
+        RecommendationsTabs val = RecommendationsTabs.create(position);
 
         switch (val) {
             case Artists: {
@@ -88,7 +88,7 @@ public class RecommendationsSectionsPagerAdapter extends FragmentStatePagerAdapt
     @Override
     public int getCount() {
         // Show 4 total pages.
-        return LibraryTabs.DEFAULT.ordinal();
+        return RecommendationsTabs.DEFAULT.ordinal();
     }
 
     @Override

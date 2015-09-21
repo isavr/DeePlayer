@@ -6,6 +6,7 @@ package com.tutorial.deeplayer.app.deeplayer.pojo;
 public class FavouriteItem extends BaseTypedItem implements ItemsPicturesActions {
     private boolean favourite;
     private boolean isRecommended;
+    private int position;
 
     public boolean isFavourite() {
         return favourite;
@@ -86,5 +87,13 @@ public class FavouriteItem extends BaseTypedItem implements ItemsPicturesActions
 
     public void setIsRecommended(boolean isRecommended) {
         this.isRecommended = isRecommended;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }

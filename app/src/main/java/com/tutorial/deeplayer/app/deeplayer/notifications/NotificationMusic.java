@@ -221,18 +221,6 @@ public class NotificationMusic extends NotificationSimple {
         if (url == null && track.getAlbum() != null) {
             url = track.getAlbum().getCoverUrl();
         }
-//        if (data instanceof Radio) {
-//            url = data.getPictureSmall();
-//            if (url == null && track.getAlbum() != null) {
-//                url = track.getAlbum().getCoverUrl();
-//            }
-//        } else if (data instanceof Artist) {
-//            url = data.getPictureSmall();
-//        } else if (data instanceof Album) {
-//            url = data.getPictureSmall();
-//        } else {
-//            url = track.getAlbum().getCoverUrl();
-//        }
         return url;
     }
 

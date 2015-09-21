@@ -171,7 +171,9 @@ public class RecommendedAlbumsView extends FrameLayout
     }
 
     public void clean() {
-        adapter.remove();
+        if (adapter != null) {
+            adapter.remove();
+        }
         adapter = null;
         mListView.setAdapter(null);
     }

@@ -15,4 +15,6 @@ public interface TrackRepository {
     Observable<List<Track>> getTracksFromDB();
     Observable<List<ContentValues[]>> getTracksFromNet();
     Observable<List<ContentValues[]>> getFavouriteTracksFromNet();
+
+    Observable<List<ContentValues[]>> getChartedTracksFromNet();
 }

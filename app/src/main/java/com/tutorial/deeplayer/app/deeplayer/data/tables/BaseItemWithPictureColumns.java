@@ -14,6 +14,8 @@ public interface BaseItemWithPictureColumns {
 
     @DataType(DataType.Type.INTEGER) String IS_FAVOURITE = "is_favourite";
     @DataType(DataType.Type.INTEGER) String IS_RECOMMENDED = "is_recommended";
+    @DataType(DataType.Type.INTEGER)
+    String POSITION = "position";
 
     @DataType(DataType.Type.TEXT) String PICTURE = "picture";
     @DataType(DataType.Type.TEXT) String PICTURE_SMALL = "picture_small";

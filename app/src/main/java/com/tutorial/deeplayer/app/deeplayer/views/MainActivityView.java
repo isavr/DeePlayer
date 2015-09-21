@@ -1,7 +1,6 @@
 package com.tutorial.deeplayer.app.deeplayer.views;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
@@ -9,9 +8,6 @@ import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
-import com.tutorial.deeplayer.app.deeplayer.activities.MixActivity;
-import com.tutorial.deeplayer.app.deeplayer.activities.RecommendationsActivity;
-import com.tutorial.deeplayer.app.deeplayer.activities.UserLibraryActivity;
 import com.tutorial.deeplayer.app.deeplayer.adapters.MainViewAdapter;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.MainViewModel;
@@ -33,7 +29,11 @@ public class MainActivityView extends FrameLayout {
     @Bind(R.id.recycler_view)
     RecyclerView recyclerView;
 
+    private OnMainItemInteractionListener listener;
+
     private MainViewModel mainViewModel;
+
+    private MainViewAdapter adapter;
 
     public MainActivityView(Context context) {
         super(context, null);
@@ -59,7 +59,7 @@ public class MainActivityView extends FrameLayout {
         String[] items = getResources().getStringArray(R.array.main_categories_list);
 //        ArrayAdapter<String> listAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, items);
 //        listView.setAdapter(listAdapter);
-        MainViewAdapter adapter = new MainViewAdapter(getContext(), items, menuClickListener);
+        adapter = new MainViewAdapter(getContext(), items, menuClickListener);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
@@ -69,33 +69,19 @@ public class MainActivityView extends FrameLayout {
 //        sessionStore.restore(deezerConnect, DeePlayerApp.get());
     }
 
-    private MainViewAdapter.ViewHolderClicks menuClickListener = new MainViewAdapter.ViewHolderClicks() {
-        @Override
-        public void onItemClick(String key) {
-            if (key == null) {
-                return;
-            }
-            switch (key) {
-                case "Library": {
-                    Intent intent = new Intent(getContext(), UserLibraryActivity.class);
-                    getContext().startActivity(intent);
-                    break;
-                }
-                case "Hear This": {
-                    Intent intent = new Intent(getContext(), RecommendationsActivity.class);
-                    getContext().startActivity(intent);
-                    break;
-                }
-                case "Mixes": {
-                    Intent intent = new Intent(getContext(), MixActivity.class);
-                    getContext().startActivity(intent);
-                    break;
-                }
-                default: {
-
-                }
+    private MainViewAdapter.ViewHolderClicks menuClickListener = key -> {
+        if (key == null || listener == null || adapter == null) {
+            return;
+        }
+        listener.selectItemWithKey(key);
+        String[] items = getResources().getStringArray(R.array.main_categories_list);
+        for (int i = 0; i < items.length; ++i) {
+            if (key.equals(items[i])) {
+                adapter.selectItemAtPos(i);
+                break;
             }
         }
+
     };
 
     public void setViewModel(MainViewModel viewModel) {
@@ -110,6 +96,15 @@ public class MainActivityView extends FrameLayout {
         }
     }
 
+    public void clean() {
+        listener = null;
+        menuClickListener = null;
+        if (recyclerView != null) {
+            recyclerView.setOnClickListener(null);
+            recyclerView.removeAllViews();
+        }
+    }
+
     private <U> void dataUpdated(U u) {
         Log.d(TAG, "data updated");
     }
@@ -118,27 +113,13 @@ public class MainActivityView extends FrameLayout {
         Log.d(TAG, "Handle Error");
     }
 
-//    @OnItemClick(R.id.listView)
-//    public void listViewItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-//        switch (position) {
-//            case 0: {
-//                Intent intent = new Intent(getContext(), UserLibraryActivity.class);
-//                getContext().startActivity(intent);
-//                break;
-//            }
-//            case 1: {
-//                Intent intent = new Intent(getContext(), RecommendationsActivity.class);
-//                getContext().startActivity(intent);
-//                break;
-//            }
-//            case 4: {
-//                Intent intent = new Intent(getContext(), MixActivity.class);
-//                getContext().startActivity(intent);
-//                break;
-//            }
-//            default: {
-//
-//            }
-//        }
-//    }
+    public void setListener(OnMainItemInteractionListener listener) {
+        this.listener = listener;
+    }
+
+    public interface OnMainItemInteractionListener {
+        void selectItemWithKey(String key);
+
+        void onError(Throwable err);
+    }
 }

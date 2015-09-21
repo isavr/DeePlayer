@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/navigation_group"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/user_library_menu"
+            android:checked="false"
+            android:title="@string/title_activity_user_library" />
+
+        <item
+            android:id="@+id/recommendations_menu"
+            android:checked="false"
+            android:title="@string/title_activity_recommendations" />
+        <item
+            android:id="@+id/new_releases_menu"
+            android:checked="false"
+            android:title="@string/title_activity_new_releases" />
+        <item
+            android:id="@+id/chart_menu"
+            android:checked="false"
+            android:title="@string/title_activity_chart" />
+
+        <item
+            android:id="@+id/mix_menu"
+            android:checked="false"
+            android:title="@string/title_activity_mix" />
+    </group>
+
+</menu>

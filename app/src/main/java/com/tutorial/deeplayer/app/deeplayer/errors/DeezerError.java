@@ -31,4 +31,6 @@ public class DeezerError extends Throwable {
     public void setCode(int code) {
         this.code = code;
     }
+
+
 }

@@ -5,6 +5,7 @@ import android.net.Uri;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.AlbumColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.ArtistColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.GenreColumns;
+import com.tutorial.deeplayer.app.deeplayer.data.tables.PlaylistColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.RadioColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.TrackColumns;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.UserColumns;
@@ -31,13 +32,14 @@ public class SchematicDataProvider {
     interface Path {
         String GENRES = "genres";
         String RADIOS = "radios";
-        String USER = "user";
+        String USER = "users";
         String ARTISTS = "artists";
         String ALBUMS = "albums";
         String ALBUMS_FROM_ARTIST = "albums_from_artist";
         String ALBUMS_WITH_ARTISTS = "albums_with_artists";
         String REC_ALBUMS_WITH_ARTISTS = "rec_albums_with_artists";
         String TRACKS = "tracks";
+        String PLAYLISTS = "playlists";
     }
 
     private static Uri buildUri(String... paths) {
@@ -90,14 +92,14 @@ public class SchematicDataProvider {
     public static class User {
         @ContentUri(
                 path = Path.USER,
-                type = "vnd.android.cursor.dir/user",
+                type = "vnd.android.cursor.dir/users",
                 defaultSort = UserColumns.ID + " ASC")
         public static final Uri CONTENT_URI = buildUri(Path.USER);
 
         @InexactContentUri(
                 name = "USER_ID",
                 path = Path.USER + "/#",
-                type = "vnd.android.cursor.item/user",
+                type = "vnd.android.cursor.item/users",
                 whereColumn = UserColumns.ID,
                 pathSegment = 1)
         public static Uri withId(long id) {
@@ -251,10 +253,29 @@ public class SchematicDataProvider {
                 name = "TRACKS_ID",
                 path = Path.TRACKS + "/#",
                 type = "vnd.android.cursor.item/tracks",
-                whereColumn = GenreColumns.ID,
+                whereColumn = TrackColumns.ID,
                 pathSegment = 1)
         public static Uri withId(long id) {
             return buildUri(Path.TRACKS, String.valueOf(id));
+        }
+    }
+
+    @TableEndpoint(table = Database.Tables.PLAYLISTS)
+    public static class Playlists {
+        @ContentUri(
+                path = Path.PLAYLISTS,
+                type = "vnd.android.cursor.dir/playlists",
+                defaultSort = PlaylistColumns.POSITION + " , " + PlaylistColumns.TITLE + " ASC")
+        public static final Uri CONTENT_URI = buildUri(Path.PLAYLISTS);
+
+        @InexactContentUri(
+                name = "PLAYLISTS_ID",
+                path = Path.PLAYLISTS + "/#",
+                type = "vnd.android.cursor.item/playlists",
+                whereColumn = PlaylistColumns.ID,
+                pathSegment = 1)
+        public static Uri withId(long id) {
+            return buildUri(Path.PLAYLISTS, String.valueOf(id));
         }
     }
 }

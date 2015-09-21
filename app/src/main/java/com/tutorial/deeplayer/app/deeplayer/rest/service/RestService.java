@@ -1,7 +1,14 @@
 package com.tutorial.deeplayer.app.deeplayer.rest.service;
 
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.pojo.*;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Chart;
+import com.tutorial.deeplayer.app.deeplayer.pojo.DataList;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Track;
+import com.tutorial.deeplayer.app.deeplayer.pojo.User;
+import com.tutorial.deeplayer.app.deeplayer.rest.interfaces.ChartsAPI;
 import com.tutorial.deeplayer.app.deeplayer.rest.interfaces.RadioAPI;
 import com.tutorial.deeplayer.app.deeplayer.rest.interfaces.UserAPI;
 
@@ -25,6 +32,7 @@ public class RestService {
     private static final String WEB_SERVICE_BASE_URL = "http://api.deezer.com/";
     private final UserAPI userAPI;
     private final RadioAPI radioAPI;
+    private final ChartsAPI chartsAPI;
     private String token;
 
     @Inject
@@ -44,6 +52,7 @@ public class RestService {
         token = extractDeeToken();
         userAPI = restAdapter.create(UserAPI.class);
         radioAPI = restAdapter.create(RadioAPI.class);
+        chartsAPI = restAdapter.create(ChartsAPI.class);
     }
 
     protected String extractDeeToken() {
@@ -53,6 +62,15 @@ public class RestService {
                     getSharedPreferences("deezer-session", 0).getString("access_token", null);
         }
         return null;
+    }
+
+    public Observable<Chart> fetchChartInfo() {
+        return chartsAPI.getChartsInfo().flatMap(item -> {
+            if (item.getError() != null) {
+                return Observable.error(item.getError());
+            }
+            return Observable.just(item);
+        });
     }
 
     public Observable<User> fetchUserInfo() {

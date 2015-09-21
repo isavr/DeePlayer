@@ -1,28 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+    </style>
     <!-- The actual themes are split over several files -->
-    <style name="CustomBaseTheme" parent="Theme.AppCompat.NoActionBar" />
+    <style name="CustomBaseTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="tabSelectedTextColor">@color/tab_selected_orange</item>
+        <item name="tabTextColor">@color/tab_unselected_orange</item>
+        <item name="colorPrimary">@color/primary_grey</item>
+        <item name="colorPrimaryDark">@color/primary_grey_dark</item>
+        <item name="colorAccent">@color/accent_orange</item>
+    </style>
 
     <style name="CustomBaseTheme.Default" parent="CustomBaseTheme" />
 
     <style name="CustomBaseTheme.Light" parent="Theme.AppCompat.Light.NoActionBar" />
 
     <style name="CustomBaseTheme.Dark" parent="CustomBaseTheme" />
-    <!-- API 11 theme customizations can go here. -->
-    <!--<style name="AppTheme" parent="AppBaseTheme" />-->
-
 
     <!-- Yay, actual themes! -->
     <style name="CustomTheme.Grey" parent="CustomBaseTheme.Default">
         <item name="colorPrimary">@color/primary_grey</item>
         <item name="colorPrimaryDark">@color/primary_grey_dark</item>
         <item name="colorAccent">@color/accent_orange</item>
+        <item name="tabTextColor">@color/tab_unselected_orange</item>
+        <item name="tabSelectedTextColor">@color/tab_selected_orange</item>
     </style>
 
     <style name="CustomTheme.Indigo" parent="CustomBaseTheme.Default">
         <item name="colorPrimary">@color/primary_indigo</item>
         <item name="colorPrimaryDark">@color/primary_indigo_dark</item>
         <item name="colorAccent">@color/accent_pink</item>
+        <item name="tabTextColor">@color/tab_unselected_pink</item>
+        <item name="tabSelectedTextColor">@color/tab_selected_pink</item>
     </style>
 
     <!-- New Android themes -->
@@ -30,26 +42,15 @@
         <item name="colorPrimary">@color/primary_blue</item>
         <item name="colorPrimaryDark">@color/primary_blue_dark</item>
         <item name="colorAccent">@color/accent_green</item>
-        <!--<item name="android:colorBackground">@color/primary_blue_background</item>-->
-        <!--<item name="android:textColor">@color/primary_blue_text</item>-->
-        <!--<item name="android:shadowColor">@color/primary_blue_shadow</item>-->
+        <item name="tabTextColor">@color/tab_unselected_green</item>
+        <item name="tabSelectedTextColor">@color/tab_selected_green</item>
     </style>
 
     <style name="CustomTheme.Green" parent="CustomBaseTheme.Light">
         <item name="colorPrimary">@color/primary_green</item>
         <item name="colorPrimaryDark">@color/primary_green_dark</item>
         <item name="colorAccent">@color/accent_amber</item>
+        <item name="tabTextColor">@color/tab_unselected_amber</item>
+        <item name="tabSelectedTextColor">@color/tab_selected_amber</item>
     </style>
-
-    <!-- The old Android themes -->
-    <style name="Theme.DarkSimple" parent="@android:style/Theme.Black" />
-
-    <style name="Theme.LightSimple" parent="@android:style/Theme.Light" />
-
-    <!-- Misc -->
-    <style name="Theme.Wallpaper" parent="@android:style/Theme.Holo.Wallpaper" />
-
-    <style name="Theme.DialogDark" parent="@android:style/Theme.Holo.Dialog" />
-
-    <style name="Theme.DialogLight" parent="@android:style/Theme.Holo.Light.Dialog" />
 </resources>
