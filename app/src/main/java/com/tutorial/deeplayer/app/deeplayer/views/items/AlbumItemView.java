@@ -6,7 +6,11 @@ import android.util.AttributeSet;
 import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.tutorial.deeplayer.app.deeplayer.R;
@@ -85,10 +89,6 @@ public class AlbumItemView extends RelativeLayout {
     private void setFavourite(boolean isFavourite) {
         checkFavouriteView.setChecked(isFavourite);
     }
-
-
-    //TODO: setup listener
-
 
     @OnCheckedChanged(R.id.favourite_check)
     public void itemStatusChanged(CompoundButton button, boolean isChecked) {

@@ -17,34 +17,6 @@ import java.util.Locale;
  * Created by ilya.savritsky on 11.09.2015.
  */
 public class RecommendationsSectionsPagerAdapter extends FragmentStatePagerAdapter {
-    private enum RecommendationsTabs {
-        Artists,
-        Albums,
-        Tracks,
-        Flow,
-        DEFAULT;
-
-        public static RecommendationsTabs create(int p) {
-            switch (p) {
-                case 0: {
-                    return Artists;
-                }
-                case 1: {
-                    return Albums;
-                }
-                case 2: {
-                    return Tracks;
-                }
-                case 4: {
-                    return Flow;
-                }
-                default: {
-                    return DEFAULT;
-                }
-            }
-        }
-    }
-
     private final String[] tabLabels;
 
     public RecommendationsSectionsPagerAdapter(FragmentManager fm, Context context) {
@@ -71,7 +43,6 @@ public class RecommendationsSectionsPagerAdapter extends FragmentStatePagerAdapt
             case Albums: {
                 return new AlbumFragment();
             }
-            // TODO: possible Playlists , etc fragments will be added here
             case Tracks: {
                 return new TracksFragment();
             }
@@ -98,5 +69,33 @@ public class RecommendationsSectionsPagerAdapter extends FragmentStatePagerAdapt
             return tabLabels[position].toUpperCase(l);
         }
         return null;
+    }
+
+    private enum RecommendationsTabs {
+        Artists,
+        Albums,
+        Tracks,
+        Flow,
+        DEFAULT;
+
+        public static RecommendationsTabs create(int p) {
+            switch (p) {
+                case 0: {
+                    return Artists;
+                }
+                case 1: {
+                    return Albums;
+                }
+                case 2: {
+                    return Tracks;
+                }
+                case 4: {
+                    return Flow;
+                }
+                default: {
+                    return DEFAULT;
+                }
+            }
+        }
     }
 }

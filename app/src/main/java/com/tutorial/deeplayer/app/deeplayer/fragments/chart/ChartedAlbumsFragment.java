@@ -64,7 +64,7 @@ public class ChartedAlbumsFragment extends BaseAlbumFragment {
 
     @Override
     protected String createFilter(final String filterKeyVal) {
-        // TODO: fix search thogh artists names
+        // TODO: fix search through artists names
         String selectionString = AlbumColumns.POSITION + "!=0";
         if (filterKeyVal != null && !filterKeyVal.trim().isEmpty()) {
             final String comparedVal = "\'%" + filterKeyVal + "%\'";
