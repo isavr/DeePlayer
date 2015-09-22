@@ -22,13 +22,14 @@ import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Playlist;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
-import com.tutorial.deeplayer.app.deeplayer.pojo.Track;
 import com.tutorial.deeplayer.app.deeplayer.services.MusicService;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
+import com.tutorial.deeplayer.app.deeplayer.utils.Utils;
 import com.tutorial.deeplayer.app.deeplayer.views.FlowView;
 import com.tutorial.deeplayer.app.deeplayer.views.MainActivityView;
 import com.tutorial.deeplayer.app.deeplayer.views.PlaylistsView;
 import com.tutorial.deeplayer.app.deeplayer.views.RadioView;
+import com.tutorial.deeplayer.app.deeplayer.views.RecommendationsTypes;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedAlbumsView;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedArtistsView;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedTracksView;
@@ -64,18 +65,14 @@ public class MainActivity extends BaseActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        if (container == null) {
-            mTwoPane = false;
-        } else {
-            mTwoPane = true;
-        }
+        mTwoPane = container != null;
         initNavigationView();
     }
 
     private void initNavigationView() {
         navigationView.setNavigationItemSelectedListener(menuItem -> {
-            final boolean menuChecked = false;//menuItem.isChecked();
-            menuItem.setChecked(!menuChecked);
+            //final boolean menuChecked = false;//menuItem.isChecked();
+            menuItem.setChecked(true);
             //Closing drawer on item click
             drawerLayout.closeDrawers();
             switch (menuItem.getItemId()) {
@@ -134,27 +131,47 @@ public class MainActivity extends BaseActivity
 
     @Override
     public void onAlbumItemInteraction(@NonNull Album album) {
-
+        if (kMP.musicService != null) {
+            Utils.initMusicService(RecommendationsTypes.Albums);
+            kMP.musicService.setData(album);
+            kMP.musicService.play();
+        }
     }
 
     @Override
     public void onArtistItemInteraction(@NonNull Artist artist) {
-
+        if (kMP.musicService != null) {
+            Utils.initMusicService(RecommendationsTypes.Artists);
+            kMP.musicService.setData(artist);
+            kMP.musicService.play();
+        }
     }
 
     @Override
-    public void onTrackItemInteraction(@NonNull Track track) {
-
-    }
-
-    @Override
-    public void onRadioItemInteraction(@NonNull Radio radio) {
-
+    public void onTrackItemInteraction(@NonNull com.tutorial.deeplayer.app.deeplayer.pojo.Track track) {
+        if (kMP.musicService != null) {
+            Utils.initMusicService(RecommendationsTypes.Tracks);
+            kMP.musicService.setData(track);
+            kMP.musicService.play();
+        }
     }
 
     @Override
     public void onPlaylistItemInteraction(@NonNull Playlist playlist) {
+        if (kMP.musicService != null) {
+            Utils.initMusicService(RecommendationsTypes.Playlists);
+            kMP.musicService.setData(playlist);
+            kMP.musicService.play();
+        }
+    }
 
+    @Override
+    public void onRadioItemInteraction(@NonNull Radio radio) {
+        if (kMP.musicService != null) {
+            Utils.initMusicService(RecommendationsTypes.Radio);
+            kMP.musicService.setData(radio);
+            kMP.musicService.play();
+        }
     }
 
     @Override

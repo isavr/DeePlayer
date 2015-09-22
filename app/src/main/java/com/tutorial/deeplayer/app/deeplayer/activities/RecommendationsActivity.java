@@ -20,6 +20,7 @@ import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 import com.tutorial.deeplayer.app.deeplayer.services.MusicService;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
+import com.tutorial.deeplayer.app.deeplayer.utils.Utils;
 import com.tutorial.deeplayer.app.deeplayer.views.FlowView;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendationsTypes;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedAlbumsView;
@@ -88,30 +89,6 @@ public class RecommendationsActivity extends BaseActivity implements TabLayout.O
         startService(intent);
     }
 
-    private void initMusicService(RecommendationsTypes type) {
-        switch (type) {
-            case Artists: {
-                kMP.musicService.initPlayer(MusicService.PlayerType.ARTIST);
-                break;
-            }
-            case Albums: {
-                kMP.musicService.initPlayer(MusicService.PlayerType.ALBUM);
-                break;
-            }
-            case Tracks: {
-                kMP.musicService.initPlayer(MusicService.PlayerType.TRACK);
-                break;
-            }
-            case Flow: {
-                kMP.musicService.initPlayer(MusicService.PlayerType.FLOW);
-                break;
-            }
-            default: {
-
-            }
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -143,7 +120,7 @@ public class RecommendationsActivity extends BaseActivity implements TabLayout.O
     @Override
     public void onAlbumItemInteraction(@NonNull Album album) {
         if (kMP.musicService != null) {
-            initMusicService(RecommendationsTypes.Albums);
+            Utils.initMusicService(RecommendationsTypes.Albums);
             kMP.musicService.setData(album);
             kMP.musicService.play();
         }
@@ -152,7 +129,7 @@ public class RecommendationsActivity extends BaseActivity implements TabLayout.O
     @Override
     public void onArtistItemInteraction(@NonNull Artist artist) {
         if (kMP.musicService != null) {
-            initMusicService(RecommendationsTypes.Artists);
+            Utils.initMusicService(RecommendationsTypes.Artists);
             kMP.musicService.setData(artist);
             kMP.musicService.play();
         }
@@ -161,7 +138,7 @@ public class RecommendationsActivity extends BaseActivity implements TabLayout.O
     @Override
     public void onTrackItemInteraction(@NonNull com.tutorial.deeplayer.app.deeplayer.pojo.Track track) {
         if (kMP.musicService != null) {
-            initMusicService(RecommendationsTypes.Tracks);
+            Utils.initMusicService(RecommendationsTypes.Tracks);
             kMP.musicService.setData(track);
             kMP.musicService.play();
         }
@@ -184,7 +161,7 @@ public class RecommendationsActivity extends BaseActivity implements TabLayout.O
     public void onFlowInteraction(long userId) {
         Log.d(TAG, "try yo play the FLOW");
         if (kMP.musicService != null) {
-            initMusicService(RecommendationsTypes.Flow);
+            Utils.initMusicService(RecommendationsTypes.Flow);
             Radio radio = new Radio();
             radio.setId(userId);
             radio.setTitle("User Flow");

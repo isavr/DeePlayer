@@ -7,16 +7,25 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.deezer.sdk.model.Track;
 import com.deezer.sdk.player.PlayerWrapper;
-import com.deezer.sdk.player.event.*;
+import com.deezer.sdk.player.event.BufferState;
+import com.deezer.sdk.player.event.OnBufferErrorListener;
+import com.deezer.sdk.player.event.OnBufferProgressListener;
+import com.deezer.sdk.player.event.OnBufferStateChangeListener;
+import com.deezer.sdk.player.event.OnPlayerErrorListener;
+import com.deezer.sdk.player.event.OnPlayerProgressListener;
+import com.deezer.sdk.player.event.OnPlayerStateChangeListener;
+import com.deezer.sdk.player.event.PlayerState;
 import com.deezer.sdk.player.exception.NotAllowedToPlayThatSongException;
 import com.deezer.sdk.player.exception.StreamLimitationException;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -28,10 +37,8 @@ import butterknife.ButterKnife;
 // use service for playing music
 public class PlayerFragment extends BaseFragment {
     public static final String TAG = PlayerFragment.class.getSimpleName();
-
-    private PlayerHandler mPlayerHandler = new PlayerHandler();
-    private OnClickHandler mOnClickHandler = new OnClickHandler();
-
+    @Bind(R.id.button_repeat)
+    protected ImageButton mButtonPlayerRepeat;
     @Bind(R.id.button_stop)
     ImageButton mButtonPlayerStop;
     @Bind(R.id.button_pause)
@@ -44,29 +51,61 @@ public class PlayerFragment extends BaseFragment {
     ImageButton mButtonPlayerSeekBackward;
     @Bind(R.id.button_seek_forward)
     ImageButton mButtonPlayerSeekForward;
-
-    @Bind(R.id.button_repeat)
-    protected ImageButton mButtonPlayerRepeat;
-
-
     @Bind(R.id.seek_progress)
     SeekBar mSeekBar;
-    private boolean mIsUserSeeking = false;
     @Bind(R.id.text_time)
     TextView mTextTime;
     @Bind(R.id.text_length)
     TextView mTextLength;
-
     @Bind(R.id.text_artist)
     TextView mTextArtist;
     @Bind(R.id.text_track)
     TextView mTextTrack;
-
     @Bind(R.id.container)
     View container;
-
+    private PlayerHandler mPlayerHandler = new PlayerHandler();
+    private OnClickHandler mOnClickHandler = new OnClickHandler();
+    private boolean mIsUserSeeking = false;
     private PlayerWrapper mPlayer;
 
+    /**
+     * Formats a time.
+     *
+     * @param time the time (in seconds)
+     * @return the formatted time.
+     */
+    private static String formatTime(long time) {
+        time /= 1000;
+        long seconds = time % 60;
+        time /= 60;
+        long minutes = time % 60;
+        time /= 60;
+        long hours = time;
+        StringBuilder builder = new StringBuilder(8);
+        doubleDigit(builder, seconds);
+        builder.insert(0, ':');
+        if (hours == 0) {
+            builder.insert(0, minutes);
+        } else {
+            doubleDigit(builder, minutes);
+            builder.insert(0, ':');
+            builder.insert(0, hours);
+        }
+        return builder.toString();
+    }
+
+    /**
+     * Ensure double decimal representation of numbers.
+     *
+     * @param builder a builder where a number is gonna be inserted at beginning.
+     * @param value   the number value. If below 10 then a leading 0 is inserted.
+     */
+    private static void doubleDigit(final StringBuilder builder, final long value) {
+        builder.insert(0, value);
+        if (value < 10) {
+            builder.insert(0, '0');
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -240,7 +279,6 @@ public class PlayerFragment extends BaseFragment {
         }
     }
 
-
     /**
      * displays the current progression of the buffer
      *
@@ -271,48 +309,63 @@ public class PlayerFragment extends BaseFragment {
         }
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////
+    // Click handler
+    //////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Formats a time.
-     *
-     * @param time the time (in seconds)
-     * @return the formatted time.
-     */
-    private static String formatTime(long time) {
-        time /= 1000;
-        long seconds = time % 60;
-        time /= 60;
-        long minutes = time % 60;
-        time /= 60;
-        long hours = time;
-        StringBuilder builder = new StringBuilder(8);
-        doubleDigit(builder, seconds);
-        builder.insert(0, ':');
-        if (hours == 0) {
-            builder.insert(0, minutes);
-        } else {
-            doubleDigit(builder, minutes);
-            builder.insert(0, ':');
-            builder.insert(0, hours);
+    protected void onSkipToNextTrack() {
+        mPlayer.skipToNextTrack();
+    }
+
+    protected void onSkipToPreviousTrack() {
+        mPlayer.skipToPreviousTrack();
+    }
+
+    protected void switchRepeatMode() {
+        PlayerWrapper.RepeatMode current = mPlayer.getRepeatMode();
+        PlayerWrapper.RepeatMode next;
+        String toast;
+
+        switch (current) {
+            case NONE:
+                next = PlayerWrapper.RepeatMode.ONE;
+                toast = "Repeat mode set to : Repeat One";
+                break;
+            case ONE:
+                next = PlayerWrapper.RepeatMode.ALL;
+                toast = "Repeat mode set to : Repeat All";
+                break;
+            case ALL:
+            default:
+                next = PlayerWrapper.RepeatMode.NONE;
+                toast = "Repeat mode set to : No Repeat";
+                break;
         }
-        return builder.toString();
+
+        mPlayer.setRepeatMode(next);
+        Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT).show();
     }
 
     /**
-     * Ensure double decimal representation of numbers.
+     * Handle errors by displaying a toast and logging.
      *
-     * @param builder a builder where a number is gonna be inserted at beginning.
-     * @param value   the number value. If below 10 then a leading 0 is inserted.
+     * @param exception the exception that occured while contacting Deezer services.
      */
-    private static void doubleDigit(final StringBuilder builder, final long value) {
-        builder.insert(0, value);
-        if (value < 10) {
-            builder.insert(0, '0');
+    protected void handleError(final Exception exception) {
+        String message = exception.getMessage();
+        if (TextUtils.isEmpty(message)) {
+            message = exception.getClass().getName();
         }
+
+        Toast toast = Toast.makeText(getActivity(), message, Toast.LENGTH_LONG);
+        ((TextView) toast.getView().findViewById(android.R.id.message)).setTextColor(Color.RED);
+        toast.show();
+
+        Log.e("BaseActivity", "Exception occured " + exception.getClass().getName(), exception);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////
-    // Click handler
+    // Player Handler
     //////////////////////////////////////////////////////////////////////////////////////
 
     private class OnClickHandler implements View.OnClickListener {
@@ -350,44 +403,6 @@ public class PlayerFragment extends BaseFragment {
             }
         }
     }
-
-    protected void onSkipToNextTrack() {
-        mPlayer.skipToNextTrack();
-    }
-
-    protected void onSkipToPreviousTrack() {
-        mPlayer.skipToPreviousTrack();
-    }
-
-    protected void switchRepeatMode() {
-        PlayerWrapper.RepeatMode current = mPlayer.getRepeatMode();
-        PlayerWrapper.RepeatMode next;
-        String toast;
-
-        switch (current) {
-            case NONE:
-                next = PlayerWrapper.RepeatMode.ONE;
-                toast = "Repeat mode set to : Repeat One";
-                break;
-            case ONE:
-                next = PlayerWrapper.RepeatMode.ALL;
-                toast = "Repeat mode set to : Repeat All";
-                break;
-            case ALL:
-            default:
-                next = PlayerWrapper.RepeatMode.NONE;
-                toast = "Repeat mode set to : No Repeat";
-                break;
-        }
-
-        mPlayer.setRepeatMode(next);
-        Toast.makeText(getActivity(), toast, Toast.LENGTH_SHORT).show();
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////
-    // Player Handler
-    //////////////////////////////////////////////////////////////////////////////////////
-
 
     /**
      * Handler for messages sent by the player and buffer
@@ -437,23 +452,5 @@ public class PlayerFragment extends BaseFragment {
         public void onPlayerProgress(final long timePosition) {
             getActivity().runOnUiThread(() -> showPlayerProgress(timePosition));
         }
-    }
-
-    /**
-     * Handle errors by displaying a toast and logging.
-     *
-     * @param exception the exception that occured while contacting Deezer services.
-     */
-    protected void handleError(final Exception exception) {
-        String message = exception.getMessage();
-        if (TextUtils.isEmpty(message)) {
-            message = exception.getClass().getName();
-        }
-
-        Toast toast = Toast.makeText(getActivity(), message, Toast.LENGTH_LONG);
-        ((TextView) toast.getView().findViewById(android.R.id.message)).setTextColor(Color.RED);
-        toast.show();
-
-        Log.e("BaseActivity", "Exception occured " + exception.getClass().getName(), exception);
     }
 }

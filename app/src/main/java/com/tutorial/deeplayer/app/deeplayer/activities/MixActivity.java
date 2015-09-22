@@ -27,8 +27,10 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
 
     @Bind(R.id.fragment_container)
     View container;
-    @Bind(R.id.app_bar)
-    android.support.v7.widget.Toolbar toolbar;
+//    @Bind(R.id.app_bar)
+//    android.support.v7.widget.Toolbar toolbar;
+//    @Bind(R.id.search_view)
+//    EditText searchView;
 
 
 //    @Bind(R.id.player)
@@ -64,10 +66,13 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
     @Override
     protected void onResume() {
         super.onResume();
-        setSupportActionBar(toolbar);
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+//        setSupportActionBar(toolbar);
+//        if (getSupportActionBar() != null) {
+//            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        }
+//
+
+
         if (paused) {
             // Ensure that the controller
             // is shown when the user returns to the app
@@ -75,7 +80,6 @@ public class MixActivity extends BaseMediaActivity implements RadioView.OnRadioI
             paused = false;
         }
     }
-
 
 
     //connect to the service

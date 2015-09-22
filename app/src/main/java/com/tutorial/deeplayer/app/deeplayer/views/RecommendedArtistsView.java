@@ -17,6 +17,7 @@ import com.tutorial.deeplayer.app.deeplayer.adapters.ArtistAdapter;
 import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
+import com.tutorial.deeplayer.app.deeplayer.utils.FilterableContent;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteArtistViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.ArtistItemView;
@@ -34,13 +35,12 @@ public class RecommendedArtistsView extends LinearLayout
     public static final String TAG = RecommendedAlbumsView.class.getSimpleName();
 
     private final RxBinderUtil rxBinderUtil = new RxBinderUtil(this);
-    private OnArtistItemInteractionListener listener;
-    private ArtistAdapter adapter;
-
     @Bind(android.R.id.list)
     AbsListView mListView;
-
     FavouriteArtistViewModel artistViewModel;
+    private OnArtistItemInteractionListener listener;
+    private FilterableContent filterListener;
+    private ArtistAdapter adapter;
 
     public RecommendedArtistsView(Context context) {
         super(context);
@@ -73,12 +73,23 @@ public class RecommendedArtistsView extends LinearLayout
         if (viewModel != null) {
             artistViewModel = viewModel;
             rxBinderUtil.bindProperty(viewModel.getSubject(), this::updateArtistList, this::onError);
+            if (viewModel.getFilterObservable() != null) {
+                rxBinderUtil.bindProperty(viewModel.getFilterObservable(), this::updateFilter, this::onError);
+            }
         }
     }
 
     private <U> void updateArtistList(U u) {
         if (listener != null) {
             listener.onStopProgress();
+        }
+    }
+
+    private void updateFilter(String s) {
+        Log.d(TAG, "Filter update received with data -> " + s);
+        if (filterListener != null) {
+            // filter update
+            filterListener.OnFilterUpdate(s);
         }
     }
 
@@ -189,6 +200,10 @@ public class RecommendedArtistsView extends LinearLayout
         if (adapter != null) {
             adapter.changeCursor(null);
         }
+    }
+
+    public void setFilterListener(FilterableContent filterListener) {
+        this.filterListener = filterListener;
     }
 
     public interface OnArtistItemInteractionListener {

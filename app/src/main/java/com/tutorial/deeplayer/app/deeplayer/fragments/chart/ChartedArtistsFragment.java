@@ -1,45 +1,26 @@
 package com.tutorial.deeplayer.app.deeplayer.fragments.chart;
 
-import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
-import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.ArtistColumns;
-import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
+import com.tutorial.deeplayer.app.deeplayer.fragments.BaseArtistFragment;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.ChartedArtistsViewModel;
-import com.tutorial.deeplayer.app.deeplayer.views.RecommendedArtistsView;
 
 import javax.inject.Inject;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
 
 /**
  * Created by ilya.savritsky on 17.09.2015.
  */
-public class ChartedArtistsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ChartedArtistsFragment extends BaseArtistFragment {
     public static final String TAG = ChartedArtistsFragment.class.getSimpleName();
-    private static final int LOADER_ARTISTS = 20;
-
-    @Bind(R.id.artist_view)
-    RecommendedArtistsView recommendedArtistsView;
 
     @Inject
     ChartedArtistsViewModel artistViewModel;
-//    @Inject
-//    Instrumentation instrumentation;
-
-    private RecommendedArtistsView.OnArtistItemInteractionListener listener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,75 +29,44 @@ public class ChartedArtistsFragment extends BaseFragment implements LoaderManage
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_artist, container, false);
-        ButterKnife.bind(this, view);
-        return view;
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //recommendedArtistsView = (RecommendedArtistsView) view.findViewById(R.id.artist_view);
+
         DialogFactory.showProgressDialog(this.getActivity(),
                 getActivity().getSupportFragmentManager());
+
         artistViewModel.subscribeToDataStore();
-        getLoaderManager().initLoader(LOADER_ARTISTS, null, this);
+        artistViewModel.subscribeToFilterUpdates(searchView);
+
+        initLoader("");
     }
 
     @Override
     public void onResume() {
         super.onResume();
         recommendedArtistsView.setViewModel(artistViewModel);
-        recommendedArtistsView.setListener(listener);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        recommendedArtistsView.setViewModel(null);
-        recommendedArtistsView.setListener(null);
     }
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         artistViewModel.unsubscribeFromDataStore();
         artistViewModel.dispose();
         artistViewModel = null;
-        if (recommendedArtistsView != null) {
-            recommendedArtistsView.clean();
-            recommendedArtistsView.setListener(null);
-        }
-        ButterKnife.unbind(this);
-        DeePlayerApp.getRefWatcher().watch(this, "Charted Artist Fragment");
+        super.onDestroyView();
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            listener = (RecommendedArtistsView.OnArtistItemInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnArtistItemInteractionListener");
+    protected String createFilter(String filterKeyVal) {
+        String selectionString = ArtistColumns.POSITION + "!=0";
+        if (filterKeyVal != null && !filterKeyVal.trim().isEmpty()) {
+            selectionString += " AND " + ArtistColumns.NAME + " LIKE " + "\'%" + filterKeyVal + "%\'";
         }
+        return selectionString;
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
-        if (recommendedArtistsView != null) {
-            recommendedArtistsView.clean();
-            recommendedArtistsView.setListener(null);
-        }
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new CursorLoader(getActivity(), SchematicDataProvider.Artists.CONTENT_URI, null,
-                ArtistColumns.POSITION + "!=0", null, ArtistColumns.POSITION + " ASC");
+    protected String createSortString() {
+        return ArtistColumns.POSITION + " ASC";
     }
 
     @Override

@@ -21,6 +21,7 @@ import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Track;
 import com.tutorial.deeplayer.app.deeplayer.services.MusicService;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
+import com.tutorial.deeplayer.app.deeplayer.utils.Utils;
 import com.tutorial.deeplayer.app.deeplayer.views.RadioView;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendationsTypes;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedAlbumsView;
@@ -52,7 +53,7 @@ public class UserLibraryActivity extends BaseActivity implements TabLayout.OnTab
     @Override
     public void onAlbumItemInteraction(@NonNull Album album) {
         if (kMP.musicService != null) {
-            initMusicService(RecommendationsTypes.Albums);
+            Utils.initMusicService(RecommendationsTypes.Albums);
             kMP.musicService.setData(album);
             kMP.musicService.play();
         }
@@ -63,34 +64,10 @@ public class UserLibraryActivity extends BaseActivity implements TabLayout.OnTab
         super.onConfigurationChanged(newConfig);
     }
 
-    private void initMusicService(RecommendationsTypes type) {
-        switch (type) {
-            case Artists: {
-                kMP.musicService.initPlayer(MusicService.PlayerType.ARTIST);
-                break;
-            }
-            case Albums: {
-                kMP.musicService.initPlayer(MusicService.PlayerType.ALBUM);
-                break;
-            }
-            case Tracks: {
-                kMP.musicService.initPlayer(MusicService.PlayerType.TRACK);
-                break;
-            }
-            case Flow: {
-                kMP.musicService.initPlayer(MusicService.PlayerType.FLOW);
-                break;
-            }
-            default: {
-
-            }
-        }
-    }
-
     @Override
     public void onArtistItemInteraction(@NonNull Artist artist) {
         if (kMP.musicService != null) {
-            initMusicService(RecommendationsTypes.Artists);
+            Utils.initMusicService(RecommendationsTypes.Artists);
             kMP.musicService.setData(artist);
             kMP.musicService.play();
         }
@@ -99,7 +76,7 @@ public class UserLibraryActivity extends BaseActivity implements TabLayout.OnTab
     @Override
     public void onRadioItemInteraction(@NonNull Radio radio) {
         if (kMP.musicService != null) {
-            kMP.musicService.initPlayer(MusicService.PlayerType.RADIO);
+            Utils.initMusicService(RecommendationsTypes.Radio);
             kMP.musicService.setData(radio);
             kMP.musicService.play();
         }
@@ -108,7 +85,7 @@ public class UserLibraryActivity extends BaseActivity implements TabLayout.OnTab
     @Override
     public void onTrackItemInteraction(@NonNull Track track) {
         if (kMP.musicService != null) {
-            initMusicService(RecommendationsTypes.Tracks);
+            Utils.initMusicService(RecommendationsTypes.Tracks);
             kMP.musicService.setData(track);
             kMP.musicService.play();
         }
@@ -124,8 +101,6 @@ public class UserLibraryActivity extends BaseActivity implements TabLayout.OnTab
         DialogFactory.closeAlertDialog(getSupportFragmentManager());
         //DialogFactory.showSimpleErrorMessage(this, getSupportFragmentManager(), err.getMessage());
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

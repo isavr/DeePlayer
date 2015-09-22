@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.LoginViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.LoginView;
 
@@ -18,11 +17,10 @@ import javax.inject.Inject;
  */
 public class LoginFragment extends BaseFragment implements LoginView.OnLoginInteractionListener {
     public static final String TAG = LoginFragment.class.getSimpleName();
-
-    private LoginView.OnLoginInteractionListener listener;
-    private LoginView loginView;
     @Inject
     LoginViewModel loginViewModel;
+    private LoginView.OnLoginInteractionListener listener;
+    private LoginView loginView;
 //    @Inject
 //    Instrumentation instrumentation;
 

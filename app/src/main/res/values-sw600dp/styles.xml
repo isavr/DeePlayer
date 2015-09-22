@@ -4,4 +4,11 @@
     <style name="MyCustomCheckedTextView" parent="TextAppearance.AppCompat.Headline">
         <item name="android:drawableRight">?android:attr/listChoiceIndicatorSingle</item>
     </style>
+
+    <style name="CustomToolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?actionBarSize</item>
+        <item name="android:elevation">4dp</item>
+        <item name="android:visibility">gone</item>
+    </style>
 </resources>

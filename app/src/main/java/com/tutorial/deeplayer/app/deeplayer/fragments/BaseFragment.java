@@ -1,4 +1,4 @@
-package com.tutorial.deeplayer.app.deeplayer.fragments.recommended;
+package com.tutorial.deeplayer.app.deeplayer.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

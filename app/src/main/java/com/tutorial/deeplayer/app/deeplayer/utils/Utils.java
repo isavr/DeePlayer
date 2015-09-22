@@ -5,6 +5,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 
+import com.tutorial.deeplayer.app.deeplayer.kMP;
+import com.tutorial.deeplayer.app.deeplayer.services.MusicService;
+import com.tutorial.deeplayer.app.deeplayer.views.RecommendationsTypes;
+
 /**
  * Created by ilya.savritsky on 09.09.2015.
  */
@@ -31,6 +35,37 @@ public class Utils {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void initMusicService(RecommendationsTypes type) {
+        switch (type) {
+            case Artists: {
+                kMP.musicService.initPlayer(MusicService.PlayerType.ARTIST);
+                break;
+            }
+            case Albums: {
+                kMP.musicService.initPlayer(MusicService.PlayerType.ALBUM);
+                break;
+            }
+            case Tracks: {
+                kMP.musicService.initPlayer(MusicService.PlayerType.TRACK);
+                break;
+            }
+            case Flow: {
+                kMP.musicService.initPlayer(MusicService.PlayerType.FLOW);
+                break;
+            }
+            case Playlists: {
+                kMP.musicService.initPlayer(MusicService.PlayerType.PLAYLIST);
+                break;
+            }
+            case Radio: {
+                kMP.musicService.initPlayer(MusicService.PlayerType.RADIO);
+            }
+            default: {
+
+            }
         }
     }
 }

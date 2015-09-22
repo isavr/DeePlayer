@@ -29,6 +29,14 @@ public class SchematicDataProvider {
 
     static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
+    private static Uri buildUri(String... paths) {
+        Uri.Builder builder = BASE_CONTENT_URI.buildUpon();
+        for (String path : paths) {
+            builder.appendPath(path);
+        }
+        return builder.build();
+    }
+
     interface Path {
         String GENRES = "genres";
         String RADIOS = "radios";
@@ -38,16 +46,9 @@ public class SchematicDataProvider {
         String ALBUMS_FROM_ARTIST = "albums_from_artist";
         String ALBUMS_WITH_ARTISTS = "albums_with_artists";
         String REC_ALBUMS_WITH_ARTISTS = "rec_albums_with_artists";
+        String CHARTED_ALBUMS_WITH_ARTISTS = "charted_albums_with_artists";
         String TRACKS = "tracks";
         String PLAYLISTS = "playlists";
-    }
-
-    private static Uri buildUri(String... paths) {
-        Uri.Builder builder = BASE_CONTENT_URI.buildUpon();
-        for (String path : paths) {
-            builder.appendPath(path);
-        }
-        return builder.build();
     }
 
     @TableEndpoint(table = Database.Tables.GENRES)
@@ -131,21 +132,11 @@ public class SchematicDataProvider {
     @TableEndpoint(table = Database.Tables.ALBUMS)
     public static class Albums {
 
-        @MapColumns
-        public static Map<String, String> mapColumns() {
-            Map<String, String> map = new HashMap<>();
-
-            map.put(AlbumColumns.ARTIST_NAME, ARTIST_NAME_SELECT);
-
-            return map;
-        }
-
         @ContentUri(
                 path = Path.ALBUMS,
                 type = "vnd.android.cursor.dir/albums",
                 defaultSort = AlbumColumns.ARTIST_ID + ", " + AlbumColumns.ID + " ASC")
         public static final Uri CONTENT_URI = buildUri(Path.ALBUMS);
-
         static final String ARTIST_NAME_SELECT = "(SELECT " + Database.Tables.ARTISTS
                 + "." + ArtistColumns.NAME + " FROM "
                 + Database.Tables.ALBUMS + " INNER JOIN " + Database.Tables.ARTISTS
@@ -158,6 +149,15 @@ public class SchematicDataProvider {
                 + "."
                 + AlbumColumns.ARTIST_ID
                 + ")";
+
+        @MapColumns
+        public static Map<String, String> mapColumns() {
+            Map<String, String> map = new HashMap<>();
+
+            map.put(AlbumColumns.ARTIST_NAME, ARTIST_NAME_SELECT);
+
+            return map;
+        }
 
         @InexactContentUri(
                 name = "ALBUM_ID",
@@ -207,6 +207,21 @@ public class SchematicDataProvider {
                 allowUpdate = false)
         public static Uri recommendedQueryWithArtists(boolean isRecommended) {
             return buildUri(Path.REC_ALBUMS_WITH_ARTISTS, String.valueOf(isRecommended ? 1 : 0) );
+        }
+
+        @InexactContentUri(
+                name = "CHARTED_ALBUMS_WITH_ARTISTS",
+                table = "albums",
+                join = " INNER JOIN (SELECT artists._id, artists.name From artists) as artistSelection ON artistSelection._id=albums.artist_id ",//" INNER JOIN artists ON artists._id=albums.artist_id ",
+                path = Path.CHARTED_ALBUMS_WITH_ARTISTS + "/#",
+                type = "vnd.android.cursor.item/albums/charted_albums_with_artists",
+                whereColumn = Database.Tables.ALBUMS + "." + AlbumColumns.POSITION,
+                pathSegment = 1,
+                allowInsert = false,
+                allowDelete = false,
+                allowUpdate = false)
+        public static Uri chartedQueryWithArtists(int notInChartPositionVal) {
+            return buildUri(Path.CHARTED_ALBUMS_WITH_ARTISTS, String.valueOf(notInChartPositionVal));
         }
 //
 //        @NotifyInsert(paths = Path.ALBUMS)

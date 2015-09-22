@@ -36,12 +36,14 @@ import com.tutorial.deeplayer.app.deeplayer.notifications.NotificationMusic;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 import com.tutorial.deeplayer.app.deeplayer.pojo.FavouriteItem;
+import com.tutorial.deeplayer.app.deeplayer.pojo.Playlist;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
 import com.tutorial.deeplayer.app.deeplayer.rest.service.RestService_Factory;
 import com.tutorial.deeplayer.app.deeplayer.services.player.AbstractPlayer;
 import com.tutorial.deeplayer.app.deeplayer.services.player.AlbumDeePlayer;
 import com.tutorial.deeplayer.app.deeplayer.services.player.ArtistDeePlayer;
 import com.tutorial.deeplayer.app.deeplayer.services.player.FlowDeePlayer;
+import com.tutorial.deeplayer.app.deeplayer.services.player.PlaylistDeePlayer;
 import com.tutorial.deeplayer.app.deeplayer.services.player.RadioDeePlayer;
 import com.tutorial.deeplayer.app.deeplayer.services.player.TrackDeePlayer;
 
@@ -116,48 +118,31 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
      * Broadcast for when the user skipped to the previous song
      */
     public static final String BROADCAST_EXTRA_SKIP_PREVIOUS = "previous";
-
-    public enum PlayerType {
-        RADIO,
-        FLOW,
-        ARTIST,
-        ALBUM,
-        TRACK,
-        PLAYLIST,
-        UNKNOWN        // Create according to data
-    }
-
-    private PlayerType playerType = PlayerType.UNKNOWN;
-
-    private AbstractPlayer mDeezerPlayer;
-    private FavouriteItem data;
-    private DeezerConnect deezerConnect;
-
     // These are the Intent actions that we are prepared to handle. Notice that the fact these
     // constants exist in our class is a mere convenience: what really defines the actions our
     // service can handle are the <action> tags in the <intent-filters> tag for our service in
     // AndroidManifest.xml.
     public static final String BROADCAST_ORDER = " com.tutorial.deeplayer.app.deeplayer.MUSIC_SERVICE";
     public static final String BROADCAST_EXTRA_GET_ORDER = "com.tutorial.deeplayer.app.deeplayer.services.MUSIC_SERVICE";
-
     public static final String BROADCAST_ORDER_PLAY = "com.tutorial.deeplayer.app.deeplayer.action.PLAY";
     public static final String BROADCAST_ORDER_PAUSE = "com.tutorial.deeplayer.app.deeplayer.action.PAUSE";
     public static final String BROADCAST_ORDER_TOGGLE_PLAYBACK = "dlsadasd";
     public static final String BROADCAST_ORDER_STOP = "com.tutorial.deeplayer.app.deeplayer.action.STOP";
     public static final String BROADCAST_ORDER_SKIP = "com.tutorial.deeplayer.app.deeplayer.action.SKIP";
     public static final String BROADCAST_ORDER_REWIND = "com.tutorial.deeplayer.app.deeplayer.action.REWIND";
-
     /**
-     * Possible states this Service can be on.
+     * Token for the interaction between an Activity and this Service.
      */
-
-
+    private final IBinder musicBind = new MusicBinder();
+    /**
+     * Tells if this service is bound to an Activity.
+     */
+    public boolean musicBound = false;
     /**
      * Controller that communicates with the lock screen,
      * providing that fancy widget.
      */
     RemoteControlClientCompat lockscreenController = null;
-
     /**
      * We use this to get the media buttons' Broadcasts and
      * to control the lock screen widget.
@@ -165,7 +150,6 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
      * Component name of the MusicIntentReceiver.
      */
     ComponentName mediaButtonEventReceiver;
-
     /**
      * Use this to get audio focus:
      * <p>
@@ -176,14 +160,56 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
      */
     AudioManager audioManager;
 
-
+    /**
+     * Possible states this Service can be on.
+     */
+    private PlayerType playerType = PlayerType.UNKNOWN;
+    private AbstractPlayer mDeezerPlayer;
+    private FavouriteItem data;
+    private DeezerConnect deezerConnect;
     private Set<Long> favouriteTracksIds = new HashSet<>();
-
     /**
      * Spawns an on-going notification with our current
      * playing song.
      */
     private NotificationMusic notification = null;
+    /**
+     * The thing that will keep an eye on LocalBroadcasts
+     * for the MusicService.
+     */
+    BroadcastReceiver localBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            // Getting the information sent by the MusicService
+            // (and ignoring it if invalid)
+            String order = intent.getStringExtra(MusicService.BROADCAST_EXTRA_GET_ORDER);
+
+            // What?
+            if (order == null)
+                return;
+
+            if (order.equals(MusicService.BROADCAST_ORDER_PAUSE)) {
+                pausePlayer();
+            } else if (order.equals(MusicService.BROADCAST_ORDER_PLAY)) {
+                unpausePlayer();
+            } else if (order.equals(MusicService.BROADCAST_ORDER_TOGGLE_PLAYBACK)) {
+                togglePlayback();
+            } else if (order.equals(MusicService.BROADCAST_ORDER_SKIP)) {
+                next(true);
+                //mDeezerPlayer.skipToNextTrack();
+                //playSong();
+            } else if (order.equals(MusicService.BROADCAST_ORDER_REWIND)) {
+                previous(true);
+                //mDeezerPlayer.skipToPreviousTrack();
+                //playSong();
+            }
+
+            Log.w(TAG, "local broadcast received");
+        }
+    };
+    private boolean pausedTemporarilyDueToAudioFocus = false;
+    private boolean loweredVolumeDueToAudioFocus = false;
 
     public void onCreate() {
         super.onCreate();
@@ -246,6 +272,8 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
             }
             case PLAYLIST: {
                 // do the same for now
+                mDeezerPlayer = new PlaylistDeePlayer();
+                break;
             }
             case UNKNOWN: {
                 // do the same as default
@@ -260,7 +288,9 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
                         mDeezerPlayer = new AlbumDeePlayer();
                     } else if (data instanceof com.tutorial.deeplayer.app.deeplayer.pojo.Track) {
                         mDeezerPlayer = new TrackDeePlayer();
-                    } // TODO: add playlist (?)
+                    } else if (data instanceof Playlist) {
+                        mDeezerPlayer = new PlaylistDeePlayer();
+                    }
                 }
             }
         }
@@ -299,11 +329,6 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
             updateLockScreenWidget(data, RemoteControlClient.PLAYSTATE_PLAYING);
         }
     }
-
-    /**
-     * Tells if this service is bound to an Activity.
-     */
-    public boolean musicBound = false;
 
     public void updateLockScreenWidget(FavouriteItem data, int state) {
 
@@ -420,144 +445,6 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         notification.notifyIsFavourite(favouriteTracksIds.contains(track.getId()));
     }
 
-    /**
-     * Receives external Broadcasts and gives our MusicService
-     * orders based on them.
-     * <p>
-     * It is the bridge between our application and the external
-     * world. It receives Broadcasts and launches Internal Broadcasts.
-     * <p>
-     * It acts on music events (such as disconnecting headphone)
-     * and music controls (the lockscreen widget).
-     *
-     * @note This class works because we are declaring it in a
-     * `receiver` tag in `AndroidManifest.xml`.
-     * @note It is static so we can look out for external broadcasts
-     * even when the service is offline.
-     */
-    public static class ExternalBroadcastReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            Log.w(TAG, "external broadcast");
-
-            // Broadcasting orders to our MusicService
-            // locally (inside the application)
-            LocalBroadcastManager local = LocalBroadcastManager.getInstance(context);
-
-            String action = intent.getAction();
-
-            // TODO: check headphones
-            // Headphones disconnected
-//            if (action.equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
-//
-//                // Will only pause the music if the Setting
-//                // for it is enabled.
-//                if (!kMP.settings.get("pause_headphone_off", true))
-//                    return;
-//
-//                // ADD SETTINGS HERE
-//                String text = context.getString(R.string.service_music_play_headphone_off);
-//                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
-//
-//                // send an intent to our MusicService to telling it to pause the audio
-//                Intent broadcastIntent = new Intent(MusicService.BROADCAST_ORDER);
-//                broadcastIntent.putExtra(MusicService.BROADCAST_EXTRA_GET_ORDER, MusicService.BROADCAST_ORDER_PAUSE);
-//
-//                local.sendBroadcast(broadcastIntent);
-//                Log.w(TAG, "becoming noisy");
-//                return;
-//            }
-
-            if (action.equals(Intent.ACTION_MEDIA_BUTTON)) {
-
-                // Which media key was pressed
-                KeyEvent keyEvent = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
-
-                // Not interested on anything other than pressed keys.
-                if (keyEvent.getAction() != KeyEvent.ACTION_DOWN)
-                    return;
-
-                String intentValue = null;
-
-                switch (keyEvent.getKeyCode()) {
-
-                    case KeyEvent.KEYCODE_HEADSETHOOK:
-                    case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                        intentValue = MusicService.BROADCAST_ORDER_TOGGLE_PLAYBACK;
-                        Log.w(TAG, "media play pause");
-                        break;
-
-                    case KeyEvent.KEYCODE_MEDIA_PLAY:
-                        intentValue = MusicService.BROADCAST_ORDER_PLAY;
-                        Log.w(TAG, "media play");
-                        break;
-
-                    case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                        intentValue = MusicService.BROADCAST_ORDER_PAUSE;
-                        Log.w(TAG, "media pause");
-                        break;
-
-                    case KeyEvent.KEYCODE_MEDIA_NEXT:
-                        intentValue = MusicService.BROADCAST_ORDER_SKIP;
-                        Log.w(TAG, "media next");
-                        break;
-
-                    case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                        // previous song
-                        intentValue = MusicService.BROADCAST_ORDER_REWIND;
-                        Log.w(TAG, "media previous");
-                        break;
-                }
-
-                // Actually sending the Intent
-                if (intentValue != null) {
-                    Intent broadcastIntent = new Intent(MusicService.BROADCAST_ORDER);
-                    broadcastIntent.putExtra(MusicService.BROADCAST_EXTRA_GET_ORDER, intentValue);
-
-                    local.sendBroadcast(broadcastIntent);
-                }
-            }
-        }
-    }
-
-    /**
-     * The thing that will keep an eye on LocalBroadcasts
-     * for the MusicService.
-     */
-    BroadcastReceiver localBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-
-            // Getting the information sent by the MusicService
-            // (and ignoring it if invalid)
-            String order = intent.getStringExtra(MusicService.BROADCAST_EXTRA_GET_ORDER);
-
-            // What?
-            if (order == null)
-                return;
-
-            if (order.equals(MusicService.BROADCAST_ORDER_PAUSE)) {
-                pausePlayer();
-            } else if (order.equals(MusicService.BROADCAST_ORDER_PLAY)) {
-                unpausePlayer();
-            } else if (order.equals(MusicService.BROADCAST_ORDER_TOGGLE_PLAYBACK)) {
-                togglePlayback();
-            } else if (order.equals(MusicService.BROADCAST_ORDER_SKIP)) {
-                next(true);
-                //mDeezerPlayer.skipToNextTrack();
-                //playSong();
-            } else if (order.equals(MusicService.BROADCAST_ORDER_REWIND)) {
-                previous(true);
-                //mDeezerPlayer.skipToPreviousTrack();
-                //playSong();
-            }
-
-            Log.w(TAG, "local broadcast received");
-        }
-    };
-
     public void pausePlayer() {
         PlayerState playerState = mDeezerPlayer.getPlayerState();
         if (playerState != PlayerState.PAUSED && playerState != PlayerState.PLAYING)
@@ -640,7 +527,6 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         }
     }
 
-
     public void togglePlayback() {
         PlayerState playerState = mDeezerPlayer.getPlayerState();
         if (playerState == PlayerState.PAUSED) {
@@ -649,21 +535,6 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
             pausePlayer();
         }
     }
-
-    /**
-     * Defines the interaction between an Activity and this Service.
-     */
-    public class MusicBinder extends Binder {
-        public MusicService getService() {
-            return MusicService.this;
-        }
-    }
-
-
-    /**
-     * Token for the interaction between an Activity and this Service.
-     */
-    private final IBinder musicBind = new MusicBinder();
 
     /**
      * Called when the Service is finally bound to the app.
@@ -914,9 +785,6 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
         return mDeezerPlayer != null && mDeezerPlayer.getPlayerState() == PlayerState.PLAYING;
     }
 
-    private boolean pausedTemporarilyDueToAudioFocus = false;
-    private boolean loweredVolumeDueToAudioFocus = false;
-
     @Override
     public void onTooManySkipsException() {
     }
@@ -937,5 +805,126 @@ public class MusicService extends Service implements AudioManager.OnAudioFocusCh
 
     @Override
     public void onRequestException(Exception e, Object o) {
+    }
+
+    public enum PlayerType {
+        RADIO,
+        FLOW,
+        ARTIST,
+        ALBUM,
+        TRACK,
+        PLAYLIST,
+        UNKNOWN        // Create according to data
+    }
+
+    /**
+     * Receives external Broadcasts and gives our MusicService
+     * orders based on them.
+     * <p>
+     * It is the bridge between our application and the external
+     * world. It receives Broadcasts and launches Internal Broadcasts.
+     * <p>
+     * It acts on music events (such as disconnecting headphone)
+     * and music controls (the lockscreen widget).
+     *
+     * @note This class works because we are declaring it in a
+     * `receiver` tag in `AndroidManifest.xml`.
+     * @note It is static so we can look out for external broadcasts
+     * even when the service is offline.
+     */
+    public static class ExternalBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Log.w(TAG, "external broadcast");
+
+            // Broadcasting orders to our MusicService
+            // locally (inside the application)
+            LocalBroadcastManager local = LocalBroadcastManager.getInstance(context);
+
+            String action = intent.getAction();
+
+            // TODO: check headphones
+            // Headphones disconnected
+//            if (action.equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
+//
+//                // Will only pause the music if the Setting
+//                // for it is enabled.
+//                if (!kMP.settings.get("pause_headphone_off", true))
+//                    return;
+//
+//                // ADD SETTINGS HERE
+//                String text = context.getString(R.string.service_music_play_headphone_off);
+//                Toast.makeText(context, text, Toast.LENGTH_SHORT).show();
+//
+//                // send an intent to our MusicService to telling it to pause the audio
+//                Intent broadcastIntent = new Intent(MusicService.BROADCAST_ORDER);
+//                broadcastIntent.putExtra(MusicService.BROADCAST_EXTRA_GET_ORDER, MusicService.BROADCAST_ORDER_PAUSE);
+//
+//                local.sendBroadcast(broadcastIntent);
+//                Log.w(TAG, "becoming noisy");
+//                return;
+//            }
+
+            if (action.equals(Intent.ACTION_MEDIA_BUTTON)) {
+
+                // Which media key was pressed
+                KeyEvent keyEvent = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
+
+                // Not interested on anything other than pressed keys.
+                if (keyEvent.getAction() != KeyEvent.ACTION_DOWN)
+                    return;
+
+                String intentValue = null;
+
+                switch (keyEvent.getKeyCode()) {
+
+                    case KeyEvent.KEYCODE_HEADSETHOOK:
+                    case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+                        intentValue = MusicService.BROADCAST_ORDER_TOGGLE_PLAYBACK;
+                        Log.w(TAG, "media play pause");
+                        break;
+
+                    case KeyEvent.KEYCODE_MEDIA_PLAY:
+                        intentValue = MusicService.BROADCAST_ORDER_PLAY;
+                        Log.w(TAG, "media play");
+                        break;
+
+                    case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                        intentValue = MusicService.BROADCAST_ORDER_PAUSE;
+                        Log.w(TAG, "media pause");
+                        break;
+
+                    case KeyEvent.KEYCODE_MEDIA_NEXT:
+                        intentValue = MusicService.BROADCAST_ORDER_SKIP;
+                        Log.w(TAG, "media next");
+                        break;
+
+                    case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                        // previous song
+                        intentValue = MusicService.BROADCAST_ORDER_REWIND;
+                        Log.w(TAG, "media previous");
+                        break;
+                }
+
+                // Actually sending the Intent
+                if (intentValue != null) {
+                    Intent broadcastIntent = new Intent(MusicService.BROADCAST_ORDER);
+                    broadcastIntent.putExtra(MusicService.BROADCAST_EXTRA_GET_ORDER, intentValue);
+
+                    local.sendBroadcast(broadcastIntent);
+                }
+            }
+        }
+    }
+
+    /**
+     * Defines the interaction between an Activity and this Service.
+     */
+    public class MusicBinder extends Binder {
+        public MusicService getService() {
+            return MusicService.this;
+        }
     }
 }

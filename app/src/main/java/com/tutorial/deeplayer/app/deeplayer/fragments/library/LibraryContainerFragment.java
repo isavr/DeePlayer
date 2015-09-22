@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.adapters.UserLibrarySectionsPagerAdapter;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
+import com.tutorial.deeplayer.app.deeplayer.fragments.BaseFragment;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;

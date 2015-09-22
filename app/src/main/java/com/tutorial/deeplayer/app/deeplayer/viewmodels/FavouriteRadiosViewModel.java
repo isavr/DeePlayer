@@ -27,6 +27,7 @@ public class FavouriteRadiosViewModel extends AbstractViewModel {
     private static final String TAG = RadioViewModel.class.getSimpleName();
     private final BehaviorSubject subject = BehaviorSubject.create();
 
+
     @Override
     void subscribeToDataStoreInternal(@NonNull CompositeSubscription compositeSubscription) {
         UseCase getRadiosUseCase = new GetUserFavouriteRadios();

@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
-import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
+import com.tutorial.deeplayer.app.deeplayer.fragments.BaseFragment;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.ChartedPlaylistsViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.PlaylistsView;
@@ -26,13 +26,11 @@ import javax.inject.Inject;
 public class ChartedPlaylistsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = ChartedPlaylistsFragment.class.getSimpleName();
     private static final int LOADER_PLAYLISTS = 50;
-
-    private PlaylistsView playlistsView;
     @Inject
     ChartedPlaylistsViewModel playlistsViewModel;
+    private PlaylistsView playlistsView;
 //    @Inject
 //    Instrumentation instrumentation;
-
     private PlaylistsView.OnPlaylistItemInteractionListener listener;
 
     @Override

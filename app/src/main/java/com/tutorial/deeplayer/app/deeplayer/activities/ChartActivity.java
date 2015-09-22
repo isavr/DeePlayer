@@ -17,10 +17,11 @@ import com.tutorial.deeplayer.app.deeplayer.kMP;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Artist;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Playlist;
-import com.tutorial.deeplayer.app.deeplayer.pojo.Track;
 import com.tutorial.deeplayer.app.deeplayer.services.MusicService;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
+import com.tutorial.deeplayer.app.deeplayer.utils.Utils;
 import com.tutorial.deeplayer.app.deeplayer.views.PlaylistsView;
+import com.tutorial.deeplayer.app.deeplayer.views.RecommendationsTypes;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedAlbumsView;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedArtistsView;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedTracksView;
@@ -116,12 +117,38 @@ public class ChartActivity extends BaseActivity implements TabLayout.OnTabSelect
 
     @Override
     public void onAlbumItemInteraction(@NonNull Album album) {
+        if (kMP.musicService != null) {
+            Utils.initMusicService(RecommendationsTypes.Albums);
+            kMP.musicService.setData(album);
+            kMP.musicService.play();
+        }
+    }
 
+    @Override
+    public void onArtistItemInteraction(@NonNull Artist artist) {
+        if (kMP.musicService != null) {
+            Utils.initMusicService(RecommendationsTypes.Artists);
+            kMP.musicService.setData(artist);
+            kMP.musicService.play();
+        }
+    }
+
+    @Override
+    public void onTrackItemInteraction(@NonNull com.tutorial.deeplayer.app.deeplayer.pojo.Track track) {
+        if (kMP.musicService != null) {
+            Utils.initMusicService(RecommendationsTypes.Tracks);
+            kMP.musicService.setData(track);
+            kMP.musicService.play();
+        }
     }
 
     @Override
     public void onPlaylistItemInteraction(@NonNull Playlist playlist) {
-
+        if (kMP.musicService != null) {
+            Utils.initMusicService(RecommendationsTypes.Playlists);
+            kMP.musicService.setData(playlist);
+            kMP.musicService.play();
+        }
     }
 
     @Override
@@ -132,16 +159,6 @@ public class ChartActivity extends BaseActivity implements TabLayout.OnTabSelect
     @Override
     public void onError(Throwable err) {
         DialogFactory.closeAlertDialog(getSupportFragmentManager());
-    }
-
-    @Override
-    public void onArtistItemInteraction(@NonNull Artist artist) {
-
-    }
-
-    @Override
-    public void onTrackItemInteraction(@NonNull Track track) {
-
     }
 
     @Override

@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 
 import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
-import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.MainViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.MainActivityView;
 
@@ -19,20 +18,16 @@ import javax.inject.Inject;
  */
 public class MainActivityFragment extends BaseFragment {
     private static final String TAG = MainActivityFragment.class.getSimpleName();
-
-
-    private MainActivityView mainActivityView;
-    private MainActivityView.OnMainItemInteractionListener listener;
-
     @Inject
     MainViewModel viewModel;
+    private MainActivityView mainActivityView;
+    private MainActivityView.OnMainItemInteractionListener listener;
 //    @Inject
 //    Instrumentation instrumentation;
 
     //
     //private CompositeSubscription compositeSubscription;
     //private RxDatabase rxCupboard = null;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

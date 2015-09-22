@@ -1,40 +1,29 @@
 package com.tutorial.deeplayer.app.deeplayer.fragments.chart;
 
-import android.app.Activity;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
+import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
-import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.AlbumColumns;
-import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
+import com.tutorial.deeplayer.app.deeplayer.fragments.BaseAlbumFragment;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.ChartedAlbumsViewModel;
-import com.tutorial.deeplayer.app.deeplayer.views.RecommendedAlbumsView;
 
 import javax.inject.Inject;
 
 /**
  * Created by ilya.savritsky on 17.09.2015.
  */
-public class ChartedAlbumsFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class ChartedAlbumsFragment extends BaseAlbumFragment {
     public static final String TAG = ChartedAlbumsFragment.class.getSimpleName();
-    private static final int LOADER_ALBUMS = 30;
 
-    private RecommendedAlbumsView recommendedAlbumsView;
     @Inject
     ChartedAlbumsViewModel albumsViewModel;
-//    @Inject
-//    Instrumentation instrumentation;
-
-    private RecommendedAlbumsView.OnAlbumItemInteractionListener listener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,70 +32,52 @@ public class ChartedAlbumsFragment extends BaseFragment implements LoaderManager
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_album, container, false);
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recommendedAlbumsView = (RecommendedAlbumsView) view.findViewById(R.id.album_view);
         DialogFactory.showProgressDialog(this.getActivity(),
                 getActivity().getSupportFragmentManager());
+
         albumsViewModel.subscribeToDataStore();
-        getLoaderManager().initLoader(LOADER_ALBUMS, null, this);
+        albumsViewModel.subscribeToFilterUpdates(searchView);
+
+        initLoader("");
     }
 
     @Override
     public void onResume() {
         super.onResume();
         recommendedAlbumsView.setViewModel(albumsViewModel);
-        recommendedAlbumsView.setListener(listener);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        recommendedAlbumsView.setViewModel(null);
-        recommendedAlbumsView.setListener(null);
     }
 
     @Override
     public void onDestroyView() {
-        super.onDestroyView();
         albumsViewModel.unsubscribeFromDataStore();
         albumsViewModel.dispose();
         albumsViewModel = null;
-        //instrumentation.getLeakTracing().traceLeakage(this);
-        DeePlayerApp.getRefWatcher().watch(this, "Recommended Albums Fragment");
+        super.onDestroyView();
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            listener = (RecommendedAlbumsView.OnAlbumItemInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnAlbumItemInteractionListener");
+    protected Uri createUri() {
+        return SchematicDataProvider.Albums.CONTENT_URI;//SchematicDataProvider.Albums.chartedQueryWithArtists(0);
+    }
+
+    @Override
+    protected String createFilter(final String filterKeyVal) {
+        // TODO: fix search thogh artists names
+        String selectionString = AlbumColumns.POSITION + "!=0";
+        if (filterKeyVal != null && !filterKeyVal.trim().isEmpty()) {
+            final String comparedVal = "\'%" + filterKeyVal + "%\'";
+            selectionString += " AND ( " + AlbumColumns.TITLE + " LIKE " + comparedVal + " )";
+//            selectionString += " AND ( artistSelection.name LIKE " + comparedVal +
+//                    "  OR " + AlbumColumns.TITLE + " LIKE " + comparedVal + " )";
         }
+        return selectionString;
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        listener = null;
-        recommendedAlbumsView.clean();
-        recommendedAlbumsView.setListener(null);
-        //instrumentation.getLeakTracing().traceLeakage(this);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-//        return new CursorLoader(getActivity(), SchematicDataProvider.Albums.CONTENT_URI, null,
-//                AlbumColumns.IS_RECOMMENDED + "=1", null, null);
-        return new CursorLoader(getActivity(), SchematicDataProvider.Albums.CONTENT_URI, null,
-                AlbumColumns.POSITION + "!=0", null, AlbumColumns.POSITION + " ASC");
+    @Nullable
+    protected String createSortString() {
+        return AlbumColumns.POSITION + " ASC";
     }
 
     @Override

@@ -14,7 +14,7 @@ import com.tutorial.deeplayer.app.deeplayer.R;
 import com.tutorial.deeplayer.app.deeplayer.app.DeePlayerApp;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.data.tables.TrackColumns;
-import com.tutorial.deeplayer.app.deeplayer.fragments.recommended.BaseFragment;
+import com.tutorial.deeplayer.app.deeplayer.fragments.BaseFragment;
 import com.tutorial.deeplayer.app.deeplayer.utils.DialogFactory;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.ChartedTracksViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.RecommendedTracksView;
@@ -27,12 +27,9 @@ import javax.inject.Inject;
 public class ChartedTracksFragment extends BaseFragment implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String TAG = ChartedTracksFragment.class.getSimpleName();
     private static final int LOADER_TRACKS = 40;
-
-    private RecommendedTracksView recommendedTrackView;
-
     @Inject
     ChartedTracksViewModel trackViewModel;
-
+    private RecommendedTracksView recommendedTrackView;
     private RecommendedTracksView.OnTrackItemInteractionListener listener;
 
     @Override

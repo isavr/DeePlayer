@@ -17,6 +17,7 @@ import com.tutorial.deeplayer.app.deeplayer.adapters.AlbumAdapter;
 import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Album;
+import com.tutorial.deeplayer.app.deeplayer.utils.FilterableContent;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteAlbumsViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.AlbumItemView;
@@ -34,13 +35,12 @@ public class RecommendedAlbumsView extends FrameLayout
     public static final String TAG = RecommendedAlbumsView.class.getSimpleName();
 
     private final RxBinderUtil rxBinderUtil = new RxBinderUtil(this);
-    private OnAlbumItemInteractionListener listener;
-    private AlbumAdapter adapter;
-
     @Bind(android.R.id.list)
     AbsListView mListView;
-
     FavouriteAlbumsViewModel albumsViewModel;
+    private OnAlbumItemInteractionListener listener;
+    private FilterableContent filterListener;
+    private AlbumAdapter adapter;
 
     public RecommendedAlbumsView(Context context) {
         super(context, null);
@@ -74,6 +74,17 @@ public class RecommendedAlbumsView extends FrameLayout
         if (viewModel != null) {
             albumsViewModel = viewModel;
             rxBinderUtil.bindProperty(viewModel.getSubject(), this::updateAlbumList, this::onError);
+            if (viewModel.getFilterObservable() != null) {
+                rxBinderUtil.bindProperty(viewModel.getFilterObservable(), this::updateFilter, this::onError);
+            }
+        }
+    }
+
+    private void updateFilter(String s) {
+        Log.d(TAG, "Filter update received with data -> " + s);
+        if (filterListener != null) {
+            // filter update
+            filterListener.OnFilterUpdate(s);
         }
     }
 
@@ -194,6 +205,9 @@ public class RecommendedAlbumsView extends FrameLayout
         }
     }
 
+    public void setFilterListener(FilterableContent filterListener) {
+        this.filterListener = filterListener;
+    }
 
     public interface OnAlbumItemInteractionListener {
         void onAlbumItemInteraction(@NonNull Album album);

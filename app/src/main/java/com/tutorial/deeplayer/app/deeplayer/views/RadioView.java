@@ -17,6 +17,7 @@ import com.tutorial.deeplayer.app.deeplayer.adapters.RadioAdapter;
 import com.tutorial.deeplayer.app.deeplayer.data.DataContract;
 import com.tutorial.deeplayer.app.deeplayer.data.SchematicDataProvider;
 import com.tutorial.deeplayer.app.deeplayer.pojo.Radio;
+import com.tutorial.deeplayer.app.deeplayer.utils.FilterableContent;
 import com.tutorial.deeplayer.app.deeplayer.utils.RxBinderUtil;
 import com.tutorial.deeplayer.app.deeplayer.viewmodels.FavouriteRadiosViewModel;
 import com.tutorial.deeplayer.app.deeplayer.views.items.RadioItemView;
@@ -32,15 +33,13 @@ import rx.Observer;
 public class RadioView extends FrameLayout
         implements RadioItemView.OnRadioItemFavouriteStatusInteractionListener {
     public static final String TAG = RadioView.class.getSimpleName();
-
+    private final RxBinderUtil rxBinderUtil = new RxBinderUtil(this);
     @Bind(android.R.id.list)
     AbsListView mListView;
-
     private RadioAdapter radioAdapter;
-
-    private final RxBinderUtil rxBinderUtil = new RxBinderUtil(this);
     private FavouriteRadiosViewModel radioViewModel;
     private OnRadioItemInteractionListener listener;
+    private FilterableContent filterListener;
 
     public RadioView(Context context) {
         super(context, null);
@@ -75,6 +74,17 @@ public class RadioView extends FrameLayout
             radioViewModel = viewModel;
             Log.d(TAG, "set view model");
             rxBinderUtil.bindProperty(viewModel.getSubject(), this::updateRadioList, this::onError);
+            if (viewModel.getFilterObservable() != null) {
+                rxBinderUtil.bindProperty(viewModel.getFilterObservable(), this::updateFilter, this::onError);
+            }
+        }
+    }
+
+    private void updateFilter(String s) {
+        Log.d(TAG, "Filter update received with data -> " + s);
+        if (filterListener != null) {
+            // filter update
+            filterListener.OnFilterUpdate(s);
         }
     }
 
@@ -190,6 +200,10 @@ public class RadioView extends FrameLayout
         if (radioAdapter != null) {
             radioAdapter.changeCursor(null);
         }
+    }
+
+    public void setFilterListener(FilterableContent filterListener) {
+        this.filterListener = filterListener;
     }
 
     public interface OnRadioItemInteractionListener {
